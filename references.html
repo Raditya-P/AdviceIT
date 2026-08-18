@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdviceIT by Radit: References</title>
+  <meta name="description" content="References, datasets, methods, tools, libraries, models, fonts and standards used to build AdviceIT by Radit, with citations.">
+  <meta property="og:title" content="AdviceIT by Radit: References">
+  <meta property="og:description" content="Everything AdviceIT stands on: the dataset, the literature behind the design, the tools and libraries, and how to cite it.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#f6f9fc">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f7fd0'/%3E%3Cpath d='M14 44 L26 24 L36 36 L50 16' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='16' r='5' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="references" aria-current="page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div>
+          <h1 class="brand-title">AdviceIT by Radit</h1>
+          <p class="brand-subtitle">Explainable AI investment advice, and how people rely on it</p>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Primary">
+        <a class="linklike nav-page" href="index.html" data-page="ml">AI advisor</a>
+        <a class="linklike nav-page" href="interpretable.html" data-page="logit">Interpretable rule-based advisor</a>
+        <a class="linklike nav-page" href="training-data.html" data-page="data">Training data</a>
+        <a class="linklike nav-page" href="analytics.html" data-page="analytics">Analytics</a>
+        <a class="linklike nav-page" href="references.html" data-page="references" aria-current="page">References</a>
+        <a class="linklike" href="index.html?panel=study-design">Study design</a>
+        <a class="linklike" href="index.html?panel=how-it-works">How it works</a>
+        <a class="linklike" href="https://github.com/Raditya-P/AdviceIT" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <section class="panel data-panel" aria-labelledby="ref-heading">
+      <h2 id="ref-heading" class="panel-title">References and tools</h2>
+      <p class="data-summary">The short list of what AdviceIT directly builds on: the dataset the advisors are trained on, the handful of works behind the design of the study and the explanations, and the software and models it runs on. Where a work informed a specific part of the app, that part is named.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-data-heading">
+      <h2 id="ref-data-heading" class="panel-title">Dataset</h2>
+      <ul class="ref-list">
+        <li>Bonelli, M. (2026). <em>ILS-Bench: Investor Language-to-Suitability Benchmark</em>. Mendeley Data, V1. <a href="https://doi.org/10.17632/w48mh2dtg5.1" target="_blank" rel="noopener">https://doi.org/10.17632/w48mh2dtg5.1</a>. Licence CC BY 4.0. <span class="ref-use">Training data for the neural network and the interpretable model, the shared label vocabulary, the Human review outcome, the case browser and the language-reading benchmark. See the <a href="training-data.html">Training data</a> page.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-domain-heading">
+      <h2 id="ref-domain-heading" class="panel-title">Robo-advisory, risk and ethics</h2>
+      <ul class="ref-list">
+        <li>Nahidi, N., and Zarifis, A. (Eds.) (2026). <em>AI, FinTech, and the Future of Robo-Advisory: Risk Management and Ethical Considerations</em>. Contributions to Finance and Accounting. Springer Nature Switzerland. <a href="https://doi.org/10.1007/978-3-032-18109-1" target="_blank" rel="noopener">https://doi.org/10.1007/978-3-032-18109-1</a>. <span class="ref-use">Domain background on AI-driven robo-advisory, its risk management and its ethical questions: the framing of suitability, of escalation to a human adviser, and of the ethics note and debrief in the study design.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-prov-heading">
+      <h2 id="ref-prov-heading" class="panel-title">Provenance</h2>
+      <ul class="ref-list">
+        <li>Pratama, R., and co-authors (2026). Systematic literature review of trust and algorithm aversion in the choice between human and AI financial advisors. Presented at SSRAAI 2026. <span class="ref-use">The review that identified miscalibrated trust as the problem. AdviceIT is its design-side follow-up.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-trust-heading">
+      <h2 id="ref-trust-heading" class="panel-title">Trust, reliance and algorithm aversion</h2>
+      <ul class="ref-list">
+        <li>Lee, J. D., and See, K. A. (2004). Trust in automation: Designing for appropriate reliance. <em>Human Factors</em>, 46(1), 50 to 80. <span class="ref-use">The notion of appropriate reliance and calibrated trust that the dependent variables operationalise.</span></li>
+        <li>Dietvorst, B. J., Simmons, J. P., and Massey, C. (2015). Algorithm aversion: People erroneously avoid algorithms after seeing them err. <em>Journal of Experimental Psychology: General</em>, 144(1), 114 to 126. <span class="ref-use">Under-reliance, and the reason the flawed scenario is debriefed.</span></li>
+        <li>Bansal, G., Wu, T., Zhou, J., Fok, R., Nushi, B., Kamar, E., Ribeiro, M. T., and Weld, D. S. (2021). Does the whole exceed its parts? The effect of AI explanations on complementary team performance. <em>CHI 2021</em>. <span class="ref-use">Explanations can increase reliance on wrong advice, the reason sound and flawed trials are both needed.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-xai-heading">
+      <h2 id="ref-xai-heading" class="panel-title">Explainable AI methods</h2>
+      <ul class="ref-list">
+        <li>Rudin, C. (2019). Stop explaining black box machine learning models for high stakes decisions and use interpretable models instead. <em>Nature Machine Intelligence</em>, 1, 206 to 215. <span class="ref-use">The interpretable-by-design position behind the interpretable rule-based advisor and the fidelity factor.</span></li>
+        <li>Lundberg, S. M., and Lee, S.-I. (2017). A unified approach to interpreting model predictions. <em>NeurIPS 2017</em>. <span class="ref-use">SHAP: Shapley values as feature attributions relative to a baseline, computed exactly for the neural network.</span></li>
+        <li>Wachter, S., Mittelstadt, B., and Russell, C. (2017). Counterfactual explanations without opening the black box: Automated decisions and the GDPR. <em>Harvard Journal of Law and Technology</em>, 31(2). <span class="ref-use">The counterfactual content: smallest change that alters the outcome, found by search, and the contrastive "why not X" panel.</span></li>
+        <li>Guo, C., Pleiss, G., Sun, Y., and Weinberger, K. Q. (2017). On calibration of modern neural networks. <em>ICML 2017</em>. <span class="ref-use">Temperature scaling and expected calibration error for the probabilities shown in the confidence content.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-hci-heading">
+      <h2 id="ref-hci-heading" class="panel-title">Human-centred explanation interfaces and measures</h2>
+      <ul class="ref-list">
+        <li>De Croon, R., and colleagues, Augment research group, KU Leuven (2025). Designing and personalising hybrid health explanations for lay users. <em>ACM Transactions on Interactive Intelligent Systems</em>. <span class="ref-use">The hybrid content and the adaptive delivery, and personalisation to a measured user characteristic.</span></li>
+        <li>Lusardi, A., and Mitchell, O. S. (2011). Financial literacy around the world: An overview. <em>Journal of Pension Economics and Finance</em>, 10(4), 497 to 508. <span class="ref-use">The "Big Three" financial literacy questions used as the moderator and by the adaptive delivery.</span></li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="ref-tools-heading">
+      <h2 id="ref-tools-heading" class="panel-title">Software, models and services</h2>
+      <div class="table-wrap">
+        <table class="log-table data-table">
+          <thead><tr><th scope="col">What</th><th scope="col">Used for</th><th scope="col">Licence and source</th></tr></thead>
+          <tbody>
+            <tr><td>Python 3 (standard library)</td><td><code>serve.py</code>, the study server, and <code>ml/fetch_ils_bench.py</code>, <code>tools/make_pages.py</code></td><td>PSF licence, <a href="https://www.python.org/" target="_blank" rel="noopener">python.org</a></td></tr>
+            <tr><td>NumPy</td><td>Training both advisors in <code>ml/train_model.py</code> (multilayer perceptron with Adam, multinomial logistic regression, temperature scaling)</td><td>BSD, <a href="https://numpy.org/" target="_blank" rel="noopener">numpy.org</a></td></tr>
+            <tr><td>openpyxl</td><td>Reading the ILS-Bench Excel file in <code>ml/fetch_ils_bench.py</code></td><td>MIT, <a href="https://openpyxl.readthedocs.io/" target="_blank" rel="noopener">openpyxl.readthedocs.io</a></td></tr>
+            <tr><td>WebLLM (MLC project)</td><td>Running the language model in the browser for the conversational condition, the narrative reading and the benchmark. Ruan, C. F., and colleagues (2024). WebLLM: A high-performance in-browser LLM inference engine. arXiv:2412.15803.</td><td>Apache 2.0, <a href="https://github.com/mlc-ai/web-llm" target="_blank" rel="noopener">github.com/mlc-ai/web-llm</a>, loaded from jsDelivr (esm.run)</td></tr>
+            <tr><td>Llama 3.2 (1B and 3B Instruct)</td><td>Default language model</td><td>Llama 3.2 Community License, Meta Platforms, weights via Hugging Face (MLC builds)</td></tr>
+            <tr><td>Qwen 2.5 (0.5B and 1.5B Instruct)</td><td>Alternative language models</td><td>Apache 2.0, Alibaba Cloud, weights via Hugging Face (MLC builds)</td></tr>
+            <tr><td>WebGPU</td><td>GPU access in the browser for WebLLM</td><td>W3C specification, <a href="https://www.w3.org/TR/webgpu/" target="_blank" rel="noopener">w3.org/TR/webgpu</a></td></tr>
+            <tr><td>Mendeley Data</td><td>Hosting of the ILS-Bench dataset and its API used by the fetch script</td><td><a href="https://data.mendeley.com/" target="_blank" rel="noopener">data.mendeley.com</a></td></tr>
+            <tr><td>GitHub and GitHub Pages</td><td>Source hosting and static deployment</td><td><a href="https://pages.github.com/" target="_blank" rel="noopener">pages.github.com</a></td></tr>
+            <tr><td>Node.js and jsdom</td><td>Development only: automated checks of the pages, the explanations and the study flow</td><td>MIT, <a href="https://github.com/jsdom/jsdom" target="_blank" rel="noopener">github.com/jsdom/jsdom</a></td></tr>
+            <tr><td>Browser standards</td><td>localStorage for the session log, Blob and object URLs for downloads, the dialog element for the panels, ARIA for accessibility</td><td>WHATWG and W3C</td></tr>
+            <tr><td>WCAG 2.1 level AA</td><td>Contrast, keyboard operation, focus visibility, labels, never colour alone</td><td><a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener">w3.org/TR/WCAG21</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint">Everything else in AdviceIT (the label rules, the explanation modules, the study machinery, the pages) is original code written for this project, released under the MIT licence.</p>
+    </section>
+
+  </main>
+</body>
+</html>

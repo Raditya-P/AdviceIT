@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdviceIT by Radit: Explainable AI Investment Advice</title>
+  <meta name="description" content="AdviceIT by Radit is a research instrument for studying how explanation styles (none, feature-based, counterfactual, confidence) calibrate trust and appropriate reliance on AI investment advice. Runs fully in the browser.">
+  <meta property="og:title" content="AdviceIT by Radit: Explainable AI Investment Advice">
+  <meta property="og:description" content="An interactive research instrument for studying how explanation styles calibrate trust in AI investment advice. Two advisors, five explanation conditions, participant links, CSV export.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#f6f9fc">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f7fd0'/%3E%3Cpath d='M14 44 L26 24 L36 36 L50 16' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='16' r='5' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-advisor="ml">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div>
+          <h1 class="brand-title">AdviceIT by Radit</h1>
+          <p class="brand-subtitle">Explainable AI investment advice, and how people rely on it</p>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Primary">
+        <a class="linklike nav-page" href="index.html" data-page="ml">AI advisor</a>
+        <a class="linklike nav-page" href="interpretable.html" data-page="logit">Interpretable rule-based advisor</a>
+        <a class="linklike nav-page" href="training-data.html" data-page="data">Training data</a>
+        <a class="linklike nav-page" href="analytics.html" data-page="analytics">Analytics</a>
+        <a class="linklike nav-page" href="references.html" data-page="references">References</a>
+        <button type="button" class="linklike" id="open-study-design" data-researcher-only>Study design</button>
+        <button type="button" class="linklike" id="open-how-it-works">How it works</button>
+        <a class="linklike" href="https://github.com/Raditya-P/AdviceIT" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <!-- Participant banner (participant mode only) -->
+    <section class="notice participant-only" id="participant-banner" hidden aria-live="polite">
+      <p><strong>Study session.</strong> Participant ID <code id="participant-id-display"></code>.</p>
+    </section>
+
+    <!-- Study flow stages (participant mode with flow=study) -->
+    <section class="panel study-stage" id="study-stage" hidden aria-live="polite"></section>
+
+    <!-- AI advisor intro (AI page, researcher mode) -->
+    <section class="panel data-panel" id="ai-panel" data-researcher-only data-advisor-only="ml" aria-labelledby="ai-heading">
+      <div class="data-head">
+        <h2 id="ai-heading" class="panel-title">The AI advisor</h2>
+        <a class="btn btn-small" href="training-data.html">About the training data</a>
+      </div>
+      <p class="data-summary">This page runs the <strong>neural-network advisor</strong>: a small multilayer perceptron trained on <strong>ILS-Bench</strong>, 400 investor cases whose suitability labels and recommended outcome were validated by a panel of four financial-domain experts. It maps the three suitability labels (risk tolerance, risk capacity, liquidity need) plus age to one of six outcomes, the five portfolios or Human review, with <span id="ai-panel-acc"></span> percent cross-validated accuracy and calibrated probabilities. Its weights are not human-readable, so the explanations on this page are computed post hoc (Shapley values, model-agnostic counterfactuals, calibrated probability). The <a href="interpretable.html">interpretable rule-based advisor</a> is a scorecard fitted on the same data whose explanations are exact, so the same explanation styles can be compared between an opaque and a transparent model learned from the same expert judgements.</p>
+    </section>
+
+    <!-- Interpretable rule-based advisor intro (interpretable page, researcher mode) -->
+    <section class="panel data-panel" id="logit-panel" data-researcher-only data-advisor-only="logit" aria-labelledby="logit-heading">
+      <div class="data-head">
+        <h2 id="logit-heading" class="panel-title">The interpretable rule-based advisor</h2>
+        <a class="btn btn-small" href="training-data.html">About the training data</a>
+      </div>
+      <p class="data-summary">This page runs a <strong>scorecard derived from data</strong>: a multinomial logistic regression fitted on ILS-Bench, the same 400 expert-validated cases and the same twelve inputs as the neural network, with <span id="logit-panel-acc"></span> percent cross-validated accuracy and calibrated probabilities. It is rule-based in the sense that every outcome has one weight per input and the outcome with the largest total wins, exactly like the points-based suitability scorecards used in practice, except that its weights were learned from expert judgements rather than set by hand. Because the weights are visible, the contribution of every input to the recommended outcome is read directly from them, exact and additive. It is the transparent counterpart of the <a href="index.html">AI advisor</a>: same data, same inputs, no black box.</p>
+    </section>
+
+    <!-- Researcher controls -->
+    <section class="panel researcher-controls" id="researcher-controls" data-researcher-only aria-labelledby="researcher-controls-heading">
+      <h2 id="researcher-controls-heading" class="panel-title">Researcher controls</h2>
+      <div class="controls-grid">
+        <div class="control">
+          <label class="control-label" for="preset-select">Explanation</label>
+          <select id="preset-select" aria-label="Explanation preset">
+            <option value="none">No explanation</option>
+            <option value="feature">Why (feature-based)</option>
+            <option value="counterfactual">What would change it (counterfactual)</option>
+            <option value="confidence">How sure (confidence)</option>
+            <option value="hybrid">All three (hybrid)</option>
+            <option value="interactive">Interactive what-if</option>
+            <option value="adaptive">Adaptive to literacy</option>
+            <option value="llm">Conversational (LLM)</option>
+            <option value="custom">Custom</option>
+          </select>
+          <details class="customise" id="customise">
+            <summary>Customise</summary>
+            <div class="customise-row">
+              <span class="control-label">Content</span>
+              <label class="check-inline"><input type="checkbox" name="content" value="feature"> Why (feature-based)</label>
+              <label class="check-inline"><input type="checkbox" name="content" value="counterfactual"> What would change it (counterfactual)</label>
+              <label class="check-inline"><input type="checkbox" name="content" value="confidence"> How sure (confidence)</label>
+            </div>
+            <div class="customise-row">
+              <span class="control-label">Delivery</span>
+              <label class="check-inline"><input type="radio" name="form" value="static" checked> Static</label>
+              <label class="check-inline"><input type="radio" name="form" value="interactive"> Interactive what-if</label>
+              <label class="check-inline"><input type="radio" name="form" value="adaptive"> Adaptive to literacy</label>
+              <label class="check-inline"><input type="radio" name="form" value="llm"> Conversational (LLM)</label>
+            </div>
+            <p class="control-hint">Content is what is explained. Delivery is how it is shown: as is, with steering controls, adapted to the literacy score, or as a grounded conversation. A preset is one combination, and the log records both parts.</p>
+          </details>
+        </div>
+        <fieldset class="control">
+          <legend>Scenario</legend>
+          <div class="segmented" role="radiogroup" aria-label="Advice scenario" id="scenario-group">
+            <label><input type="radio" name="scenario" value="sound" checked><span>Sound advice</span></label>
+            <label><input type="radio" name="scenario" value="flawed"><span>Flawed advice, for reliance measurement</span></label>
+          </div>
+        </fieldset>
+        <div class="control">
+          <p class="control-label" id="mode-label">Mode</p>
+          <p class="control-value">Researcher mode. <a id="participant-link" href="?mode=participant">Open a participant link</a> (one trial) or <a id="study-link" href="?mode=participant&amp;flow=study">open the full study flow</a> (consent, literacy check, six trials, attention check, debrief).</p>
+          <p class="control-hint">Participant links accept <code>?mode=participant&amp;pid=P07&amp;cond=counterfactual&amp;scenario=flawed</code>, plus <code>&amp;flow=study</code>, <code>&amp;trials=6</code>, and for custom combinations <code>&amp;content=feature,confidence&amp;form=interactive</code>. Each page makes links for its own advisor.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="columns" id="columns">
+
+      <!-- Step 1: Investor profile -->
+      <section class="panel" id="profile-panel" aria-labelledby="profile-heading">
+        <div class="step-head">
+          <span class="step-number" aria-hidden="true">1</span>
+          <h2 id="profile-heading" class="panel-title">Investor profile</h2>
+        </div>
+        <p class="panel-intro">Answer the questions a robo-advisor would ask.</p>
+
+        <div class="examples" data-researcher-only>
+          <p class="control-label" id="examples-label">Load example profile</p>
+          <div class="button-row" role="group" aria-labelledby="examples-label" id="example-buttons"></div>
+        </div>
+
+        <form id="profile-form" novalidate>
+          <div class="field">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age" min="18" max="80" step="1" value="35" inputmode="numeric" aria-describedby="age-hint">
+            <p class="hint" id="age-hint">18 to 80.</p>
+          </div>
+
+          <div class="field">
+            <label for="horizon">Investment horizon: <output id="horizon-output" for="horizon">15</output> years</label>
+            <input type="range" id="horizon" name="horizon" min="1" max="40" step="1" value="15" aria-describedby="horizon-hint">
+            <p class="hint" id="horizon-hint">How many years until you expect to need this money.</p>
+          </div>
+
+          <fieldset class="field">
+            <legend>Risk tolerance</legend>
+            <div class="segmented" role="radiogroup" aria-label="Risk tolerance">
+              <label><input type="radio" name="tolerance" value="low"><span>Low</span></label>
+              <label><input type="radio" name="tolerance" value="medium" checked><span>Medium</span></label>
+              <label><input type="radio" name="tolerance" value="high"><span>High</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Emergency fund covering at least 6 months of expenses</legend>
+            <div class="segmented" role="radiogroup" aria-label="Emergency fund">
+              <label><input type="radio" name="emergencyFund" value="yes" checked><span>Yes</span></label>
+              <label><input type="radio" name="emergencyFund" value="no"><span>No</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Income stability</legend>
+            <div class="segmented" role="radiogroup" aria-label="Income stability">
+              <label><input type="radio" name="incomeStable" value="stable" checked><span>Stable</span></label>
+              <label><input type="radio" name="incomeStable" value="variable"><span>Variable</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Financial knowledge, self-rated</legend>
+            <div class="segmented" role="radiogroup" aria-label="Financial knowledge">
+              <label><input type="radio" name="knowledge" value="beginner"><span>Beginner</span></label>
+              <label><input type="radio" name="knowledge" value="intermediate" checked><span>Intermediate</span></label>
+              <label><input type="radio" name="knowledge" value="advanced"><span>Advanced</span></label>
+            </div>
+            <p class="hint">Recorded only. This does not affect the recommendation. In a study it is a measured moderator variable (financial literacy).</p>
+          </fieldset>
+
+          <fieldset class="field literacy-block">
+            <legend>Financial literacy check (three questions)</legend>
+            <p class="hint">The "Big Three" questions of Lusardi and Mitchell. Recorded only, they do not affect the recommendation. They give the literacy score that the adaptive delivery uses to choose the plain or the detailed explanation, so this check appears with that delivery. In the full study flow it is asked at the start for every participant, as the moderator variable.</p>
+            <div class="literacy-q">
+              <p class="literacy-text">1. Suppose you had 100 in a savings account and the interest rate was 2 percent per year. After 5 years, how much do you think you would have in the account if you left the money to grow?</p>
+              <div class="segmented" role="radiogroup" aria-label="Literacy question 1">
+                <label><input type="radio" name="lit1" value="more"><span>More than 102</span></label>
+                <label><input type="radio" name="lit1" value="exact"><span>Exactly 102</span></label>
+                <label><input type="radio" name="lit1" value="less"><span>Less than 102</span></label>
+                <label><input type="radio" name="lit1" value="dk"><span>Do not know</span></label>
+              </div>
+            </div>
+            <div class="literacy-q">
+              <p class="literacy-text">2. Imagine that the interest rate on your savings account was 1 percent per year and inflation was 2 percent per year. After 1 year, how much would you be able to buy with the money in this account?</p>
+              <div class="segmented" role="radiogroup" aria-label="Literacy question 2">
+                <label><input type="radio" name="lit2" value="more"><span>More than today</span></label>
+                <label><input type="radio" name="lit2" value="same"><span>Exactly the same</span></label>
+                <label><input type="radio" name="lit2" value="less"><span>Less than today</span></label>
+                <label><input type="radio" name="lit2" value="dk"><span>Do not know</span></label>
+              </div>
+            </div>
+            <div class="literacy-q">
+              <p class="literacy-text">3. Buying a single company's stock usually provides a safer return than a stock mutual fund.</p>
+              <div class="segmented" role="radiogroup" aria-label="Literacy question 3">
+                <label><input type="radio" name="lit3" value="true"><span>True</span></label>
+                <label><input type="radio" name="lit3" value="false"><span>False</span></label>
+                <label><input type="radio" name="lit3" value="dk"><span>Do not know</span></label>
+              </div>
+            </div>
+            <p class="hint" id="literacy-status" data-researcher-only>Literacy score: not answered.</p>
+          </fieldset>
+
+          <fieldset class="field narrative-block">
+            <legend>Or describe your situation in your own words</legend>
+            <textarea id="narrative" rows="4" aria-describedby="narrative-hint" placeholder="For example: I am 52, saving for retirement in about 12 years, steady salary, six months of expenses in the bank, and I can live with market swings."></textarea>
+            <p class="hint" id="narrative-hint">Optional. The in-browser language model reads the description and fills in the fields above, following the ILS-Bench language-to-suitability procedure. Check the fields before continuing.</p>
+            <div class="button-row">
+              <button type="button" class="btn" id="read-narrative">Read description into the form</button>
+              <button type="button" class="btn" id="load-ils-case" data-researcher-only>Load an ILS-Bench case</button>
+              <span class="status" id="narrative-status" role="status" aria-live="polite"></span>
+            </div>
+            <div class="ils-box" id="ils-box" hidden data-researcher-only></div>
+            <p class="chip-row" id="inconsistent-chip" hidden><span class="chip">Risk tolerance read as Inconsistent from the description</span> <button type="button" class="linklike" id="clear-inconsistent">Clear</button></p>
+          </fieldset>
+
+          <div class="participant-only" hidden>
+            <button type="button" class="btn btn-primary" id="show-recommendation">Show my recommendation</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Step 2 and 3: Recommendation, explanation, response -->
+      <section class="panel" aria-labelledby="recommendation-heading">
+        <div class="step-head">
+          <span class="step-number" aria-hidden="true">2</span>
+          <h2 id="recommendation-heading" class="panel-title">AI recommendation</h2>
+        </div>
+
+        <div id="recommendation-placeholder" class="placeholder" hidden>
+          <p>Complete your profile, then press "Show my recommendation".</p>
+        </div>
+
+        <div id="recommendation-block">
+          <div class="case-card" id="case-card" hidden>
+            <p class="card-eyebrow" id="case-eyebrow">Case 1 of 6</p>
+            <p class="case-text" id="case-text"></p>
+          </div>
+          <article class="card" id="recommendation-card" aria-live="polite">
+            <p class="card-eyebrow">Recommended outcome <span class="advisor-tag" id="advisor-tag" data-researcher-only></span></p>
+            <h3 class="portfolio-name" id="portfolio-name">Balanced</h3>
+            <div class="allocation" id="allocation-bar" role="img" aria-label="Allocation bar"></div>
+            <ul class="allocation-legend" id="allocation-legend"></ul>
+            <p class="human-review-note" id="human-review-note" hidden></p>
+            <p class="portfolio-summary" id="portfolio-summary"></p>
+            <p class="labels-line" id="labels-line" data-researcher-only></p>
+            <p class="compare-line" id="compare-line" data-researcher-only></p>
+            <p class="flawed-marker" id="flawed-marker" hidden data-researcher-only>Flawed advice scenario active: this recommendation was deliberately shifted two portfolios in the wrong direction. Logged rows are marked as flawed.</p>
+          </article>
+
+          <div class="explanation" id="explanation-area" aria-live="polite">
+            <!-- filled by app.js according to the active condition -->
+          </div>
+
+          <div class="response" id="response-block">
+            <div class="step-head">
+              <span class="step-number" aria-hidden="true">3</span>
+              <h2 class="panel-title">Your response</h2>
+            </div>
+            <div class="field">
+              <label for="trust">How much do you trust this recommendation? <output id="trust-output" for="trust">4</output> of 7</label>
+              <input type="range" id="trust" name="trust" min="1" max="7" step="1" value="4" aria-describedby="trust-hint">
+              <div class="scale-ends" id="trust-hint" aria-hidden="true"><span>1, not at all</span><span>7, completely</span></div>
+            </div>
+            <p class="attention-line" id="attention-line" hidden><strong>Attention check.</strong> For this case, please choose "Reject" whatever the advice says.</p>
+            <fieldset class="field">
+              <legend>Would you follow this advice?</legend>
+              <div class="segmented" role="radiogroup" aria-label="Decision">
+                <label><input type="radio" name="decision" value="follow"><span>Follow</span></label>
+                <label><input type="radio" name="decision" value="adjust"><span>Adjust</span></label>
+                <label><input type="radio" name="decision" value="reject"><span>Reject</span></label>
+                <label><input type="radio" name="decision" value="ask-human"><span>Ask a human adviser</span></label>
+              </div>
+              <div class="adjust-panel" id="adjust-panel" hidden>
+                <p class="control-label">Adjust to which portfolio?</p>
+                <div class="segmented" role="radiogroup" aria-label="Adjusted portfolio" id="adjust-group"></div>
+                <p class="hint" id="adjust-hint"></p>
+              </div>
+            </fieldset>
+            <details class="field secondary-measures">
+              <summary>A few more questions about this decision</summary>
+              <div class="field">
+                <label for="understanding">How well do you understand why this advice was given? <output id="understanding-output" for="understanding">4</output> of 7</label>
+                <input type="range" id="understanding" min="1" max="7" step="1" value="4">
+                <div class="scale-ends" aria-hidden="true"><span>1, not at all</span><span>7, completely</span></div>
+              </div>
+              <div class="field">
+                <label for="decision-confidence">How confident are you in your decision? <output id="decision-confidence-output" for="decision-confidence">4</output> of 7</label>
+                <input type="range" id="decision-confidence" min="1" max="7" step="1" value="4">
+                <div class="scale-ends" aria-hidden="true"><span>1, not at all</span><span>7, completely</span></div>
+              </div>
+              <div class="field">
+                <label for="mental-demand">How mentally demanding was this decision? <output id="mental-demand-output" for="mental-demand">4</output> of 7</label>
+                <input type="range" id="mental-demand" min="1" max="7" step="1" value="4">
+                <div class="scale-ends" aria-hidden="true"><span>1, very low</span><span>7, very high</span></div>
+              </div>
+              <div class="field">
+                <label for="reason">Why did you decide this? (optional)</label>
+                <textarea id="reason" rows="2" placeholder="In your own words"></textarea>
+              </div>
+            </details>
+            <div class="button-row">
+              <button type="button" class="btn btn-primary" id="submit-response">Submit response</button>
+              <button type="button" class="btn btn-primary" id="next-trial" hidden>Next case</button>
+              <span class="status" id="submit-status" role="status" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Session log -->
+    <section class="panel" aria-labelledby="session-heading">
+      <div class="panel-head-row">
+        <h2 id="session-heading" class="panel-title">Session</h2>
+        <div class="button-row">
+          <button type="button" class="btn" id="download-csv">Download CSV</button>
+          <button type="button" class="btn" id="download-json">Download JSON</button>
+          <button type="button" class="btn btn-danger" id="clear-session">Clear session</button>
+        </div>
+      </div>
+      <p class="panel-intro"><span id="session-count">0</span> response(s) recorded in this browser. Stored locally so a reload does not lose them.</p>
+      <div class="table-wrap">
+        <table class="log-table" id="session-table">
+          <thead>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col">Participant</th>
+              <th scope="col">Condition</th>
+              <th scope="col">Advisor</th>
+              <th scope="col">Scenario</th>
+              <th scope="col">Profile</th>
+              <th scope="col">Shown</th>
+              <th scope="col">Score</th>
+              <th scope="col">Margin</th>
+              <th scope="col">Trust</th>
+              <th scope="col">Decision</th>
+              <th scope="col">Time (ms)</th>
+            </tr>
+          </thead>
+          <tbody id="session-tbody"></tbody>
+        </table>
+      </div>
+      <p class="hint" id="session-empty">No responses yet.</p>
+    </section>
+  </main>
+
+  <!-- Study design dialog -->
+  <dialog id="study-design-dialog" class="dialog" aria-labelledby="study-design-title">
+    <div class="dialog-head">
+      <h2 id="study-design-title">Study design</h2>
+      <button type="button" class="btn btn-close" data-close-dialog aria-label="Close study design">Close</button>
+    </div>
+    <div class="dialog-body prose">
+      <h3>Research question</h3>
+      <p>Does explanation style (none, feature-based, counterfactual, confidence) affect appropriate reliance on AI investment advice, and does financial literacy moderate the effect?</p>
+
+      <h3>Design</h3>
+      <p>Between-subjects on explanation condition, defined by two parts: content (why, what would change it, how sure, in any combination or none) and delivery (static, interactive what-if, adaptive to literacy, conversational). Eight named presets cover the common combinations. Advisor type (neural network or interpretable rule-based advisor, both learned from the same expert data) is a second between-subjects factor that manipulates explanation fidelity with the origin of the rules held constant. A study picks a subset of conditions, for example the four single-content presets and the hybrid, by two advisors. Each participant completes sound and flawed advice trials in a seeded random order (the study flow uses six fixed hypothetical cases, half sound and half flawed, with one attention check). Financial literacy, measured with the Lusardi and Mitchell "Big Three", is a moderator. A within-subjects design with counterbalanced condition order is a viable alternative if recruitment is limited.</p>
+
+      <h3>Variables</h3>
+      <p><strong>Independent variables:</strong> explanation content, explanation delivery, advisor type.</p>
+      <p><strong>Dependent variables:</strong> appropriate reliance (follow rate on sound advice, override rate on flawed advice, where override is Adjust, Reject or Ask a human adviser), trust rating (1 to 7), decision time. When the participant adjusts, the chosen portfolio and the number of steps from the shown one are recorded, so reliance is also available on a scale. Secondary: perceived understanding, decision confidence, mental demand (one NASA-TLX style item), a free-text reason, and in the interactive condition the number of what-if moves and "why not" questions. Human review is a possible outcome of every advisor and "Ask a human adviser" a possible decision, so deferral is measured on both sides.</p>
+
+      <h3>How appropriate reliance is measured</h3>
+      <p>The Scenario control switches between sound advice (the model as is) and flawed advice (the recommendation shifted two portfolios in the wrong direction). Appropriate reliance means following sound advice and overriding flawed advice. Every logged row records the scenario, the shown portfolio and the sound portfolio, so both rates can be computed per condition.</p>
+
+      <h3>Analysis sketch</h3>
+      <p>Mixed-effects models with participant as random effect (several trials per participant), explanation style and advisor type as fixed effects, financial literacy as covariate, separately for sound and flawed trials. The Analytics page gives the descriptive rates per condition. Short interviews, or the free-text reasons, for why participants followed or overrode.</p>
+
+      <h3>Ethics note</h3>
+      <p>A real study needs ethics approval, informed consent, hypothetical scenarios only, no real financial advice, and a debrief about the flawed trials. The study flow implements a consent screen, fixed hypothetical cases, an attention check and a debrief, to be adapted to the approving committee's requirements.</p>
+
+      <h3>Provenance</h3>
+      <p>AdviceIT extends my systematic literature review of trust and algorithm aversion in the choice between human and AI financial advisors (SSRAAI 2026). The review described the problem of miscalibrated trust. AdviceIT by Radit is a first step toward the design-side answer.</p>
+
+      <h3>Limitations, plainly</h3>
+      <p>The neural network is trained on ILS-Bench, 400 expert-validated but synthetic narratives, not on real client records. No participant data collected yet. Model portfolios are stylised, not calibrated to a regulatory suitability standard. LLM explanations and narrative reading depend on the participant's browser and GPU.</p>
+
+    </div>
+  </dialog>
+
+  <!-- How it works dialog -->
+  <dialog id="how-it-works-dialog" class="dialog" aria-labelledby="how-it-works-title">
+    <div class="dialog-head">
+      <h2 id="how-it-works-title">How it works</h2>
+      <button type="button" class="btn btn-close" data-close-dialog aria-label="Close how it works">Close</button>
+    </div>
+    <div class="dialog-body prose">
+      <p>AdviceIT has two advisors, one per page, both learned from the same expert-validated data, and a set of explanation conditions built from two choices: what is explained (content) and how it is delivered (form). The advisor produces the recommendation. The explanation condition decides what the participant sees next to it. The scenario decides whether the advice shown is sound or deliberately flawed. Both advisors take the same profile, describe it with the same three suitability labels, and answer with one of the same six outcomes.</p>
+
+      <h3>Shared vocabulary: suitability labels</h3>
+      <p>Both advisors describe a profile with the three labels used by ILS-Bench, derived from the form by three documented rules. Risk tolerance is the stated Low / Medium / High (Moderate), or Inconsistent when a written description shows conflicting attitudes. Risk capacity is High with an emergency fund and stable income, Moderate with one of them, Low with neither. Liquidity need follows the horizon: 1 to 2 years Urgent, 3 to 5 High, 6 to 10 Moderate, 11 or more Low. Age is the fourth input.</p>
+
+      <h3>Advisor 1: the AI advisor (neural network)</h3>
+      <p>A multilayer perceptron (12 inputs: the three labels one-hot encoded plus age, two hidden layers of 16 units, 6 outputs) trained with <code>ml/train_model.py</code> on ILS-Bench (Bonelli 2026, Mendeley Data, CC BY 4.0): 400 investor narratives whose suitability labels and recommended outcome were validated by a panel of four financial-domain experts. The six outcomes are the five portfolios and Human review. Cross-validated accuracy is <span id="hiw-ml-acc"></span> percent (5-fold, three repeats), on par with the dataset author's own draft labels and with a lookup table over the label combinations, and its probabilities are calibrated with temperature scaling. It runs in the browser from the exported weights in <code>ml_weights.js</code>. Its weights are not human-readable, so its explanations must be computed post hoc: exact Shapley values of the probability of the recommended outcome, the same counterfactual search, and calibrated probability for confidence.</p>
+
+      <h3>Advisor 2: the interpretable rule-based advisor</h3>
+      <p>A multinomial logistic regression fitted on the same ILS-Bench cases and the same twelve inputs as the network, <span id="hiw-logit-acc"></span> percent cross-validated accuracy, calibrated with temperature scaling. It is a scorecard derived from data: one weight per input and outcome, the outcome with the largest total wins, and the contribution of each input to the evidence for the recommended outcome is read directly from the weights, exact and additive in log-odds. Same data and inputs as the network, but transparent. That is what makes explanation fidelity a factor: the same explanation styles are exact here and estimated on the AI advisor page.</p>
+
+      <h3>Language to suitability</h3>
+      <p>The ILS-Bench procedure starts from what an investor writes. The profile form therefore accepts a free-text description: the in-browser language model reads it into the form fields (age, horizon, tolerance, emergency fund, income) and flags an Inconsistent risk attitude when the text asks for high returns while saying that a loss would cause serious stress. The researcher can load any of the 400 benchmark cases and compare the advisors' outcome with the expert consensus for that case.</p>
+
+      <h3>Explanation conditions: content and delivery</h3>
+      <p>An explanation condition is a combination of <strong>content</strong> (what is explained: why, what would change it, how sure, in any combination or none) and <strong>delivery</strong> (how it is shown: static, interactive what-if, adaptive to literacy, or conversational). The Explanation control offers named presets for the common combinations, and Customise for any other. Both parts are recorded in the log.</p>
+      <ul>
+        <li><strong>None:</strong> recommendation only.</li>
+        <li><strong>Why (feature-based):</strong> signed contribution of each input relative to the baseline profile. Exact log-odds contributions read from the weights for the interpretable rule-based advisor, exact Shapley values of the probability of the recommended outcome for the network.</li>
+        <li><strong>What would change it (counterfactual):</strong> the advisor is re-run over each input's range to find the smallest single change that flips the outcome. Works identically for both advisors.</li>
+        <li><strong>How sure (confidence):</strong> the calibrated probability of the recommended outcome with a bar per outcome.</li>
+        <li><strong>All three (hybrid):</strong> the three content parts together. Any other combination is a custom condition.</li>
+        <li><strong>Interactive what-if (delivery):</strong> a copy of the inputs the participant can move, with the outcome, the probabilities and the largest contributions updating live, "ignore this input" switches that hold an input at the neutral baseline, and a "why not X?" selector that gives a contrastive explanation (the smallest change that would give X, found by search), shown above whatever content is ticked. Moves and questions are counted in the log.</li>
+        <li><strong>Adaptive to literacy (delivery):</strong> the ticked content is shown as short plain sentences for a low Big Three literacy score, and as bars and probabilities for a high score. The three literacy questions appear in the profile form only with this delivery (and at the start of the full study flow). Falls back to the self-rating when the questions were not answered.</li>
+        <li><strong>Conversational (delivery):</strong> an open-weight language model (Llama 3.2 or Qwen 2.5) runs inside the browser on the GPU through WebLLM. It receives the ticked content, as computed by the other explanations, as its only source, writes a plain-language explanation, and answers follow-up questions. Its text is stored in the session log. Needs a WebGPU browser and the page served over http, not opened from a file.</li>
+      </ul>
+      <h3>The response</h3>
+      <p>Under every recommendation the participant rates trust (1 to 7) and chooses Follow, Adjust, Reject or Ask a human adviser. Adjust asks which portfolio they would go for instead, and the log records it together with the number of steps from the shown portfolio. Three optional ratings (understanding, decision confidence, mental demand) and a free-text reason follow. Decision time runs from the moment the recommendation was shown.</p>
+
+      <h3>The study flow</h3>
+      <p>A participant link with <code>flow=study</code> runs the whole procedure: consent, the three literacy questions, six fixed hypothetical cases (half with sound and half with flawed advice, in an order seeded by the participant ID so it is reproducible), one attention check, and a debrief that names the flawed cases. The Analytics page then reads the collected responses.</p>
+
+      <h3>Scenarios: sound and flawed advice</h3>
+      <p>The Scenario control (researcher mode) or the <code>scenario</code> URL parameter (participant links) decides which advice is shown. <strong>Sound advice</strong> is the advisor's real outcome. <strong>Flawed advice</strong> takes that outcome and deliberately shifts it two portfolios in the wrong direction: conservative outcomes are pushed toward Aggressive growth, growth outcomes toward Capital preservation, and a Human review outcome is replaced by an automated portfolio two steps more aggressive than the score would justify. Two steps was chosen because one step is often still defensible, while two is a mistake a careful reader can catch.</p>
+      <p>The explanations always describe the advisor's real reasoning, so in the flawed scenario the explanation and the recommendation do not fit together. Whether participants notice, and whether the explanation style helps them notice, is exactly what the study measures. Every logged response records the scenario, the portfolio that was shown and the sound portfolio, so <strong>appropriate reliance</strong> can be computed per condition: the follow rate on sound advice and the override rate (Adjust or Reject) on flawed advice. Following flawed advice is over-reliance, rejecting sound advice is under-reliance. In researcher mode an amber note marks a flawed recommendation. Participants never see that note, and a real study debriefs them about the flawed trials afterwards.</p>
+
+      <p>The full source is readable in <code>model.js</code> (label rules), <code>ml_model.js</code>, <code>logit_model.js</code>, <code>explanations.js</code>, <code>llm.js</code> and <code>ml/train_model.py</code>.</p>
+    </div>
+  </dialog>
+
+  <script src="model.js"></script>
+  <script src="ils_bench_cases.js"></script>
+  <script src="ml_weights.js"></script>
+  <script src="ml_model.js"></script>
+  <script src="logit_model.js"></script>
+  <script src="explanations.js"></script>
+  <script src="llm.js"></script>
+  <script src="study.js"></script>
+  <script src="session.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

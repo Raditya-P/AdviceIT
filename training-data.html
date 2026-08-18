@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdviceIT by Radit: Training Data</title>
+  <meta name="description" content="The training data behind AdviceIT's AI advisor: ILS-Bench, 400 expert-validated investor suitability cases (Bonelli 2026, CC BY 4.0), how the network is trained on it, its cross-validated results, and every case to browse.">
+  <meta property="og:title" content="AdviceIT by Radit: Training Data">
+  <meta property="og:description" content="ILS-Bench, the expert-validated dataset behind AdviceIT's neural-network advisor: contents, statistics, training results, and all 400 cases.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#f6f9fc">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f7fd0'/%3E%3Cpath d='M14 44 L26 24 L36 36 L50 16' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='16' r='5' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="data">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div>
+          <h1 class="brand-title">AdviceIT by Radit</h1>
+          <p class="brand-subtitle">Explainable AI investment advice, and how people rely on it</p>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Primary">
+        <a class="linklike nav-page" href="index.html" data-page="ml">AI advisor</a>
+        <a class="linklike nav-page" href="interpretable.html" data-page="logit">Interpretable rule-based advisor</a>
+        <a class="linklike nav-page" href="training-data.html" data-page="data" aria-current="page">Training data</a>
+        <a class="linklike nav-page" href="analytics.html" data-page="analytics">Analytics</a>
+        <a class="linklike nav-page" href="references.html" data-page="references">References</a>
+        <a class="linklike" href="index.html?panel=study-design">Study design</a>
+        <a class="linklike" href="index.html?panel=how-it-works">How it works</a>
+        <a class="linklike" href="https://github.com/Raditya-P/AdviceIT" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <section class="panel data-panel" aria-labelledby="ds-heading">
+      <div class="data-head">
+        <h2 id="ds-heading" class="panel-title">ILS-Bench: Investor Language-to-Suitability Benchmark</h2>
+        <a class="btn btn-primary btn-small" href="https://data.mendeley.com/datasets/w48mh2dtg5/1" target="_blank" rel="noopener">View the dataset on Mendeley Data</a>
+      </div>
+      <p class="data-summary">The neural-network advisor on the <a href="index.html">AI advisor page</a> is trained on ILS-Bench, published by <strong>Marco Bonelli</strong> (Ca' Foscari University of Venice) on Mendeley Data on 16 June 2026, version 1, DOI <a href="https://doi.org/10.17632/w48mh2dtg5.1" target="_blank" rel="noopener">10.17632/w48mh2dtg5.1</a>, licence <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. The dataset describes itself as a synthetic benchmark for evaluating suitability-aware robo-advisory systems that convert investor language into portfolio and escalation decisions. It contains 400 AI-assisted synthetic investor narratives, no real client data or personal information, each reviewed by four independent financial-domain experts who agreed, disagreed or revised the proposed suitability labels. The consensus of the panel is the label AdviceIT learns from.</p>
+      <p class="data-summary"><strong>Citation.</strong> Bonelli, M. (2026). ILS-Bench: Investor Language-to-Suitability Benchmark. Mendeley Data, V1. https://doi.org/10.17632/w48mh2dtg5.1</p>
+    </section>
+
+    <div class="columns data-columns">
+      <section class="panel" aria-labelledby="codebook-heading">
+        <h2 id="codebook-heading" class="panel-title">What each case contains</h2>
+        <p class="panel-intro">The fields of the Cases_Consensus sheet, from the dataset's codebook.</p>
+        <div class="table-wrap">
+          <table class="log-table data-table">
+            <thead><tr><th scope="col">Field</th><th scope="col">Values</th><th scope="col">Meaning</th></tr></thead>
+            <tbody>
+              <tr><td>Investor narrative</td><td>free text, 317 to 538 characters</td><td>The investor's own description of goals, buffers, income, horizon and attitude to risk.</td></tr>
+              <tr><td>Evidence span</td><td>quoted sentences</td><td>The parts of the narrative the labels rest on.</td></tr>
+              <tr><td>Risk tolerance</td><td>Low, Moderate, High, Inconsistent</td><td>Willingness and emotional ability to accept volatility. Inconsistent when statements conflict.</td></tr>
+              <tr><td>Risk capacity</td><td>Low, Moderate, High</td><td>Financial ability to absorb losses given income, savings, debt and obligations.</td></tr>
+              <tr><td>Liquidity need</td><td>Low, Moderate, High, Urgent</td><td>Need to access the funds within a short or medium horizon.</td></tr>
+              <tr><td>Suitability risk</td><td>Low, Medium, High</td><td>Overall risk that automated advice may be unsuitable or unsafe.</td></tr>
+              <tr><td>Portfolio</td><td>Capital preservation, Conservative, Balanced, Growth, Aggressive growth, Human review</td><td>Recommended portfolio class, or a non-automated review outcome.</td></tr>
+              <tr><td>Escalation</td><td>Yes, No</td><td>Whether a human adviser should review the case before advice is finalised. Identical to Portfolio = Human review in all 400 cases.</td></tr>
+              <tr><td>Consensus</td><td>expert majority</td><td>Majority label of the four validators, Unsure votes excluded. Eight cases carry a review flag for weak consensus.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="sub-heading">The expert panel</h3>
+        <ul class="plain-list">
+          <li>Expert 1: retired Boston portfolio manager (portfolio suitability, risk capacity, allocation realism)</li>
+          <li>Expert 2: senior New York head trader (trading risk, downside protection, market-risk perspective)</li>
+          <li>Expert 3: Shenzhen FinTech executive (provider-side implementation, automation risk, escalation discipline)</li>
+          <li>Expert 4: European FinTech academic (research-design consistency, FinTech classification validity)</li>
+        </ul>
+        <p class="hint">Across the 1600 validations, 1316 were Agree, 223 Disagree and 61 Unsure. The dataset author's own draft portfolio label agreed with the final consensus in 88.2 percent of cases, individual expert votes in 94.7 percent.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" class="panel-title">The 400 cases in numbers</h2>
+        <p class="panel-intro">Computed live from <code>ils_bench_cases.js</code>, the extract used for training.</p>
+        <div id="stats"></div>
+      </section>
+    </div>
+
+    <section class="panel" aria-labelledby="use-heading">
+      <h2 id="use-heading" class="panel-title">How AdviceIT uses it</h2>
+      <div class="columns data-columns">
+        <div>
+          <h3 class="sub-heading">The procedure</h3>
+          <p>The benchmark's pipeline is investor language, then structured suitability labels, then a portfolio class or escalation to a human. AdviceIT follows it. Step one, language to labels, is done either by the profile form through three documented rules, or by the in-browser language model reading a free-text description ("Read description into the form" on the advisor pages). Step two, labels to outcome, is what the network learned from the expert consensus.</p>
+          <h3 class="sub-heading">From the form to the labels</h3>
+          <ul class="plain-list">
+            <li><strong>Risk tolerance:</strong> stated Low / Medium / High becomes Low / Moderate / High. Inconsistent only when a written description shows conflicting attitudes.</li>
+            <li><strong>Risk capacity:</strong> emergency fund and stable income: High. One of them: Moderate. Neither: Low.</li>
+            <li><strong>Liquidity need:</strong> horizon 1 to 2 years: Urgent. 3 to 5: High. 6 to 10: Moderate. 11 or more: Low.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="sub-heading">The network</h3>
+          <p>Twelve inputs (the three labels one-hot encoded plus age, which every narrative states), two hidden layers of 16 ReLU units, six outputs. Trained with Adam, cross-entropy and L2 weight decay, written from scratch in numpy in <code>ml/train_model.py</code>, seeded and reproducible. Probabilities calibrated with temperature scaling on out-of-fold predictions. The weights are exported to <code>ml_weights.js</code> and run in the browser in <code>ml_model.js</code>.</p>
+          <h3 class="sub-heading">Human review on both advisors</h3>
+          <p>The panel refused to automate almost half of the cases. The network learned that. Both advisors learned it, the network and the interpretable rule-based advisor, so both can answer Human review instead of a portfolio.</p>
+          <h3 class="sub-heading">Reproduce</h3>
+          <pre class="cmd"><code>cd ml
+pip install numpy openpyxl
+python3 fetch_ils_bench.py
+python3 train_model.py</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="results-heading">
+      <h2 id="results-heading" class="panel-title">Training results</h2>
+      <p class="panel-intro">Read live from the <code>meta</code> block of <code>ml_weights.js</code>, written by the training script. Cross-validation is stratified 5-fold, repeated three times.</p>
+      <div id="results"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="bench-heading">
+      <div class="panel-head-row">
+        <h2 id="bench-heading" class="panel-title">Benchmark the language-reading step</h2>
+        <div class="button-row">
+          <label class="inline-label" for="bench-n">Cases</label>
+          <select id="bench-n" aria-label="Number of cases">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="400">all 400</option>
+          </select>
+          <label class="inline-label" for="bench-model">Model</label>
+          <select id="bench-model" aria-label="Language model"></select>
+          <button type="button" class="btn btn-primary" id="bench-run">Run</button>
+          <button type="button" class="btn" id="bench-stop" hidden>Stop</button>
+          <button type="button" class="btn" id="bench-download" hidden>Download results CSV</button>
+        </div>
+      </div>
+      <p class="panel-intro">The in-browser language model reads each narrative into the five form fields, the form rules turn them into the three suitability labels, and the advisors turn the labels into an outcome. Each is compared with the expert consensus. Cases are drawn in a fixed order (every k-th case) so runs are comparable. Needs WebGPU and the page served over http, like the conversational condition.</p>
+      <p class="llm-status" id="bench-status" role="status" aria-live="polite"></p>
+      <div class="llm-progress" aria-hidden="true"><div class="llm-progress-fill" id="bench-progress"></div></div>
+      <div id="bench-results"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="cases-heading">
+      <div class="panel-head-row">
+        <h2 id="cases-heading" class="panel-title">Browse the cases</h2>
+        <div class="button-row">
+          <label class="inline-label" for="case-search">Search</label>
+          <input type="search" id="case-search" placeholder="word in the narrative or a case ID" aria-label="Search narratives">
+          <label class="inline-label" for="case-outcome">Outcome</label>
+          <select id="case-outcome" aria-label="Filter by outcome">
+            <option value="">All</option>
+          </select>
+        </div>
+      </div>
+      <p class="panel-intro"><span id="case-count"></span> Each row shows the expert consensus. "Open in the AI advisor" pastes the narrative into the advisor page so the language model can read it and the advisors can be compared with the panel.</p>
+      <div class="table-wrap">
+        <table class="log-table data-table" id="case-table">
+          <thead>
+            <tr>
+              <th scope="col">Case</th>
+              <th scope="col">Narrative</th>
+              <th scope="col">Tolerance</th>
+              <th scope="col">Capacity</th>
+              <th scope="col">Liquidity</th>
+              <th scope="col">Outcome</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody id="case-tbody"></tbody>
+        </table>
+      </div>
+      <div class="button-row" style="margin-top:10px">
+        <button type="button" class="btn" id="show-more">Show more</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="model.js"></script>
+  <script src="ils_bench_cases.js"></script>
+  <script src="ml_weights.js"></script>
+  <script src="ml_model.js"></script>
+  <script src="logit_model.js"></script>
+  <script src="explanations.js"></script>
+  <script src="llm.js"></script>
+  <script src="training-data.js"></script>
+</body>
+</html>

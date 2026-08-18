@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdviceIT by Radit: Analytics</title>
+  <meta name="description" content="Researcher analytics for AdviceIT: appropriate reliance, trust, decision time and secondary measures per explanation condition and advisor, computed from the session log, the study server or an exported file.">
+  <meta property="og:title" content="AdviceIT by Radit: Analytics">
+  <meta property="og:description" content="Appropriate reliance, trust and decision time per condition and advisor, computed live from collected responses.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#f6f9fc">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f7fd0'/%3E%3Cpath d='M14 44 L26 24 L36 36 L50 16' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='50' cy='16' r='5' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="analytics" aria-current="page">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div>
+          <h1 class="brand-title">AdviceIT by Radit</h1>
+          <p class="brand-subtitle">Explainable AI investment advice, and how people rely on it</p>
+        </div>
+      </div>
+      <nav class="topnav" aria-label="Primary">
+        <a class="linklike nav-page" href="index.html" data-page="ml">AI advisor</a>
+        <a class="linklike nav-page" href="interpretable.html" data-page="logit">Interpretable rule-based advisor</a>
+        <a class="linklike nav-page" href="training-data.html" data-page="data">Training data</a>
+        <a class="linklike nav-page" href="analytics.html" data-page="analytics" aria-current="page">Analytics</a>
+        <a class="linklike nav-page" href="references.html" data-page="references">References</a>
+        <a class="linklike" href="index.html?panel=study-design">Study design</a>
+        <a class="linklike" href="index.html?panel=how-it-works">How it works</a>
+        <a class="linklike" href="https://github.com/Raditya-P/AdviceIT" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page">
+
+    <section class="panel data-panel" aria-labelledby="an-heading">
+      <div class="data-head">
+        <h2 id="an-heading" class="panel-title">Analytics: what the responses say so far</h2>
+        <div class="button-row">
+          <button type="button" class="btn" id="an-refresh">Refresh</button>
+          <button type="button" class="btn" id="an-download">Download combined CSV</button>
+        </div>
+      </div>
+      <p class="data-summary">Everything on this page is computed in the browser from the responses it can see: the session log stored in this browser, the responses collected by <code>serve.py</code> when the page is served from the study laptop, and any JSON export you load below. Rates are descriptive. With a pilot-sized sample they show whether the instrument records what it should, not whether an effect exists.</p>
+      <div class="an-sources" id="an-sources"></div>
+      <div class="button-row an-load">
+        <label class="inline-label" for="an-file">Load a JSON export</label>
+        <input type="file" id="an-file" accept="application/json,.json" aria-label="Load a JSON export">
+        <label class="inline-label" for="an-advisor">Advisor</label>
+        <select id="an-advisor" aria-label="Filter by advisor">
+          <option value="">All</option>
+          <option value="ml">Neural network</option>
+          <option value="logit">Interpretable rule-based</option>
+        </select>
+        <label class="inline-label" for="an-flow">Flow</label>
+        <select id="an-flow" aria-label="Filter by flow">
+          <option value="">All</option>
+          <option value="study">Study flow</option>
+          <option value="single">Single trial</option>
+        </select>
+        <label class="check-inline"><input type="checkbox" id="an-exclude-researcher" checked> Exclude researcher-mode rows</label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="an-overview-heading">
+      <h2 id="an-overview-heading" class="panel-title">Overview</h2>
+      <div id="an-overview"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="an-reliance-heading">
+      <h2 id="an-reliance-heading" class="panel-title">Appropriate reliance by explanation condition</h2>
+      <p class="panel-intro">Follow rate on sound advice, override rate on flawed advice (Adjust, Reject or Ask a human adviser), and their combination. Over-reliance is following flawed advice, under-reliance is not following sound advice.</p>
+      <div id="an-reliance"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="an-measures-heading">
+      <h2 id="an-measures-heading" class="panel-title">Trust, time and secondary measures</h2>
+      <p class="panel-intro">Means of the 1 to 7 ratings and the median decision time in seconds, per condition, split by sound and flawed advice.</p>
+      <div id="an-measures"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="an-quality-heading">
+      <h2 id="an-quality-heading" class="panel-title">Data quality and moderators</h2>
+      <div id="an-quality"></div>
+    </section>
+  </main>
+
+  <script src="session.js"></script>
+  <script src="analytics.js"></script>
+</body>
+</html>

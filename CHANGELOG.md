@@ -1,0 +1,17 @@
+# Changelog
+
+## 1.0.0, 2026-08-18
+
+First release. Everything below exists and is verified.
+
+- Two advisor pages generated from one shell (`tools/make_pages.py`): the AI advisor (`index.html`, home), a neural network trained on ILS-Bench, and the interpretable rule-based advisor (`interpretable.html`), a scorecard fitted on the same data by multinomial logistic regression with exact weight-based explanations. Both use the ILS-Bench vocabulary of three suitability labels and six outcomes (five portfolios or Human review), and each page shows what the other would answer. An illustrative hand-set scorecard remains in `model.js` for reference and is not shown.
+- Training data page (`training-data.html`): the ILS-Bench description with the Mendeley link and citation, the codebook and expert panel, live statistics over the 400 cases, the training results and confusion matrix read from `ml_weights.js`, a searchable table of every case with deep links into the AI advisor, and a benchmark of the language-reading step (narrative to labels to outcome, compared with the panel).
+- Analytics page (`analytics.html`): appropriate reliance, trust, decision time, secondary measures, attention checks and literacy, per condition and advisor, from the browser log, the study server and loaded exports, with a combined CSV download.
+- References page (`references.html`): the dataset, the essential literature behind the design, and the tools, models and standards.
+- Machine learning: `ml/fetch_ils_bench.py` downloads and extracts the dataset, `ml/train_model.py` trains the network (88.8 percent cross-validated accuracy, macro-F1 0.84) and the logistic regression (87.7 percent, macro-F1 0.82) in numpy with stratified cross-validation, reports baselines, calibrates both with temperature scaling, and exports `ml_weights.js`. Browser inference in `ml_model.js` and `logit_model.js`.
+- Explanation conditions defined by content (why, as exact weight-based contributions for the interpretable rule-based advisor and exact Shapley values for the network, what would change it, as a model-agnostic counterfactual search with change chips, and how sure, as calibrated probability bars) and delivery (static, interactive what-if with live steering, ignore-input switches and contrastive "why not", adaptive with plain or detailed rendering by literacy score, conversational with an in-browser language model grounded on the ticked content). Eight named presets plus Customise, both parts logged.
+- Response and measures: trust, Follow / Adjust (to which portfolio) / Reject / Ask a human adviser, understanding, decision confidence, mental demand, free-text reason, decision time, and the Lusardi and Mitchell "Big Three" literacy questions.
+- Study flow (`flow=study`, `study.js`): consent, literacy check, six fixed hypothetical cases in a seeded order with sound and flawed advice, attention check, debrief, done screen.
+- Language to suitability: a free-text description read into the form by the in-browser language model, with an Inconsistent tolerance flag, and an ILS-Bench case loader for comparison with the expert panel.
+- Study machinery: sound and flawed scenarios, participant links with hidden condition assignment, session log with localStorage, CSV and JSON export, and `serve.py` to run the study from a laptop and collect every response.
+- Documentation: README, study design, design decisions, citation file with the dataset reference.
