@@ -325,6 +325,8 @@
       toleranceInconsistent: state.toleranceInconsistent,
       emergencyFund: radioValue("emergencyFund") === "yes",
       incomeStable: radioValue("incomeStable") === "stable",
+      debtObligations: radioValue("debtObligations") === "yes",
+      nearTermNeed: radioValue("nearTermNeed") === "yes",
       knowledge: radioValue("knowledge")
     };
   }
@@ -341,6 +343,8 @@
     setRadio("tolerance", p.tolerance);
     setRadio("emergencyFund", p.emergencyFund ? "yes" : "no");
     setRadio("incomeStable", p.incomeStable ? "stable" : "variable");
+    setRadio("debtObligations", p.debtObligations ? "yes" : "no");
+    setRadio("nearTermNeed", p.nearTermNeed ? "yes" : "no");
     setRadio("knowledge", p.knowledge);
   }
 
@@ -606,7 +610,7 @@
      ------------------------------------------------------------ */
   function renderInteractive(result) {
     var advisor = advisors[result.advisor || "glass"];
-    var baseline = { age: 45, horizon: 10, tolerance: "medium", emergencyFund: true, incomeStable: true };
+    var baseline = { age: 45, horizon: 10, tolerance: "medium", emergencyFund: true, incomeStable: true, debtObligations: false, nearTermNeed: false };
     var whatIf = Object.assign({}, result.profile);
     var ignored = {};
 
@@ -664,6 +668,12 @@
     controls.appendChild(field("Income stability", "incomeStable", segmented("income", [
       { value: "stable", label: "Stable" }, { value: "variable", label: "Variable" }
     ], whatIf.incomeStable ? "stable" : "variable", function (v) { whatIf.incomeStable = v === "stable"; bump(); })));
+    controls.appendChild(field("Significant debt or obligations", "debtObligations", segmented("debt", [
+      { value: "no", label: "No" }, { value: "yes", label: "Yes" }
+    ], whatIf.debtObligations ? "yes" : "no", function (v) { whatIf.debtObligations = v === "yes"; bump(); })));
+    controls.appendChild(field("Money needed in the near term", "nearTermNeed", segmented("need", [
+      { value: "no", label: "No" }, { value: "yes", label: "Yes" }
+    ], whatIf.nearTermNeed ? "yes" : "no", function (v) { whatIf.nearTermNeed = v === "yes"; bump(); })));
 
     function effectiveProfile() {
       var p = Object.assign({}, whatIf);
@@ -969,6 +979,8 @@
       tolerance: p.tolerance,
       emergencyFund: p.emergencyFund ? "yes" : "no",
       incomeStable: p.incomeStable ? "stable" : "variable",
+      debtObligations: p.debtObligations ? "yes" : "no",
+      nearTermNeed: p.nearTermNeed ? "yes" : "no",
       knowledge: p.knowledge,
       toleranceInconsistent: p.toleranceInconsistent ? "yes" : "no",
       suitabilityTolerance: r.labels ? r.labels.tolerance : "",
@@ -1223,6 +1235,8 @@
       if (ex.tolerance) { setRadio("tolerance", ex.tolerance); filled.push("tolerance"); } else missing.push("tolerance");
       if (ex.emergencyFund !== null) { setRadio("emergencyFund", ex.emergencyFund ? "yes" : "no"); filled.push("emergency fund"); } else missing.push("emergency fund");
       if (ex.incomeStable !== null) { setRadio("incomeStable", ex.incomeStable ? "stable" : "variable"); filled.push("income"); } else missing.push("income");
+      if (ex.debtObligations !== null) { setRadio("debtObligations", ex.debtObligations ? "yes" : "no"); filled.push("debt"); } else missing.push("debt");
+      if (ex.nearTermNeed !== null) { setRadio("nearTermNeed", ex.nearTermNeed ? "yes" : "no"); filled.push("near-term need"); } else missing.push("near-term need");
       setInconsistent(ex.toleranceInconsistent);
       state.narrativeUsed = true;
       status.textContent = "Filled: " + (filled.join(", ") || "nothing") + (missing.length ? ". Not found in the text: " + missing.join(", ") + ", left as they were." : ".") + (ex.toleranceInconsistent ? " Risk attitude read as Inconsistent." : "");

@@ -36,7 +36,7 @@ window.AdviceIT = window.AdviceIT || {};
   var L = W.logit;
   var LAYOUT = W.featureLayout;
   var CONFIDENCE = { high: 0.75, moderate: 0.5 };
-  var BASELINE = { age: 45, horizon: 10, tolerance: "medium", emergencyFund: true, incomeStable: true, toleranceInconsistent: false };
+  var BASELINE = { age: 45, horizon: 10, tolerance: "medium", emergencyFund: true, incomeStable: true, debtObligations: false, nearTermNeed: false, toleranceInconsistent: false };
 
   function oneHot(value, options) {
     var v = [];

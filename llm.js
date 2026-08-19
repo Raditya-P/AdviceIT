@@ -101,7 +101,9 @@ window.AdviceIT = window.AdviceIT || {};
         horizonYears: p.horizon,
         statedRiskTolerance: p.tolerance,
         emergencyFund: p.emergencyFund ? "yes, at least 6 months" : "no",
-        income: p.incomeStable ? "stable" : "variable"
+        income: p.incomeStable ? "stable" : "variable",
+        debtOrObligations: p.debtObligations ? "significant" : "none reported",
+        nearTermNeed: p.nearTermNeed ? "yes" : "no"
       },
       suitabilityLabels: result.labels ? {
         riskTolerance: result.labels.tolerance,
@@ -184,10 +186,14 @@ window.AdviceIT = window.AdviceIT || {};
       "You read a short description written by an investor and fill in a suitability form.",
       "Reply with ONE JSON object and nothing else, using exactly these keys:",
       '{"age": integer 18 to 80 or null, "horizonYears": integer 1 to 40 or null, "riskTolerance": "low" | "medium" | "high" | null,',
-      ' "toleranceInconsistent": true | false, "emergencyFund": true | false | null, "incomeStable": true | false | null, "reasoning": short string}',
-      "Rules: use null when the text does not say. horizonYears is how many years until the money is needed (a short-term need such as rent, tuition or a tax bill within a year or two means 1 or 2, retirement in decades means 20 or more).",
-      "riskTolerance is the investor's stated willingness to accept swings. toleranceInconsistent is true when the text both asks for high returns or an aggressive portfolio and says that a loss would cause serious stress or that the money is needed soon.",
-      "emergencyFund is true only if the text says there is a solid cash reserve or emergency fund, false if it says the reserve is small or absent. incomeStable is true for a secure or steady income, false for irregular or variable income."
+      ' "toleranceInconsistent": true | false, "emergencyFund": true | false | null, "incomeStable": true | false | null,',
+      ' "debtOrObligations": true | false | null, "nearTermNeed": true | false | null, "reasoning": short string}',
+      "Rules: use null when the text does not say. horizonYears is how many years until the money is needed for its main goal (retirement in decades means 20 or more).",
+      "nearTermNeed is true when the money may be needed soon for anything concrete (rent, tuition, a tax bill, a purchase within a year or two), even if the stated goal is far away. false when the text says the money can stay invested.",
+      "debtOrObligations is true when the text mentions high-interest debt, loans to repay, or heavy fixed expenses that leave little room. false when it says debt is manageable or absent.",
+      "emergencyFund is true only if the text says there is a solid cash reserve or emergency fund, false if it says the reserve is small or absent. incomeStable is true for a secure or steady income, false for irregular or variable income.",
+      "riskTolerance is the investor's stated willingness to accept swings.",
+      "toleranceInconsistent is IMPORTANT and common: set it true whenever the text asks for high returns or an aggressive portfolio while ALSO showing a weak position to bear losses (money needed soon, small or no reserve, debt, irregular income, or saying a loss would cause serious stress). When in doubt between high tolerance and inconsistent, choose inconsistent."
     ].join("\n");
     return [
       { role: "system", content: system },
@@ -213,6 +219,8 @@ window.AdviceIT = window.AdviceIT || {};
       toleranceInconsistent: bool(obj.toleranceInconsistent) === true,
       emergencyFund: bool(obj.emergencyFund),
       incomeStable: bool(obj.incomeStable),
+      debtObligations: bool(obj.debtOrObligations),
+      nearTermNeed: bool(obj.nearTermNeed),
       reasoning: typeof obj.reasoning === "string" ? obj.reasoning : ""
     };
   }

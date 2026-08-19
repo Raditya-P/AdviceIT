@@ -17,9 +17,9 @@
   Unlike model.js this is a black box: the learned weights are not
   readable, so explanations are produced post hoc:
     - feature attributions: exact Shapley values of the probability of
-      the recommended outcome, over the five form inputs (age, horizon,
-      tolerance, emergency fund, income), relative to the same neutral
-      baseline profile the glass box uses (2^5 = 32 evaluations)
+      the recommended outcome, over the seven form inputs (age, horizon,
+      tolerance, emergency fund, income, debt, near-term need), relative to
+      the same neutral baseline profile (2^7 = 128 evaluations)
     - counterfactuals: the model-agnostic search in explanations.js
     - confidence: temperature-calibrated class probabilities
 */
@@ -38,7 +38,7 @@ window.AdviceIT = window.AdviceIT || {};
 
   /* Neutral baseline profile shared with the glass box (labels: Moderate
      tolerance, High capacity, Moderate liquidity). */
-  var BASELINE = { age: 45, horizon: 10, tolerance: "medium", emergencyFund: true, incomeStable: true, toleranceInconsistent: false };
+  var BASELINE = { age: 45, horizon: 10, tolerance: "medium", emergencyFund: true, incomeStable: true, debtObligations: false, nearTermNeed: false, toleranceInconsistent: false };
 
   function oneHot(value, options) {
     var v = [];
@@ -91,7 +91,7 @@ window.AdviceIT = window.AdviceIT || {};
      of a given class. f(S) evaluates the network with the inputs in S
      taken from the actual profile and the others from the baseline.
      ------------------------------------------------------------ */
-  var FEATURE_KEYS = ["age", "horizon", "tolerance", "emergencyFund", "incomeStable"];
+  var FEATURE_KEYS = ["age", "horizon", "tolerance", "emergencyFund", "incomeStable", "debtObligations", "nearTermNeed"];
 
   function factorial(n) { var r = 1; for (var i = 2; i <= n; i++) r *= i; return r; }
 
@@ -137,7 +137,9 @@ window.AdviceIT = window.AdviceIT || {};
       horizon: { label: "Investment horizon", valueText: profile.horizon + (profile.horizon === 1 ? " year" : " years") },
       tolerance: { label: "Risk tolerance", valueText: tolText },
       emergencyFund: { label: "Emergency fund", valueText: profile.emergencyFund ? "6 months covered" : "no 6-month buffer" },
-      incomeStable: { label: "Income stability", valueText: profile.incomeStable ? "stable income" : "variable income" }
+      incomeStable: { label: "Income stability", valueText: profile.incomeStable ? "stable income" : "variable income" },
+      debtObligations: { label: "Debt and obligations", valueText: profile.debtObligations ? "significant debt or obligations" : "no significant debt" },
+      nearTermNeed: { label: "Near-term need", valueText: profile.nearTermNeed ? "money may be needed soon" : "no near-term need" }
     };
     return {
       baseline: sh.baseline,

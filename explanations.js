@@ -190,6 +190,30 @@ window.AdviceIT = window.AdviceIT || {};
       });
     }
 
+    var rDebt = withChange("debtObligations", !p.debtObligations);
+    if (rDebt.portfolio.name !== current) {
+      findings.push({
+        key: "debtObligations",
+        relativeSize: 0.5,
+        change: { input: "debt", from: p.debtObligations ? "significant" : "none", to: p.debtObligations ? "none" : "significant", outcome: rDebt.portfolio.name },
+        sentence: p.debtObligations
+          ? "If you did not have significant debt or obligations, the advice would change to " + rDebt.portfolio.name + "."
+          : "If you had significant debt or obligations, the advice would change to " + rDebt.portfolio.name + "."
+      });
+    }
+
+    var rNeed = withChange("nearTermNeed", !p.nearTermNeed);
+    if (rNeed.portfolio.name !== current) {
+      findings.push({
+        key: "nearTermNeed",
+        relativeSize: 0.5,
+        change: { input: "near-term need", from: p.nearTermNeed ? "yes" : "no", to: p.nearTermNeed ? "no" : "yes", outcome: rNeed.portfolio.name },
+        sentence: p.nearTermNeed
+          ? "If you did not expect to need this money in the near term, the advice would change to " + rNeed.portfolio.name + "."
+          : "If you expected to need this money in the near term, the advice would change to " + rNeed.portfolio.name + "."
+      });
+    }
+
     // Smallest changes first. Keep at most three sentences.
     findings.sort(function (a, b) { return a.relativeSize - b.relativeSize; });
     var shown = findings.slice(0, 3);
@@ -254,6 +278,8 @@ window.AdviceIT = window.AdviceIT || {};
     });
     flips.push({ key: "emergencyFund", value: !p.emergencyFund, text: p.emergencyFund ? "you had no 6-month emergency fund" : "you had a 6-month emergency fund" });
     flips.push({ key: "incomeStable", value: !p.incomeStable, text: p.incomeStable ? "your income were variable" : "your income were stable" });
+    flips.push({ key: "debtObligations", value: !p.debtObligations, text: p.debtObligations ? "you had no significant debt" : "you had significant debt or obligations" });
+    flips.push({ key: "nearTermNeed", value: !p.nearTermNeed, text: p.nearTermNeed ? "you did not need the money in the near term" : "you might need the money in the near term" });
     flips.forEach(function (f) {
       if (withChanges([f]).portfolio.name === targetName) candidates.push({ size: 0.5, text: f.text });
     });

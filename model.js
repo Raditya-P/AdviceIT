@@ -197,6 +197,8 @@ window.AdviceIT = window.AdviceIT || {};
       tolerance: raw.tolerance === "low" || raw.tolerance === "high" ? raw.tolerance : "medium",
       emergencyFund: Boolean(raw.emergencyFund),
       incomeStable: Boolean(raw.incomeStable),
+      debtObligations: Boolean(raw.debtObligations),   // high-interest debt or heavy fixed obligations
+      nearTermNeed: Boolean(raw.nearTermNeed),         // money may be needed much sooner than the horizon
       toleranceInconsistent: Boolean(raw.toleranceInconsistent), // set only by narrative reading
       knowledge: raw.knowledge || "intermediate" // recorded only, weight zero
     };
@@ -211,20 +213,27 @@ window.AdviceIT = window.AdviceIT || {};
 
   function deriveSuitabilityLabels(profile) {
     var tolerance = profile.toleranceInconsistent ? "Inconsistent" : TOLERANCE_LABEL[profile.tolerance];
-    var buffers = (profile.emergencyFund ? 1 : 0) + (profile.incomeStable ? 1 : 0);
-    var capacity = buffers === 2 ? "High" : buffers === 1 ? "Moderate" : "Low";
+    // Capacity counts what could force selling at a loss (the codebook defines
+    // it by income, savings, debt and obligations): no emergency fund,
+    // variable income, significant debt. None: High. One: Moderate. More: Low.
+    var strains = [];
+    if (!profile.emergencyFund) strains.push("no emergency fund");
+    if (!profile.incomeStable) strains.push("variable income");
+    if (profile.debtObligations) strains.push("significant debt or obligations");
+    var capacity = strains.length === 0 ? "High" : strains.length === 1 ? "Moderate" : "Low";
+    // Liquidity need follows the horizon, but a concrete near-term need
+    // (rent, tuition, a tax bill) makes it Urgent whatever the horizon,
+    // which is how the expert panel judged such cases.
     var lb = CONFIG.LIQUIDITY_BANDS;
-    var liquidity = profile.horizon <= lb.urgentMax ? "Urgent"
+    var liquidity = (profile.nearTermNeed || profile.horizon <= lb.urgentMax) ? "Urgent"
       : profile.horizon <= lb.highMax ? "High"
       : profile.horizon <= lb.moderateMax ? "Moderate" : "Low";
     return {
       tolerance: tolerance,
       capacity: capacity,
       liquidity: liquidity,
-      capacityReason: buffers === 2 ? "emergency fund and stable income" : buffers === 1
-        ? (profile.emergencyFund ? "emergency fund but variable income" : "stable income but no emergency fund")
-        : "no emergency fund and variable income",
-      liquidityReason: profile.horizon + (profile.horizon === 1 ? " year" : " years") + " horizon"
+      capacityReason: strains.length ? strains.join(" and ") : "emergency fund, stable income, no significant debt",
+      liquidityReason: profile.nearTermNeed ? "the money may be needed in the near term" : profile.horizon + (profile.horizon === 1 ? " year" : " years") + " horizon"
     };
   }
 

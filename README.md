@@ -89,10 +89,10 @@ Both advisors speak the vocabulary of ILS-Bench. Three documented rules in `mode
 | Label | Rule |
 | --- | --- |
 | Risk tolerance | stated Low / Medium / High becomes Low / Moderate / High. *Inconsistent* only when a written description shows conflicting attitudes. |
-| Risk capacity | emergency fund and stable income: High. One of them: Moderate. Neither: Low. |
-| Liquidity need | horizon 1 to 2 years: Urgent. 3 to 5: High. 6 to 10: Moderate. 11 or more: Low. |
+| Risk capacity | counts what could force selling at a loss: no emergency fund, variable income, significant debt or obligations. None: High. One: Moderate. Two or more: Low. |
+| Liquidity need | horizon 1 to 2 years: Urgent. 3 to 5: High. 6 to 10: Moderate. 11 or more: Low. A concrete near-term need (rent, tuition, a tax bill) makes it Urgent whatever the horizon. |
 
-Age is the fourth input. Optionally, the in-browser language model reads a free-text description into the form fields, following the benchmark's own language-to-suitability procedure, filling only what it found and flagging inconsistent risk attitudes.
+Age is the fourth input. The rules follow the dataset's codebook, which defines capacity by income, savings, debt and obligations. Optionally, the in-browser language model reads a free-text description into the form fields, following the benchmark's own language-to-suitability procedure, filling only what it found and flagging inconsistent risk attitudes.
 
 ### 2. Two advisors, trained on expert judgements
 
@@ -115,7 +115,7 @@ An explanation condition is a combination of **what** is explained and **how** i
 
 | Content | How it is computed |
 | --- | --- |
-| Why (feature-based) | Interpretable advisor: contribution of each input to the evidence for the outcome, read from the weights, exact and additive in log-odds. AI advisor: exact Shapley values of the probability of the outcome over the five form inputs (all 32 coalitions, evaluated in the browser). Both reconcile to a printed total. |
+| Why (feature-based) | Interpretable advisor: contribution of each input to the evidence for the outcome, read from the weights, exact and additive in log-odds. AI advisor: exact Shapley values of the probability of the outcome over the seven form inputs (all 128 coalitions, evaluated in the browser). Both reconcile to a printed total. |
 | What would change it (counterfactual) | The advisor is re-run over each input's range to find the smallest single change that flips the outcome. Model-agnostic, true by construction, shown with change chips. |
 | How sure (confidence) | Calibrated probability of the outcome with a bar per outcome, and a note that confidence displays can help or hurt calibration. |
 

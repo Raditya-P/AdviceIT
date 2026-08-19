@@ -172,6 +172,24 @@
           </fieldset>
 
           <fieldset class="field">
+            <legend>Significant debt or large fixed obligations</legend>
+            <div class="segmented" role="radiogroup" aria-label="Debt and obligations">
+              <label><input type="radio" name="debtObligations" value="no" checked><span>No</span></label>
+              <label><input type="radio" name="debtObligations" value="yes"><span>Yes</span></label>
+            </div>
+            <p class="hint">For example high-interest debt, or fixed expenses that leave little room. Lowers risk capacity.</p>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Could you need this money much sooner than planned?</legend>
+            <div class="segmented" role="radiogroup" aria-label="Near-term need">
+              <label><input type="radio" name="nearTermNeed" value="no" checked><span>No</span></label>
+              <label><input type="radio" name="nearTermNeed" value="yes"><span>Yes</span></label>
+            </div>
+            <p class="hint">For example rent, tuition or a tax bill within a year or two. Makes the liquidity need urgent whatever the horizon.</p>
+          </fieldset>
+
+          <fieldset class="field">
             <legend>Financial knowledge, self-rated</legend>
             <div class="segmented" role="radiogroup" aria-label="Financial knowledge">
               <label><input type="radio" name="knowledge" value="beginner"><span>Beginner</span></label>
@@ -402,7 +420,7 @@
       <p>AdviceIT has two advisors, one per page, both learned from the same expert-validated data, and a set of explanation conditions built from two choices: what is explained (content) and how it is delivered (form). The advisor produces the recommendation. The explanation condition decides what the participant sees next to it. The scenario decides whether the advice shown is sound or deliberately flawed. Both advisors take the same profile, describe it with the same three suitability labels, and answer with one of the same six outcomes.</p>
 
       <h3>Shared vocabulary: suitability labels</h3>
-      <p>Both advisors describe a profile with the three labels used by ILS-Bench, derived from the form by three documented rules. Risk tolerance is the stated Low / Medium / High (Moderate), or Inconsistent when a written description shows conflicting attitudes. Risk capacity is High with an emergency fund and stable income, Moderate with one of them, Low with neither. Liquidity need follows the horizon: 1 to 2 years Urgent, 3 to 5 High, 6 to 10 Moderate, 11 or more Low. Age is the fourth input.</p>
+      <p>Both advisors describe a profile with the three labels used by ILS-Bench, derived from the form by three documented rules. Risk tolerance is the stated Low / Medium / High (Moderate), or Inconsistent when a written description shows conflicting attitudes. Risk capacity counts what could force selling at a loss: no emergency fund, variable income, significant debt or obligations. None of them: High. One: Moderate. Two or more: Low. Liquidity need follows the horizon (1 to 2 years Urgent, 3 to 5 High, 6 to 10 Moderate, 11 or more Low), and a concrete near-term need makes it Urgent whatever the horizon. Age is the fourth input. These rules follow the dataset's codebook, which defines capacity by income, savings, debt and obligations, and liquidity by the need to access the funds soon.</p>
 
       <h3>Advisor 1: the AI advisor (neural network)</h3>
       <p>A multilayer perceptron (12 inputs: the three labels one-hot encoded plus age, two hidden layers of 16 units, 6 outputs) trained with <code>ml/train_model.py</code> on ILS-Bench (Bonelli 2026, Mendeley Data, CC BY 4.0): 400 investor narratives whose suitability labels and recommended outcome were validated by a panel of four financial-domain experts. The six outcomes are the five portfolios and Human review. Cross-validated accuracy is <span id="hiw-ml-acc"></span> percent (5-fold, three repeats), on par with the dataset author's own draft labels and with a lookup table over the label combinations, and its probabilities are calibrated with temperature scaling. It runs in the browser from the exported weights in <code>ml_weights.js</code>. Its weights are not human-readable, so its explanations must be computed post hoc: exact Shapley values of the probability of the recommended outcome, the same counterfactual search, and calibrated probability for confidence.</p>

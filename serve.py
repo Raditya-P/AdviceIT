@@ -41,7 +41,7 @@ DATA_FILE = os.path.join(DATA_DIR, "responses.jsonl")
 FIELDS = [
     "receivedAt", "timestamp", "participantId", "mode", "condition", "advisorModel",
     "scenario", "age", "horizon", "tolerance", "emergencyFund", "incomeStable",
-    "knowledge", "toleranceInconsistent", "suitabilityTolerance", "suitabilityCapacity",
+    "debtObligations", "nearTermNeed", "knowledge", "toleranceInconsistent", "suitabilityTolerance", "suitabilityCapacity",
     "suitabilityLiquidity", "narrativeUsed", "ilsCaseId",
     "recommendedPortfolio", "soundPortfolio", "score", "margin",
     "confidence", "trustRating", "decision", "adjustedTo", "adjustSteps", "understanding",

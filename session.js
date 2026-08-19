@@ -29,6 +29,8 @@ window.AdviceIT = window.AdviceIT || {};
     "tolerance",
     "emergencyFund",
     "incomeStable",
+    "debtObligations",
+    "nearTermNeed",
     "knowledge",
     "toleranceInconsistent",
     "suitabilityTolerance",

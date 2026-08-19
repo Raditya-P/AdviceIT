@@ -228,7 +228,9 @@
       tolerance: ex.tolerance || "medium",
       toleranceInconsistent: ex.toleranceInconsistent,
       emergencyFund: ex.emergencyFund === null ? true : ex.emergencyFund,
-      incomeStable: ex.incomeStable === null ? true : ex.incomeStable
+      incomeStable: ex.incomeStable === null ? true : ex.incomeStable,
+      debtObligations: ex.debtObligations === null || ex.debtObligations === undefined ? false : ex.debtObligations,
+      nearTermNeed: ex.nearTermNeed === null || ex.nearTermNeed === undefined ? false : ex.nearTermNeed
     };
     var labels = model.deriveSuitabilityLabels(model.normalizeProfile(profile));
     var mlOut = advisors.ml.recommend(profile).portfolio.name;
@@ -315,13 +317,13 @@
         var c = sample[i];
         benchStatus("Reading case " + (i + 1) + " of " + sample.length + " (" + c.id + ")", i / sample.length);
         return llm.complete(llm.extractionMessages(c.narrative), 220).then(function (reply) {
-          var ex = llm.parseExtraction(reply) || { age: null, horizon: null, tolerance: null, toleranceInconsistent: false, emergencyFund: null, incomeStable: null, reasoning: "unreadable reply" };
+          var ex = llm.parseExtraction(reply) || { age: null, horizon: null, tolerance: null, toleranceInconsistent: false, emergencyFund: null, incomeStable: null, debtObligations: null, nearTermNeed: null, reasoning: "unreadable reply" };
           bench.results.push(evaluateCase(c, ex));
           i++;
           if (i % 5 === 0 || i === sample.length) renderBenchResults();
           return next();
         }).catch(function (err) {
-          bench.results.push(evaluateCase(c, { age: null, horizon: null, tolerance: null, toleranceInconsistent: false, emergencyFund: null, incomeStable: null, reasoning: "error: " + (err && err.message ? err.message : String(err)) }));
+          bench.results.push(evaluateCase(c, { age: null, horizon: null, tolerance: null, toleranceInconsistent: false, emergencyFund: null, incomeStable: null, debtObligations: null, nearTermNeed: null, reasoning: "error: " + (err && err.message ? err.message : String(err)) }));
           i++;
           return next();
         });
