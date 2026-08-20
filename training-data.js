@@ -220,17 +220,18 @@
 
   function evaluateCase(c, ex) {
     var model = ns.model, advisors = ns.advisors;
-    var age = ex.age !== null ? ex.age : ageFromText(c.narrative);
-    var complete = ex.horizon !== null && ex.tolerance !== null && ex.emergencyFund !== null && ex.incomeStable !== null && age !== null;
+    var pf = ns.llm.profileFromExtraction(ex);
+    var age = pf.age !== null ? pf.age : ageFromText(c.narrative);
+    var complete = pf.horizon !== null && pf.tolerance !== null && pf.emergencyFund !== null && pf.incomeStable !== null && age !== null;
     var profile = {
       age: age !== null ? age : 45,
-      horizon: ex.horizon !== null ? ex.horizon : 10,
-      tolerance: ex.tolerance || "medium",
-      toleranceInconsistent: ex.toleranceInconsistent,
-      emergencyFund: ex.emergencyFund === null ? true : ex.emergencyFund,
-      incomeStable: ex.incomeStable === null ? true : ex.incomeStable,
-      debtObligations: ex.debtObligations === null || ex.debtObligations === undefined ? false : ex.debtObligations,
-      nearTermNeed: ex.nearTermNeed === null || ex.nearTermNeed === undefined ? false : ex.nearTermNeed
+      horizon: pf.horizon !== null ? pf.horizon : 10,
+      tolerance: pf.tolerance || "medium",
+      toleranceInconsistent: pf.toleranceInconsistent,
+      emergencyFund: pf.emergencyFund === null ? true : pf.emergencyFund,
+      incomeStable: pf.incomeStable === null ? true : pf.incomeStable,
+      debtObligations: pf.debtObligations === null ? false : pf.debtObligations,
+      nearTermNeed: pf.nearTermNeed === null ? false : pf.nearTermNeed
     };
     var labels = model.deriveSuitabilityLabels(model.normalizeProfile(profile));
     var mlOut = advisors.ml.recommend(profile).portfolio.name;
@@ -242,7 +243,7 @@
       toleranceOk: labels.tolerance === c.tolerance, capacityOk: labels.capacity === c.capacity, liquidityOk: labels.liquidity === c.liquidity,
       mlOutcome: mlOut, logitOutcome: logitOut, consensusOutcome: c.portfolio,
       mlOk: mlOut === c.portfolio, logitOk: logitOut === c.portfolio,
-      horizonRead: ex.horizon, reasoning: ex.reasoning || ""
+      whenNeededRead: ex.whenNeeded || "", reasoning: ex.reasoning || ""
     };
   }
 
@@ -316,14 +317,14 @@
         if (bench.stop || i >= sample.length) { finish(); return; }
         var c = sample[i];
         benchStatus("Reading case " + (i + 1) + " of " + sample.length + " (" + c.id + ")", i / sample.length);
-        return llm.complete(llm.extractionMessages(c.narrative), 220).then(function (reply) {
-          var ex = llm.parseExtraction(reply) || { age: null, horizon: null, tolerance: null, toleranceInconsistent: false, emergencyFund: null, incomeStable: null, debtObligations: null, nearTermNeed: null, reasoning: "unreadable reply" };
+        return llm.complete(llm.extractionMessages(c.narrative), 200).then(function (reply) {
+          var ex = llm.parseExtraction(reply) || { age: null, whenNeeded: null, appetite: null, lossStress: null, emergencyFund: null, incomeStable: null, debtObligations: null, nearTermNeed: null, reasoning: "unreadable reply" };
           bench.results.push(evaluateCase(c, ex));
           i++;
           if (i % 5 === 0 || i === sample.length) renderBenchResults();
           return next();
         }).catch(function (err) {
-          bench.results.push(evaluateCase(c, { age: null, horizon: null, tolerance: null, toleranceInconsistent: false, emergencyFund: null, incomeStable: null, debtObligations: null, nearTermNeed: null, reasoning: "error: " + (err && err.message ? err.message : String(err)) }));
+          bench.results.push(evaluateCase(c, { age: null, whenNeeded: null, appetite: null, lossStress: null, emergencyFund: null, incomeStable: null, debtObligations: null, nearTermNeed: null, reasoning: "error: " + (err && err.message ? err.message : String(err)) }));
           i++;
           return next();
         });

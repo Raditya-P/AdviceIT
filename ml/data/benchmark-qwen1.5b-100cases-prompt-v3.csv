@@ -1,0 +1,101 @@
+id,complete,ageUsedFallback,readTolerance,readCapacity,readLiquidity,consensusTolerance,consensusCapacity,consensusLiquidity,toleranceOk,capacityOk,liquidityOk,mlOutcome,logitOutcome,consensusOutcome,mlOk,logitOk,whenNeededRead,reasoning
+ILS-001,true,true,Inconsistent,Low,Urgent,Inconsistent,Low,Urgent,true,true,true,Human review,Human review,Human review,true,true,over10,"Highly aggressive portfolio needed for high returns quickly, with significant stress risk."
+ILS-005,true,true,Moderate,High,Low,Moderate,High,Low,true,true,true,Growth,Growth,Growth,true,true,over10,"Retirement-focused, stable income, low stress."
+ILS-009,true,true,Moderate,High,Moderate,Moderate,Moderate,Low,true,false,false,Balanced,Balanced,Balanced,true,true,6to10,"balanced approach, moderate returns"
+ILS-013,true,true,Moderate,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,over10,"Anxiety during market declines, irregular income, small emergency fund."
+ILS-017,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,over10,Needs tuition soon and retirement later. May need funds within next 9 months.
+ILS-021,true,true,High,Moderate,Low,Inconsistent,Moderate,Urgent,false,true,false,Growth,Growth,Human review,false,false,over10,"High-risk, high-reward investment strategy needed."
+ILS-025,false,false,Inconsistent,Moderate,Low,Inconsistent,Low,Urgent,true,false,false,Conservative,Conservative,Human review,false,false,over10,despite unstable income and debt
+ILS-029,true,true,High,High,Low,Inconsistent,Moderate,High,false,false,false,Aggressive growth,Aggressive growth,Human review,false,false,over10,Needs funds for down payment and tuition within two years.
+ILS-033,true,true,High,Moderate,Low,Inconsistent,Low,Urgent,false,false,false,Growth,Aggressive growth,Human review,false,false,over10,"despite recent job change, financial situation is concerning"
+ILS-037,true,true,Moderate,High,Moderate,Moderate,Moderate,Moderate,true,false,true,Balanced,Balanced,Growth,false,false,6to10,"stable income, moderate risk preference"
+ILS-041,true,true,Moderate,High,Low,Moderate,Moderate,Low,true,false,true,Growth,Growth,Balanced,false,false,over10,"Retirement investor with stable income, moderate emergency fund."
+ILS-045,true,true,Moderate,Moderate,Moderate,Inconsistent,High,Urgent,false,false,false,Balanced,Balanced,Human review,false,false,6to10,"Needs money soon for tuition, long-term wealth growth. Stable income."
+ILS-049,true,true,Inconsistent,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,6to10,"Medical bills, recent job change, need for cash within 6 months."
+ILS-053,true,true,High,High,Low,High,High,Low,true,true,true,Aggressive growth,Aggressive growth,Aggressive growth,true,true,over10,"Retirement savings, stable income, diversified portfolio."
+ILS-057,true,true,High,Moderate,Moderate,High,Low,Moderate,true,false,true,Human review,Balanced,Human review,true,false,6to10,"Recent market excitement, high-interest debt, limited savings."
+ILS-061,true,true,High,High,Low,High,High,Low,true,true,true,Aggressive growth,Aggressive growth,Aggressive growth,true,true,over10,"Long-term wealth accumulation, stable income, low stress on investments."
+ILS-065,false,false,Moderate,High,Urgent,Moderate,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,over10,balanced portfolio with moderate risk
+ILS-069,true,false,Moderate,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,over10,Requires caution due to variable income and high debt
+ILS-073,false,true,High,High,Moderate,High,Moderate,High,true,false,false,Human review,Human review,Human review,true,true,6to10,Aggressive portfolio with frequent trading.
+ILS-077,false,false,Moderate,High,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,,I am unsure about my income and emergency fund.
+ILS-081,true,true,Inconsistent,Low,Urgent,Low,Low,Urgent,false,true,true,Human review,Human review,Human review,true,true,6to10,"recent job loss, limited savings, high-interest debt"
+ILS-085,true,true,Moderate,High,Low,Low,Moderate,Moderate,false,false,false,Growth,Growth,Conservative,false,false,over10,"Retired/Close to retirement, stable income, avoid large drawdowns."
+ILS-089,true,true,Moderate,Moderate,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,6to10,Information missing or unclear.
+ILS-093,true,true,Moderate,High,Low,Moderate,Moderate,Moderate,true,false,false,Growth,Growth,Balanced,false,false,over10,balanced portfolio with moderate growth and stability
+ILS-097,true,true,Low,Moderate,Urgent,Low,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,over10,"recent job loss, limited savings, irregular income"
+ILS-101,true,true,High,Moderate,Low,Low,High,Moderate,false,false,false,Human review,Growth,Conservative,false,false,over10,"Retired/Close to retirement, stable income, avoiding losses."
+ILS-105,true,true,Moderate,High,Moderate,Low,Moderate,Moderate,false,false,true,Balanced,Balanced,Conservative,false,false,6to10,"stable income, low risk"
+ILS-109,true,true,Moderate,Moderate,Low,Moderate,Moderate,High,true,true,false,Balanced,Balanced,Conservative,false,false,over10,"Retired/Close to retirement, stable income with some family expenses and a modest emergency fund. Stable financial situation."
+ILS-113,true,true,Moderate,Moderate,Low,Low,Low,Urgent,false,false,false,Balanced,Balanced,Human review,false,false,over10,"new investor, irregular income, small emergency fund, high stress tolerance"
+ILS-117,true,true,Moderate,Moderate,Low,Moderate,High,High,true,false,false,Balanced,Balanced,Human review,false,false,over10,Seeking advice for a balanced portfolio that can serve both short-term and long-term goals.
+ILS-121,true,true,Moderate,High,Low,Moderate,Moderate,High,true,false,false,Growth,Growth,Conservative,false,false,over10,"Retired/Close to retirement, stable income, manageable debt."
+ILS-125,false,false,Moderate,High,Moderate,Moderate,High,Low,true,true,false,Balanced,Balanced,Growth,false,false,,mainly retirement savings
+ILS-129,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,High,true,false,false,Human review,Human review,Human review,true,true,over10,"High risk, aggressive portfolio. Needs large funds within a short time."
+ILS-133,true,true,Moderate,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,over10,"recent job loss, limited savings, high stress from financial obligations"
+ILS-137,true,true,High,High,Low,Moderate,High,Low,false,true,true,Aggressive growth,Aggressive growth,Growth,false,false,over10,"Long-term wealth accumulation, stable income, low stress on market fluctuations."
+ILS-141,false,true,High,High,Low,Inconsistent,High,Low,false,true,true,Aggressive growth,Aggressive growth,Conservative,false,false,over10,"despite past losses, I have a balanced portfolio with low fees and regular income."
+ILS-145,true,true,High,Moderate,Low,Inconsistent,Low,High,false,false,false,Growth,Growth,Human review,false,false,over10,Investor is unsure of exact needs but wants to take some risk.
+ILS-149,true,true,Moderate,Moderate,Moderate,Inconsistent,Low,Urgent,false,false,false,Balanced,Balanced,Human review,false,false,6to10,Needs cash for medical expenses and has fixed expenses.
+ILS-153,true,true,Moderate,Moderate,Low,Moderate,High,High,true,false,false,Balanced,Balanced,Conservative,false,false,over10,"Retired/Close to retirement, balanced approach with stable income."
+ILS-157,true,true,Moderate,High,Low,Moderate,Moderate,Low,true,false,true,Growth,Growth,Balanced,false,false,over10,balanced portfolio with moderate growth and stability
+ILS-161,true,false,Moderate,High,Low,Moderate,Moderate,Moderate,true,false,false,Growth,Growth,Balanced,false,false,over10,
+ILS-165,true,true,High,Moderate,Moderate,High,Moderate,Moderate,true,true,true,Human review,Human review,Human review,true,true,6to10,"Recent market excitement, but may be putting too much weight on it."
+ILS-169,true,true,High,Moderate,Low,Inconsistent,Moderate,Moderate,false,true,false,Growth,Growth,Conservative,false,false,over10,Past behavior indicates a preference for growth over stability.
+ILS-173,false,false,Moderate,High,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,,Investment advice needed
+ILS-177,false,false,Moderate,High,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,,Not sure when needed
+ILS-181,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,over10,"Highly aggressive portfolio with high returns, but loss tolerance is low. Needs cash for medical expenses."
+ILS-185,true,true,Moderate,Low,Urgent,Low,Low,Urgent,false,true,true,Human review,Human review,Human review,true,true,over10,"divorce, uncertain expenses, recent job change, need cash for medical, sleep issues with losses"
+ILS-189,true,true,Moderate,High,Moderate,Moderate,Moderate,Low,true,false,false,Balanced,Balanced,Growth,false,false,6to10,balanced portfolio with moderate growth and stability
+ILS-193,true,true,Moderate,Moderate,Moderate,Inconsistent,High,High,false,false,false,Balanced,Balanced,Human review,false,false,6to10,"Medical costs soon, financial independence later. Business deposit in next year or two."
+ILS-197,true,true,Moderate,Moderate,Low,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,over10,Recent financial review not completed. More details needed.
+ILS-201,true,false,High,High,Low,High,High,Low,true,true,true,Growth,Growth,Growth,true,true,over10,
+ILS-205,true,true,Moderate,Moderate,Low,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,over10,"The investor wants a balanced portfolio with moderate returns, avoiding losses. They are open to growth but also want protection against financial shocks."
+ILS-209,false,true,High,High,Low,Inconsistent,High,Low,false,true,true,Aggressive growth,Aggressive growth,Conservative,false,false,over10,"Past behavior led to panic selling, but I want growth."
+ILS-213,true,true,High,High,Moderate,Low,Moderate,Moderate,false,false,true,Human review,Aggressive growth,Capital preservation,false,false,6to10,Describes a balanced approach with moderate risk tolerance.
+ILS-217,true,true,Moderate,Moderate,Low,Low,Low,High,false,false,false,Balanced,Balanced,Capital preservation,false,false,over10,"stable income, low risk"
+ILS-221,true,true,Moderate,High,Low,High,High,Low,false,true,true,Growth,Growth,Aggressive growth,false,false,over10,"Secure, stable income with manageable debt. No planned short-term withdrawals."
+ILS-225,true,true,Inconsistent,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,over10,"High interest debt, limited savings, urgent medical bills."
+ILS-229,false,false,Inconsistent,High,Urgent,Inconsistent,Low,High,true,false,false,Human review,Human review,Human review,true,true,over10,Retirement savings behind schedule; several fixed expenses; small emergency reserve; tuition in about two years
+ILS-233,true,true,Moderate,Moderate,Moderate,Inconsistent,Moderate,Urgent,false,true,false,Balanced,Balanced,Human review,false,false,6to10,"balanced approach, short-term tuition, long-term retirement"
+ILS-237,true,true,High,Moderate,Low,Inconsistent,High,Low,false,false,true,Growth,Growth,Conservative,false,false,over10,"Past behavior shows a desire for high returns, but past losses have caused anxiety."
+ILS-241,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,6to10,"High-risk, high-return portfolio with a focus on liquidity and access to cash for medical expenses."
+ILS-245,true,true,High,Moderate,Low,Low,Moderate,Moderate,false,true,false,Growth,Growth,Conservative,false,false,over10,I need a high-yield portfolio with low stress. Access to cash within five years is important.
+ILS-249,true,true,Moderate,High,Moderate,Moderate,Moderate,Low,true,false,false,Balanced,Balanced,Balanced,true,true,6to10,"stable income, moderate risk preference"
+ILS-253,false,true,High,High,Low,High,Moderate,High,true,false,false,Aggressive growth,Aggressive growth,Human review,false,false,over10,Recent market excitement may be causing stress.
+ILS-257,false,true,Moderate,High,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,,
+ILS-261,true,true,Moderate,High,Moderate,Low,Moderate,Moderate,false,false,true,Balanced,Balanced,Conservative,false,false,6to10,"Risk-averse investor with a mortgage, prefers moderate returns."
+ILS-265,true,true,Inconsistent,Moderate,Urgent,High,Low,High,false,false,false,Human review,Human review,Human review,true,true,6to10,Recent market excitement may not be a good indicator.
+ILS-269,true,true,Moderate,Moderate,Low,Inconsistent,Moderate,High,false,true,false,Balanced,Balanced,Human review,false,false,over10,"Needs money soon for business, long-term wealth growth. Stable income but not steady."
+ILS-273,true,true,Moderate,High,Low,Moderate,High,Low,true,true,true,Growth,Growth,Growth,true,true,over10,"Retirement savings, stable income, low stress on market fluctuations."
+ILS-277,true,true,High,Moderate,Low,Low,High,High,false,false,false,Growth,Growth,Conservative,false,false,over10,"Retired/Close to retirement, stable income, large near-term need."
+ILS-281,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,6to10,"High-risk, high-reward investor with a need for liquidity."
+ILS-285,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,6to10,"Retirement savings behind, fixed expenses, small emergency reserve, need money within 6 months."
+ILS-289,true,true,Inconsistent,Moderate,Urgent,Inconsistent,Low,High,true,false,false,Human review,Human review,Human review,true,true,over10,"High-risk, high-reward portfolio needed for home down payment within two years."
+ILS-293,true,true,Moderate,Moderate,Low,Inconsistent,High,High,false,false,false,Balanced,Balanced,Human review,false,false,over10,"Medical costs soon, financial independence later. Part for tuition in two years."
+ILS-297,true,true,High,High,Moderate,High,Moderate,High,true,false,false,Human review,Human review,Human review,true,true,6to10,"Considering a home down payment within the next two years, with a mortgage but stable income. High appetite for capital growth."
+ILS-301,false,false,Inconsistent,High,Urgent,Inconsistent,Low,High,true,false,false,Human review,Human review,Human review,true,true,over10,Aggressive portfolio with high returns to quickly grow funds for home down payment within two years. Avoid losses.
+ILS-305,false,false,High,High,Low,High,High,High,true,true,false,Aggressive growth,Aggressive growth,Human review,false,false,over10,salvaged from a truncated reply
+ILS-309,true,true,High,High,Low,High,High,Low,true,true,true,Aggressive growth,Aggressive growth,Aggressive growth,true,true,over10,"stable income, low stress"
+ILS-313,true,true,High,Moderate,Low,Low,High,Low,false,false,true,Growth,Growth,Conservative,false,false,over10,"I want to save for education, but I'm cautious."
+ILS-317,true,true,Moderate,Moderate,Low,Moderate,Moderate,High,true,true,false,Balanced,Balanced,Conservative,false,false,over10,"Retired/Close to retirement, balanced approach with stable income."
+ILS-321,true,true,High,High,Low,High,High,Low,true,true,true,Aggressive growth,Aggressive growth,Aggressive growth,true,true,over10,"Long-term growth, stable income."
+ILS-325,true,true,Moderate,High,Low,Moderate,Moderate,Low,true,false,true,Growth,Growth,Growth,true,true,over10,balanced portfolio with moderate growth and stability
+ILS-329,true,true,Moderate,High,Low,Moderate,Moderate,Low,true,false,true,Growth,Growth,Balanced,false,false,over10,"42-year-old retail investor, balanced portfolio with moderate risk."
+ILS-333,false,false,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,over10,Aggressive portfolio needed for high returns quickly. Needs to be invested if markets fall.
+ILS-337,true,true,Moderate,Moderate,Low,Moderate,Low,High,true,false,false,Balanced,Balanced,Human review,false,false,over10,"High interest debt, limited savings."
+ILS-341,true,true,Moderate,Moderate,Low,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,over10,Needs to balance short-term tuition with long-term family security.
+ILS-345,false,true,High,High,Low,High,Moderate,High,true,false,false,Aggressive growth,Aggressive growth,Human review,false,false,over10,Recent market excitement may cause stress.
+ILS-349,true,true,Inconsistent,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,over10,"Medical bills, unstable income, need for cash soon."
+ILS-353,true,true,Moderate,High,Low,Moderate,High,Low,true,true,true,Growth,Growth,Growth,true,true,over10,"stable income, low debt, long-term goal"
+ILS-357,true,true,Moderate,High,Low,Moderate,Moderate,Low,true,false,true,Growth,Growth,Balanced,false,false,over10,"stable income, moderate risk tolerance"
+ILS-361,true,true,Moderate,Moderate,Low,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,over10,Information missing or unclear.
+ILS-365,false,false,Inconsistent,Moderate,Urgent,Inconsistent,Low,Urgent,true,false,true,Human review,Human review,Human review,true,true,over10,High interest debt and irregular income
+ILS-369,true,true,High,High,Low,High,High,Low,true,true,true,Aggressive growth,Aggressive growth,Aggressive growth,true,true,over10,"stable income, no immediate needs, long-term focus on growth"
+ILS-373,false,false,Moderate,High,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,,Retired investor with uncertain future
+ILS-377,true,true,High,Moderate,Low,Inconsistent,Low,High,false,false,false,Growth,Aggressive growth,Human review,false,false,over10,I am unsure about the main goal.
+ILS-381,true,true,Moderate,High,Low,Moderate,High,Low,true,true,true,Growth,Growth,Growth,true,true,over10,"Retirement savings, moderate risk preference"
+ILS-385,false,true,Moderate,High,Moderate,Inconsistent,Low,High,false,false,false,Balanced,Balanced,Human review,false,false,,"I am unsure about future income, debt level, and volatility. The robo-adviser should recommend something based on the available information."
+ILS-389,false,false,Inconsistent,Moderate,Urgent,High,Moderate,High,false,true,false,Human review,Human review,Human review,true,true,over10,Recent market excitement may be causing stress.
+ILS-393,false,false,High,Moderate,Low,High,High,Moderate,true,false,false,Growth,Growth,Human review,false,false,over10,"Recent market excitement, aggressive portfolio."
+ILS-397,false,true,Inconsistent,Moderate,Urgent,Low,Low,Urgent,false,false,true,Human review,Human review,Human review,true,true,over10,"recent job loss, limited savings, need for rent and family expenses soon"

@@ -1225,21 +1225,22 @@
     llm.onProgress(function (r) { if (!llm.isReady()) progressNode.textContent = r.text; });
     llm.load(state.llmModelId).then(function () {
       status.textContent = "Reading the description";
-      return llm.complete(llm.extractionMessages(text), 220);
+      return llm.complete(llm.extractionMessages(text), 200);
     }).then(function (reply) {
       var ex = llm.parseExtraction(reply);
-      if (!ex) { status.textContent = "The model did not return readable JSON. Try again or fill in the form by hand."; status.classList.add("error"); return; }
+      if (!ex) { status.textContent = "The model did not return anything readable. Try again or fill in the form by hand."; status.classList.add("error"); return; }
+      var pf = llm.profileFromExtraction(ex);
       var filled = [], missing = [];
-      if (ex.age !== null) { $("age").value = ex.age; filled.push("age"); } else missing.push("age");
-      if (ex.horizon !== null) { $("horizon").value = ex.horizon; $("horizon-output").value = ex.horizon; filled.push("horizon"); } else missing.push("horizon");
-      if (ex.tolerance) { setRadio("tolerance", ex.tolerance); filled.push("tolerance"); } else missing.push("tolerance");
-      if (ex.emergencyFund !== null) { setRadio("emergencyFund", ex.emergencyFund ? "yes" : "no"); filled.push("emergency fund"); } else missing.push("emergency fund");
-      if (ex.incomeStable !== null) { setRadio("incomeStable", ex.incomeStable ? "stable" : "variable"); filled.push("income"); } else missing.push("income");
-      if (ex.debtObligations !== null) { setRadio("debtObligations", ex.debtObligations ? "yes" : "no"); filled.push("debt"); } else missing.push("debt");
-      if (ex.nearTermNeed !== null) { setRadio("nearTermNeed", ex.nearTermNeed ? "yes" : "no"); filled.push("near-term need"); } else missing.push("near-term need");
-      setInconsistent(ex.toleranceInconsistent);
+      if (pf.age !== null) { $("age").value = pf.age; filled.push("age"); } else missing.push("age");
+      if (pf.horizon !== null) { $("horizon").value = pf.horizon; $("horizon-output").value = pf.horizon; filled.push("when the money is needed"); } else missing.push("when the money is needed");
+      if (pf.tolerance) { setRadio("tolerance", pf.tolerance); filled.push("risk tolerance"); } else missing.push("risk tolerance");
+      if (pf.emergencyFund !== null) { setRadio("emergencyFund", pf.emergencyFund ? "yes" : "no"); filled.push("emergency fund"); } else missing.push("emergency fund");
+      if (pf.incomeStable !== null) { setRadio("incomeStable", pf.incomeStable ? "stable" : "variable"); filled.push("income"); } else missing.push("income");
+      if (pf.debtObligations !== null) { setRadio("debtObligations", pf.debtObligations ? "yes" : "no"); filled.push("debt"); } else missing.push("debt");
+      if (pf.nearTermNeed !== null) { setRadio("nearTermNeed", pf.nearTermNeed ? "yes" : "no"); filled.push("near-term need"); } else missing.push("near-term need");
+      setInconsistent(pf.toleranceInconsistent);
       state.narrativeUsed = true;
-      status.textContent = "Filled: " + (filled.join(", ") || "nothing") + (missing.length ? ". Not found in the text: " + missing.join(", ") + ", left as they were." : ".") + (ex.toleranceInconsistent ? " Risk attitude read as Inconsistent." : "");
+      status.textContent = "Filled: " + (filled.join(", ") || "nothing") + (missing.length ? ". Not found in the text: " + missing.join(", ") + ", left as they were." : ".") + (pf.toleranceInconsistent ? " Risk attitude read as Inconsistent (high stated appetite against a weak position)." : "");
       recompute();
     }).catch(function (err) {
       status.textContent = "Could not read the description: " + (err && err.message ? err.message : String(err));

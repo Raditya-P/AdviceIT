@@ -30,8 +30,8 @@ window.AdviceIT = window.AdviceIT || {};
 
   /* Prebuilt WebLLM model IDs. Smaller loads faster and needs less GPU memory. */
   var MODELS = [
-    { id: "Llama-3.2-1B-Instruct-q4f16_1-MLC", label: "Llama 3.2 1B (about 0.9 GB, default)" },
-    { id: "Qwen2.5-1.5B-Instruct-q4f16_1-MLC", label: "Qwen 2.5 1.5B (about 1.2 GB, better wording)" },
+    { id: "Qwen2.5-1.5B-Instruct-q4f16_1-MLC", label: "Qwen 2.5 1.5B (about 1.2 GB, default, best at reading descriptions)" },
+    { id: "Llama-3.2-1B-Instruct-q4f16_1-MLC", label: "Llama 3.2 1B (about 0.9 GB, lighter)" },
     { id: "Qwen2.5-0.5B-Instruct-q4f16_1-MLC", label: "Qwen 2.5 0.5B (about 0.4 GB, fastest)" },
     { id: "Llama-3.2-3B-Instruct-q4f16_1-MLC", label: "Llama 3.2 3B (about 2.2 GB, needs a strong GPU)" }
   ];
@@ -183,17 +183,26 @@ window.AdviceIT = window.AdviceIT || {};
      ------------------------------------------------------------ */
   function extractionMessages(narrative) {
     var system = [
-      "You read a short description written by an investor and fill in a suitability form.",
-      "Reply with ONE JSON object and nothing else, using exactly these keys:",
-      '{"age": integer 18 to 80 or null, "horizonYears": integer 1 to 40 or null, "riskTolerance": "low" | "medium" | "high" | null,',
-      ' "toleranceInconsistent": true | false, "emergencyFund": true | false | null, "incomeStable": true | false | null,',
-      ' "debtOrObligations": true | false | null, "nearTermNeed": true | false | null, "reasoning": short string}',
-      "Rules: use null when the text does not say. horizonYears is how many years until the money is needed for its main goal (retirement in decades means 20 or more).",
-      "nearTermNeed is true when the money may be needed soon for anything concrete (rent, tuition, a tax bill, a purchase within a year or two), even if the stated goal is far away. false when the text says the money can stay invested.",
-      "debtOrObligations is true when the text mentions high-interest debt, loans to repay, or heavy fixed expenses that leave little room. false when it says debt is manageable or absent.",
-      "emergencyFund is true only if the text says there is a solid cash reserve or emergency fund, false if it says the reserve is small or absent. incomeStable is true for a secure or steady income, false for irregular or variable income.",
-      "riskTolerance is the investor's stated willingness to accept swings.",
-      "toleranceInconsistent is IMPORTANT and common: set it true whenever the text asks for high returns or an aggressive portfolio while ALSO showing a weak position to bear losses (money needed soon, small or no reserve, debt, irregular income, or saying a loss would cause serious stress). When in doubt between high tolerance and inconsistent, choose inconsistent."
+      "You read a short description written by an investor and extract facts for a suitability form.",
+      "Reply with ONE JSON object on a single line and nothing else, using exactly these keys and allowed values:",
+      '{"age": integer or null,',
+      ' "whenNeeded": "under2" | "2to5" | "6to10" | "over10" | "unsure" | null,',
+      ' "appetite": "low" | "medium" | "high" | "unsure" | null,',
+      ' "lossStress": true | false | null,',
+      ' "emergencyFund": true | false | "unsure" | null,',
+      ' "incomeStable": true | false | "unsure" | null,',
+      ' "debtOrObligations": true | false | null,',
+      ' "nearTermNeed": true | false | null,',
+      ' "note": string of at most 10 words}',
+      "Three kinds of answer: the value when the text says it, the string unsure when the person SAYS they do not know or have not checked, null only when the text is silent. Extract, do not judge.",
+      "age: the text states it, in phrases like I am 46 or as a 64-year-old. Read it, do not answer null.",
+      "whenNeeded: how soon the money is needed for its MAIN goal. Money needed very soon or within a year or two: under2. A few years: 2to5. Do NOT answer over10 by default, only when the text says the money can stay invested for well over ten years, such as retirement decades away. The person says they do not know when: unsure.",
+      "nearTermNeed: true if ANY concrete need could take this money within about two years (rent, tuition, a tax bill, a purchase, a deposit, medical costs), even when the main goal is far away.",
+      "appetite: what the person SAYS they want. Aggressive portfolio, high returns, grow quickly, recover a gap fast: high. Cautious, avoid losses, preserve capital: low. Balanced or moderate: medium. The person says they are not sure how much risk they can take: unsure.",
+      "lossStress: true if the text says a loss would cause serious stress, anxiety or hardship, or that they cannot tolerate losses, or that they panicked and sold during a past decline.",
+      "emergencyFund: true only for a solid cash reserve or emergency fund. false if the reserve is described as small, limited or absent. unsure if they say they have not checked it.",
+      "incomeStable: true for a secure or steady income. false for irregular, variable, contract or a single unstable income. unsure if they say they cannot estimate their income.",
+      "debtOrObligations: true for high-interest debt, loans to repay, or heavy or several fixed expenses. false if debt is said to be manageable or absent."
     ].join("\n");
     return [
       { role: "system", content: system },
@@ -203,28 +212,87 @@ window.AdviceIT = window.AdviceIT || {};
 
   function parseExtraction(text) {
     if (!text) return null;
+    var obj = null;
     var start = text.indexOf("{"), end = text.lastIndexOf("}");
-    if (start < 0 || end <= start) return null;
-    var obj;
-    try { obj = JSON.parse(text.slice(start, end + 1)); } catch (e) { return null; }
+    if (start >= 0 && end > start) {
+      try { obj = JSON.parse(text.slice(start, end + 1)); } catch (e) { obj = null; }
+    }
+    // Salvage: the small models often ramble past the token limit, which
+    // truncates the JSON. Recover whatever key-value pairs are present.
+    if (!obj) {
+      obj = {};
+      var m;
+      if ((m = text.match(/"age"\s*:\s*(\d+)/))) obj.age = parseInt(m[1], 10);
+      if ((m = text.match(/"whenNeeded"\s*:\s*"(under2|2to5|6to10|over10|unsure)"/))) obj.whenNeeded = m[1];
+      if ((m = text.match(/"appetite"\s*:\s*"(low|medium|moderate|high|unsure)"/i))) obj.appetite = m[1];
+      ["lossStress", "emergencyFund", "incomeStable", "debtOrObligations", "nearTermNeed"].forEach(function (key) {
+        var mm = text.match(new RegExp('"' + key + '"\\s*:\\s*(true|false|"unsure")'));
+        if (mm) obj[key] = mm[1] === "true" ? true : mm[1] === "false" ? false : "unsure";
+      });
+      if (!Object.keys(obj).length) return null;
+      obj.note = "salvaged from a truncated reply";
+    }
     function intIn(v, lo, hi) { var n = parseInt(v, 10); return isNaN(n) || n < lo || n > hi ? null : n; }
-    function bool(v) { return v === true || v === "true" ? true : v === false || v === "false" ? false : null; }
-    var tol = typeof obj.riskTolerance === "string" ? obj.riskTolerance.toLowerCase() : null;
-    if (tol === "moderate") tol = "medium";
-    if (["low", "medium", "high"].indexOf(tol) < 0) tol = null;
+    function bool(v) { return v === true || v === "true" ? true : v === false || v === "false" ? false : v === "unsure" ? "unsure" : null; }
+    var when = typeof obj.whenNeeded === "string" && ["under2", "2to5", "6to10", "over10", "unsure"].indexOf(obj.whenNeeded) >= 0 ? obj.whenNeeded : null;
+    var appetite = typeof obj.appetite === "string" ? obj.appetite.toLowerCase() : null;
+    if (appetite === "moderate") appetite = "medium";
+    if (["low", "medium", "high", "unsure"].indexOf(appetite) < 0) appetite = null;
     return {
       age: intIn(obj.age, 18, 80),
-      horizon: intIn(obj.horizonYears, 1, 40),
-      tolerance: tol,
-      toleranceInconsistent: bool(obj.toleranceInconsistent) === true,
+      whenNeeded: when,
+      appetite: appetite,
+      lossStress: bool(obj.lossStress),
       emergencyFund: bool(obj.emergencyFund),
       incomeStable: bool(obj.incomeStable),
       debtObligations: bool(obj.debtOrObligations),
       nearTermNeed: bool(obj.nearTermNeed),
-      reasoning: typeof obj.reasoning === "string" ? obj.reasoning : ""
+      reasoning: typeof obj.note === "string" ? obj.note : ""
     };
   }
 
+  /* Turn the extracted facts into form-field values. The judgement calls
+     live HERE, in deterministic code, not in the small language model:
+       horizon      from the whenNeeded range (its midpoint in years)
+       tolerance    the stated appetite
+       Inconsistent when the stated appetite is high while the facts show a
+                    weak position to bear losses (loss stress, a near-term
+                    need, or at least two financial strains), which is how
+                    the ILS-Bench codebook uses the label. Also when the
+                    person says they do not know how much risk they can take.
+       unsure       mapped conservatively, the way the expert panel judged
+                    such cases: an unchecked emergency fund or an income the
+                    person cannot estimate counts as a strain (fund or income
+                    read as weak), and not knowing when the money is needed
+                    reads as a short horizon. The panel escalated cases with
+                    missing self-knowledge, it never defaulted them to safe.
+     Fields the model could not read at all stay null so the caller can
+     leave the form untouched and report them. */
+  var WHEN_TO_HORIZON = { under2: 2, "2to5": 4, "6to10": 8, over10: 20, unsure: 4 };
+
+  function profileFromExtraction(ex) {
+    var fund = ex.emergencyFund === "unsure" ? false : ex.emergencyFund;
+    var income = ex.incomeStable === "unsure" ? false : ex.incomeStable;
+    var debt = ex.debtObligations === "unsure" ? null : ex.debtObligations;
+    var strains = 0;
+    if (fund === false) strains++;
+    if (income === false) strains++;
+    if (debt === true) strains++;
+    var inconsistent = (ex.appetite === "high" && (ex.lossStress === true || ex.nearTermNeed === true || strains >= 2))
+      || ex.appetite === "unsure";
+    return {
+      age: ex.age,
+      horizon: ex.whenNeeded ? WHEN_TO_HORIZON[ex.whenNeeded] : null,
+      tolerance: ex.appetite === "unsure" ? "medium" : ex.appetite,
+      toleranceInconsistent: inconsistent,
+      emergencyFund: fund,
+      incomeStable: income,
+      debtObligations: debt,
+      nearTermNeed: ex.nearTermNeed === "unsure" ? null : ex.nearTermNeed
+    };
+  }
+
+  /* One-shot completion (no streaming) for the extraction. */
   /* One-shot completion (no streaming) for the extraction. */
   function complete(messages, maxTokens) {
     if (!state.engine) return Promise.reject(new Error("No model loaded."));
@@ -242,6 +310,7 @@ window.AdviceIT = window.AdviceIT || {};
     MODELS: MODELS,
     extractionMessages: extractionMessages,
     parseExtraction: parseExtraction,
+    profileFromExtraction: profileFromExtraction,
     complete: complete,
     supported: supported,
     servedOverHttp: servedOverHttp,
