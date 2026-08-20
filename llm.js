@@ -31,9 +31,7 @@ window.AdviceIT = window.AdviceIT || {};
   /* Prebuilt WebLLM model IDs. Smaller loads faster and needs less GPU memory. */
   var MODELS = [
     { id: "Qwen2.5-1.5B-Instruct-q4f16_1-MLC", label: "Qwen 2.5 1.5B (about 1.2 GB, default, best at reading descriptions)" },
-    { id: "Llama-3.2-1B-Instruct-q4f16_1-MLC", label: "Llama 3.2 1B (about 0.9 GB, lighter)" },
-    { id: "Qwen2.5-0.5B-Instruct-q4f16_1-MLC", label: "Qwen 2.5 0.5B (about 0.4 GB, fastest)" },
-    { id: "Llama-3.2-3B-Instruct-q4f16_1-MLC", label: "Llama 3.2 3B (about 2.2 GB, needs a strong GPU)" }
+    { id: "Llama-3.2-1B-Instruct-q4f16_1-MLC", label: "Llama 3.2 1B (about 0.9 GB, lighter and faster)" }
   ];
 
   var state = {

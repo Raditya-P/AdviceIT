@@ -1320,6 +1320,7 @@
   }
 
   function startStudyFlow() {
+    document.body.classList.add("flow-study");
     state.plan = study.buildPlan(state.participantId, state.trialsTotal);
     $("participant-banner").hidden = false;
     renderConsent();

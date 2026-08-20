@@ -50,7 +50,7 @@ python3 -m http.server 8000
 # then open http://localhost:8000
 ```
 
-The conversational delivery, the free-text reading and the benchmark run an open-weight language model **inside the browser** through [WebLLM](https://github.com/mlc-ai/web-llm). They need a WebGPU browser (recent Chrome or Edge, Safari 18), the page served over http, and an internet connection the first time to download the model (0.4 to 2.2 GB, then cached). Everything else works offline from a double-click.
+The conversational delivery, the free-text reading and the benchmark run an open-weight language model **inside the browser** through [WebLLM](https://github.com/mlc-ai/web-llm). They need a WebGPU browser (recent Chrome or Edge, Safari 18), the page served over http, and an internet connection the first time to download the model (about 1 GB, then cached). Everything else works offline from a double-click.
 
 Deploy anywhere that serves static files. The empty `.nojekyll` file makes GitHub Pages serve the folder as is.
 
@@ -124,7 +124,7 @@ An explanation condition is a combination of **what** is explained and **how** i
 | Static | The content as it is. |
 | Interactive what-if | A copy of the inputs the participant can move, with the outcome, probabilities and contributions updating live. "Ignore this input" switches. A "why not X?" selector with a contrastive explanation found by search. Moves are logged. |
 | Adaptive to literacy | Plain sentences for a low Big Three literacy score, bars and probabilities for a high score. The three literacy questions appear with this delivery. |
-| Conversational | An open-weight model (Llama 3.2 or Qwen 2.5) in the browser through WebLLM, grounded on the ticked content as its only source, with a follow-up chat. Its text is logged verbatim. |
+| Conversational | An open-weight model (Qwen 2.5 1.5B by default, Llama 3.2 1B as the lighter option) in the browser through WebLLM, grounded on the ticked content as its only source, with a follow-up chat. Its text is logged verbatim. |
 
 Presets: No explanation, Why, What would change it, How sure, All three (hybrid), Interactive what-if, Adaptive to literacy, Conversational. Anything else is Custom.
 

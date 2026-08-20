@@ -724,8 +724,8 @@ pre.cmd code { background: none; color: inherit; padding: 0; }
 .secondary-measures textarea { width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; resize: vertical; }
 
 /* Interactive what-if panel */
-.whatif-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-@media (max-width: 640px) { .whatif-grid { grid-template-columns: 1fr; } }
+.whatif-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.whatif-grid > * { min-width: 0; }
 .whatif-controls .field { margin-bottom: 10px; }
 .whatif-controls label, .whatif-controls legend { font-size: 0.88rem; }
 .ignore-toggle { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; margin-left: 8px; }
@@ -735,7 +735,7 @@ pre.cmd code { background: none; color: inherit; padding: 0; }
 .whatif-preview .contrib-item { grid-template-columns: minmax(100px, 1fr) 60px; }
 .whatif-preview .contrib-bar-wrap { display: none; }
 .whynot { margin-top: 12px; }
-.whynot select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.whynot select { font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; max-width: 100%; }
 .whynot-answer { margin: 8px 0 0; font-size: 0.92rem; }
 
 /* Band visual (rule-based confidence) */
@@ -748,7 +748,7 @@ pre.cmd code { background: none; color: inherit; padding: 0; }
 .band-caption { font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0; }
 
 /* Counterfactual chips */
-.cf-chip { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+.cf-chip { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); font-size: 0.78rem; font-weight: 600; white-space: normal; }
 
 /* Hybrid and adaptive */
 .hybrid-stack > .explanation-box { margin-bottom: 12px; }
@@ -791,3 +791,11 @@ pre.cmd code { background: none; color: inherit; padding: 0; }
 .scorecard td.neg { color: var(--negative); }
 .scorecard th[scope="row"] { white-space: nowrap; }
 .scorecard th[scope="col"] { font-size: 0.8rem; }
+
+/* Overflow safety inside explanation panels */
+.explanation-box { min-width: 0; overflow-wrap: break-word; }
+.whatif-controls input[type="number"] { max-width: 100%; }
+
+/* Study flow trials: one wide centered column, no step numbers */
+body.flow-study #columns { grid-template-columns: minmax(0, 1fr); max-width: 880px; margin-left: auto; margin-right: auto; }
+body.flow-study .step-number { display: none; }
