@@ -97,29 +97,56 @@
       if (root) root.appendChild(el("p", { class: "hint", text: "Training metadata not found in ml_weights.js." }));
       return;
     }
+    root.appendChild(el("p", { class: "stat-headline", text: "Both advisors were trained by the same script on the same " + meta.cases + " cases (seed " + meta.seed + ", " + meta.trainedOn + ")." }));
+
+    // Reference points: not advisors, only context for the accuracy numbers.
+    root.appendChild(el("h3", { class: "sub-heading", text: "Reference points (not advisors, shown for context)" }));
     var rows = [
-      ["Trained on", meta.cases + " cases, seed " + meta.seed + ", " + meta.trainedOn],
-      ["Cross-validated accuracy", pct(meta.cvAccuracy) + " (sd " + pct(meta.cvAccuracySd) + ", " + meta.cvFolds + "-fold, " + meta.cvRepeats + " repeats)"],
-      ["Cross-validated macro-F1", String(meta.cvMacroF1)],
-      ["Majority-class baseline", pct(meta.majorityBaselineAccuracy)],
-      ["Lookup-table baseline (cross-validated)", pct(meta.lookupBaselineAccuracy)],
-      ["Author draft label agrees with expert consensus", pct(meta.authorAgreementWithConsensus)],
-      ["Calibration (temperature scaling)", "temperature " + ns.mlWeights.temperature + ", expected calibration error " + meta.eceBefore + " before, " + meta.eceAfter + " after"],
-      ["Final model, training accuracy on all cases", pct(meta.trainAccuracy)],
-      ["Architecture", "12 inputs, two hidden layers of " + meta.hidden + " units, " + classes.length + " outputs, " + meta.epochs + " epochs"]
+      ["Always guess the most common outcome", pct(meta.majorityBaselineAccuracy)],
+      ["Memorise the most common outcome for each label combination seen in training (a lookup table)", pct(meta.lookupBaselineAccuracy)],
+      ["The dataset author's own draft labels, against the expert consensus", pct(meta.authorAgreementWithConsensus)]
     ];
     var table = el("table", { class: "log-table data-table" });
     var tbody = el("tbody");
     rows.forEach(function (r) {
-      tbody.appendChild(el("tr", {}, [el("th", { scope: "row", text: r[0] }), el("td", { text: r[1] })]));
+      tbody.appendChild(el("tr", {}, [el("th", { scope: "row", text: r[0] }), el("td", { class: "num", text: r[1] })]));
     });
     table.appendChild(tbody);
     root.appendChild(el("div", { class: "table-wrap" }, [table]));
+    root.appendChild(el("p", { class: "hint", text: "The lookup table is not the interpretable rule-based advisor. The table only memorises what it has seen: no weights, no probabilities, no answer for a new combination. The advisor is a fitted scorecard with readable weights (shown on its page) and calibrated probabilities. That the two accuracies are close means the label-to-outcome mapping is highly regular, and the advisors' value lies in what a memorised table cannot give: calibrated confidence, answers everywhere, and explanations." }));
 
-    root.appendChild(el("p", { class: "hint", text: "How to read this: once the three labels are known, the mapping to an outcome is largely rule-like, which is why the network ties a lookup table and the dataset author's own labels. What the network adds is calibrated probabilities, smooth behaviour on unseen combinations, and a realistic black box for the explanation study." }));
+    // Both advisors side by side, from the same weights file.
+    var logit = ns.mlWeights.logit || {};
+    var lmeta = logit.meta || {};
+    root.appendChild(el("h3", { class: "sub-heading", text: "The two advisors, trained by the same script on the same cases" }));
+    var comp = el("table", { class: "log-table data-table" });
+    var chead = el("tr", {}, [
+      el("th", { scope: "col", text: "Measure" }),
+      el("th", { scope: "col", text: "AI advisor (neural network)" }),
+      el("th", { scope: "col", text: "Interpretable rule-based advisor (logistic regression)" })
+    ]);
+    comp.appendChild(el("thead", {}, [chead]));
+    var cbody = el("tbody");
+    [
+      ["Cross-validated accuracy (" + meta.cvFolds + "-fold, " + meta.cvRepeats + " repeats)", pct(meta.cvAccuracy) + " (sd " + pct(meta.cvAccuracySd) + ")", pct(lmeta.cvAccuracy) + " (sd " + pct(lmeta.cvAccuracySd) + ")"],
+      ["Cross-validated macro-F1", String(meta.cvMacroF1), String(lmeta.cvMacroF1)],
+      ["Calibration (temperature scaling)", "temperature " + ns.mlWeights.temperature + ", ECE " + meta.eceBefore + " to " + meta.eceAfter, "temperature " + logit.temperature + ", ECE " + lmeta.eceBefore + " to " + lmeta.eceAfter],
+      ["Training accuracy on all cases, reproduced exactly by the browser inference", pct(meta.trainAccuracy), pct(lmeta.trainAccuracy)],
+      ["Architecture", "12 inputs, two hidden layers of " + meta.hidden + " units, " + classes.length + " outputs, " + meta.epochs + " epochs", "one linear layer, 12 inputs by " + classes.length + " outcomes, every weight readable"],
+      ["Explanations", "post hoc: exact Shapley values, counterfactual search, calibrated probability", "exact: contributions read from the weights, same counterfactual search, calibrated probability"]
+    ].forEach(function (r) {
+      cbody.appendChild(el("tr", {}, [el("th", { scope: "row", text: r[0] }), el("td", { text: r[1] }), el("td", { text: r[2] })]));
+    });
+    comp.appendChild(cbody);
+    root.appendChild(el("div", { class: "table-wrap" }, [comp]));
+
+    var more = el("details", { class: "data-details" });
+    more.appendChild(el("summary", { text: "More detail: per-class recall and the confusion matrix (neural network)" }));
+    root.appendChild(more);
+    root = more;
 
     if (meta.perClassRecall) {
-      root.appendChild(el("h3", { class: "sub-heading", text: "Per-class recall (out of fold)" }));
+      root.appendChild(el("h3", { class: "sub-heading", text: "Per-class recall (neural network, out of fold)" }));
       var t2 = el("table", { class: "log-table data-table" });
       var thead = el("thead", {}, [el("tr", {}, [el("th", { scope: "col", text: "Outcome" }), el("th", { scope: "col", text: "Cases" }), el("th", { scope: "col", text: "Recall" })])]);
       var tb2 = el("tbody");
@@ -134,7 +161,7 @@
     }
 
     if (meta.confusion && classes.length) {
-      root.appendChild(el("h3", { class: "sub-heading", text: "Confusion matrix (out of fold, rows are the experts' outcome, columns the network's)" }));
+      root.appendChild(el("h3", { class: "sub-heading", text: "Confusion matrix (neural network, out of fold, rows are the experts' outcome, columns the network's)" }));
       var t3 = el("table", { class: "log-table data-table confusion" });
       var hrow = el("tr", {}, [el("th", { scope: "col", text: "" })]);
       classes.forEach(function (c) { hrow.appendChild(el("th", { scope: "col", text: c })); });

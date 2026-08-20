@@ -65,6 +65,11 @@
         <a class="btn btn-small" href="training-data.html">About the training data</a>
       </div>
       <p class="data-summary">This page runs a <strong>scorecard derived from data</strong>: a multinomial logistic regression fitted on ILS-Bench, the same 400 expert-validated cases and the same twelve inputs as the neural network, with <span id="logit-panel-acc"></span> percent cross-validated accuracy and calibrated probabilities. It is rule-based in the sense that every outcome has one weight per input and the outcome with the largest total wins, exactly like the points-based suitability scorecards used in practice, except that its weights were learned from expert judgements rather than set by hand. Because the weights are visible, the contribution of every input to the recommended outcome is read directly from them, exact and additive. It is the transparent counterpart of the <a href="index.html">AI advisor</a>: same data, same inputs, no black box.</p>
+      <details class="data-details">
+        <summary>The whole scorecard: what every input is worth, in points, for every outcome</summary>
+        <p class="hint">These are the model's fitted weights, shown as they are. For any profile, exactly one row applies from each group. Add the applying rows, the age effect and the starting points in each column: the outcome with the largest total wins, and the totals are turned into the probabilities shown in the app. Points are log-odds, so a difference of about 1 point between two outcomes means roughly 3 to 1 odds. The "Why" explanation under a recommendation is this same table applied to one profile, relative to the neutral baseline.</p>
+        <div id="scorecard-table" class="table-wrap"></div>
+      </details>
     </section>
 
     <!-- Researcher controls -->
@@ -112,7 +117,7 @@
         <div class="control">
           <p class="control-label" id="mode-label">Mode</p>
           <p class="control-value">Researcher mode. <a id="participant-link" href="?mode=participant">Open a participant link</a> (one trial) or <a id="study-link" href="?mode=participant&amp;flow=study">open the full study flow</a> (consent, literacy check, six trials, attention check, debrief).</p>
-          </div>
+           </div>
       </div>
     </section>
 
@@ -127,8 +132,10 @@
         <p class="panel-intro">Answer the questions a robo-advisor would ask.</p>
 
         <div class="examples" data-researcher-only>
-          <p class="control-label" id="examples-label">Load example profile</p>
-          <div class="button-row" role="group" aria-labelledby="examples-label" id="example-buttons"></div>
+          <label class="control-label" for="example-select">Load an example profile</label>
+          <select id="example-select">
+            <option value="">Choose a profile</option>
+          </select>
         </div>
 
         <form id="profile-form" novalidate>
@@ -421,7 +428,7 @@
       <p>Both advisors describe a profile with the three labels used by ILS-Bench, derived from the form by three documented rules. Risk tolerance is the stated Low / Medium / High (Moderate), or Inconsistent when a written description shows conflicting attitudes. Risk capacity counts what could force selling at a loss: no emergency fund, variable income, significant debt or obligations. None of them: High. One: Moderate. Two or more: Low. Liquidity need follows the horizon (1 to 2 years Urgent, 3 to 5 High, 6 to 10 Moderate, 11 or more Low), and a concrete near-term need makes it Urgent whatever the horizon. Age is the fourth input. These rules follow the dataset's codebook, which defines capacity by income, savings, debt and obligations, and liquidity by the need to access the funds soon.</p>
 
       <h3>Advisor 1: the AI advisor (neural network)</h3>
-      <p>A multilayer perceptron (12 inputs: the three labels one-hot encoded plus age, two hidden layers of 16 units, 6 outputs) trained with <code>ml/train_model.py</code> on ILS-Bench (Bonelli 2026, Mendeley Data, CC BY 4.0): 400 investor narratives whose suitability labels and recommended outcome were validated by a panel of four financial-domain experts. The six outcomes are the five portfolios and Human review. Cross-validated accuracy is <span id="hiw-ml-acc"></span> percent (5-fold, three repeats), on par with the dataset author's own draft labels and with a lookup table over the label combinations, and its probabilities are calibrated with temperature scaling. It runs in the browser from the exported weights in <code>ml_weights.js</code>. Its weights are not human-readable, so its explanations must be computed post hoc: exact Shapley values of the probability of the recommended outcome, the same counterfactual search, and calibrated probability for confidence.</p>
+      <p>A multilayer perceptron (12 encoded inputs: the three suitability labels one-hot encoded plus age. The participant sets seven form fields, the label rules compress them to the labels, and the encoding expands the labels to 12 numbers. Two hidden layers of 16 units, 6 outputs) trained with <code>ml/train_model.py</code> on ILS-Bench (Bonelli 2026, Mendeley Data, CC BY 4.0): 400 investor narratives whose suitability labels and recommended outcome were validated by a panel of four financial-domain experts. The six outcomes are the five portfolios and Human review. Cross-validated accuracy is <span id="hiw-ml-acc"></span> percent (5-fold, three repeats), on par with the dataset author's own draft labels and with a lookup table over the label combinations, and its probabilities are calibrated with temperature scaling. It runs in the browser from the exported weights in <code>ml_weights.js</code>. Its weights are not human-readable, so its explanations must be computed post hoc: exact Shapley values of the probability of the recommended outcome, the same counterfactual search, and calibrated probability for confidence.</p>
 
       <h3>Advisor 2: the interpretable rule-based advisor</h3>
       <p>A multinomial logistic regression fitted on the same ILS-Bench cases and the same twelve inputs as the network, <span id="hiw-logit-acc"></span> percent cross-validated accuracy, calibrated with temperature scaling. It is a scorecard derived from data: one weight per input and outcome, the outcome with the largest total wins, and the contribution of each input to the evidence for the recommended outcome is read directly from the weights, exact and additive in log-odds. Same data and inputs as the network, but transparent. That is what makes explanation fidelity a factor: the same explanation styles are exact here and estimated on the AI advisor page.</p>

@@ -96,7 +96,7 @@ Age is the fourth input. The rules follow the dataset's codebook, which defines 
 
 ### 2. Two advisors, trained on expert judgements
 
-Both are trained by `ml/train_model.py`, written from scratch in numpy, seeded and reproducible, and exported to `ml_weights.js` for inference in plain JavaScript.
+Both are trained by `ml/train_model.py`, written from scratch in numpy, seeded and reproducible, and exported to `ml_weights.js` for inference in plain JavaScript. A note on input counts, because two numbers appear below: the participant sets seven form fields, the label rules compress them into the three suitability labels plus age, and one-hot encoding expands those into the 12 numbers the models actually receive. Explanations attribute to the seven form fields, architectures count the 12 encoded inputs.
 
 | | AI advisor | Interpretable rule-based advisor |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ Both are trained by `ml/train_model.py`, written from scratch in numpy, seeded a
 | Training accuracy, reproduced in JS | 94.0 % | 92.2 % |
 | Explanations | Post hoc: exact Shapley values, model-agnostic counterfactuals, calibrated probability | Exact: contributions read from the weights, same counterfactual search, calibrated probability |
 
-Reference points from the same file: majority class 47.0 %, a lookup table over the label combinations 88.7 %, and the dataset author's own draft labels agreed with the expert consensus 88.2 % of the time. Once the labels are known, the mapping is largely rule-like. The value of the two learned advisors is elsewhere: expert-grounded escalation, calibrated probabilities, and a clean opaque-versus-transparent comparison with the origin of the rules held constant.
+Reference points from the same file (context, not advisors): always guessing the most common outcome 47.0 %, memorising the most common outcome per label combination (a lookup table, not to be confused with the interpretable advisor, which is a fitted scorecard with readable weights and calibrated probabilities) 88.7 %, and the dataset author's own draft labels 88.2 %. Once the labels are known, the mapping is largely rule-like. The value of the two learned advisors is elsewhere: expert-grounded escalation, calibrated probabilities, and a clean opaque-versus-transparent comparison with the origin of the rules held constant.
 
 ### 3. Explanations: content times delivery
 
@@ -200,7 +200,7 @@ Between-subjects on explanation condition (content times delivery) and advisor t
 ## Limitations, plainly
 
 - ILS-Bench is small (400 cases) and its narratives are synthetic, although the labels are expert-validated. Once the labels are known, the mapping to an outcome is largely rule-like.
-- The language-reading step uses a small in-browser model, and the benchmark on the Training data page measures it. It is being improved iteratively, with each run's CSV kept in `ml/data/`. Run 1 (Llama 3.2 1B, 100 cases): 25 percent outcome agreement. Diagnosis: a third of replies truncated and unparseable, a numeric example anchoring 62 of 100 horizon readings, and a judgement rule too hard for a small model. Fixes: salvage parsing, a categorical timeframe, the judgement moved into deterministic code, Qwen 2.5 1.5B as default reader. Run 2 (Qwen 2.5 1.5B, 100 cases): 42 percent, with parsing solved. Diagnosis: the expert panel escalates cases where the person does not know their own finances, while unread fields defaulted to a safe profile, which is exactly backwards, plus missed strain cues and a long-horizon default. Fixes: an explicit "unsure" value that maps conservatively (an unchecked fund or inestimable income counts as a strain, an unknown timeframe reads as short), past panic-selling as a loss-stress cue, and an anti-default rule for the timeframe. A run with the current prompt has not been recorded yet. The ceiling with the panel's own labels is 94 percent.
+- The language-reading step uses a small in-browser model, and the benchmark on the Training data page measures it. Three recorded runs (100 cases each, CSVs in `ml/data/`) trace its improvement: 25 percent outcome agreement with the expert panel (Llama 3.2 1B: replies truncated past the token limit, a numeric example anchoring the horizon, a judgement rule too hard for a small model), then 42 percent (Qwen 2.5 1.5B, after salvage parsing, a categorical timeframe and moving the judgement into deterministic code), then 70 percent (after an explicit "unsure" value mapped conservatively the way the panel judged under-specified cases, sharper strain cues, and an anti-default timeframe rule). The final run catches 54 of 59 Human review cases and falsely escalates 9 of 41 others, and most remaining misses are one-step portfolio confusions. The ceiling with the panel's own labels is 94 percent, so about 24 points is the measured cost of reading suitability from free text with a 1.5B in-browser model.
 - No participant data collected yet. Nothing here is a result. The interactive, adaptive and conversational deliveries and the study flow await their first pilot.
 - Model portfolios are stylised, not calibrated to a regulatory suitability standard.
 

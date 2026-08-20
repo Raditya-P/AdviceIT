@@ -152,9 +152,36 @@ window.AdviceIT = window.AdviceIT || {};
     };
   }
 
+  /* The whole scorecard as a table: the points every input value adds to
+     the evidence for every outcome, read straight from the fitted weights.
+     Exactly one row per group applies to any profile. Age is continuous,
+     so it is shown as points per 10 years older than the baseline age. */
+  function scorecard() {
+    var k, groups = [];
+    function row(label, points) { return { label: label, points: points.map(glass.round1) }; }
+    function groupRows(title, options, offset) {
+      var rows = [];
+      options.forEach(function (opt, i) {
+        var pts = [];
+        for (k = 0; k < L.b.length; k++) pts.push(L.W[offset + i][k]);
+        rows.push(row(opt, pts));
+      });
+      groups.push({ label: title, rows: rows });
+    }
+    groupRows("Risk tolerance", LAYOUT.tolerance, 0);
+    groupRows("Risk capacity", LAYOUT.capacity, LAYOUT.tolerance.length);
+    groupRows("Liquidity need", LAYOUT.liquidity, LAYOUT.tolerance.length + LAYOUT.capacity.length);
+    var agePts = [];
+    for (k = 0; k < L.b.length; k++) agePts.push(L.W[LAYOUT.tolerance.length + LAYOUT.capacity.length + LAYOUT.liquidity.length][k] * 10 / LAYOUT.age.std);
+    groups.push({ label: "Age", rows: [row("per 10 years older than " + Math.round(LAYOUT.age.mean), agePts)] });
+    groups.push({ label: "Starting points", rows: [row("every profile starts here", L.b.slice())] });
+    return { outcomes: glass.OUTCOMES.map(function (o) { return o.name; }), groups: groups };
+  }
+
   ns.logitModel = {
     BASELINE: BASELINE,
     meta: L.meta,
+    scorecard: scorecard,
     featureVector: featureVector,
     probabilities: probabilities,
     recommend: recommend

@@ -780,8 +780,14 @@ pre.cmd code { background: none; color: inherit; padding: 0; }
 .ref-use { display: block; color: var(--text-muted); font-size: 0.86rem; margin-top: 2px; }
 
 /* Explanation preset and customise control */
-#preset-select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); max-width: 100%; }
+#preset-select, #example-select { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); max-width: 100%; }
 .customise { margin-top: 8px; }
 .customise summary { cursor: pointer; font-size: 0.88rem; color: var(--accent-dark); font-weight: 600; }
 .customise-row { display: flex; gap: 10px 14px; flex-wrap: wrap; align-items: center; margin: 8px 0 0; font-size: 0.88rem; }
 .customise-row .control-label { margin: 0; min-width: 64px; }
+
+/* Scorecard weight table */
+.scorecard td.pos { color: var(--positive); }
+.scorecard td.neg { color: var(--negative); }
+.scorecard th[scope="row"] { white-space: nowrap; }
+.scorecard th[scope="col"] { font-size: 0.8rem; }

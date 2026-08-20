@@ -348,19 +348,21 @@
     setRadio("knowledge", p.knowledge);
   }
 
-  function renderExampleButtons() {
-    var wrap = $("example-buttons");
+  function renderExampleSelect() {
+    var sel = $("example-select");
+    if (!sel) return;
     model.EXAMPLE_PROFILES.forEach(function (ex) {
-      var btn = el("button", { type: "button", class: "btn", text: ex.label });
-      btn.addEventListener("click", function () {
-        writeProfile(ex.profile);
-        setInconsistent(false);
-        state.ilsCaseId = "";
-        state.narrativeUsed = false;
-        $("ils-box").hidden = true;
-        recompute();
-      });
-      wrap.appendChild(btn);
+      sel.appendChild(el("option", { value: ex.id, text: ex.label }));
+    });
+    sel.addEventListener("change", function () {
+      var ex = model.EXAMPLE_PROFILES.filter(function (e) { return e.id === sel.value; })[0];
+      if (!ex) return;
+      writeProfile(ex.profile);
+      setInconsistent(false);
+      state.ilsCaseId = "";
+      state.narrativeUsed = false;
+      $("ils-box").hidden = true;
+      recompute();
     });
   }
 
@@ -1083,6 +1085,30 @@
     });
   }
 
+  /* The interpretable advisor's full weight table, rendered on its page. */
+  function renderScorecard() {
+    var holder = $("scorecard-table");
+    if (!holder || !ns.logitModel) return;
+    var sc = ns.logitModel.scorecard();
+    var table = el("table", { class: "log-table data-table scorecard" });
+    var hrow = el("tr", {}, [el("th", { scope: "col", text: "Input" })]);
+    sc.outcomes.forEach(function (o) { hrow.appendChild(el("th", { scope: "col", text: o })); });
+    table.appendChild(el("thead", {}, [hrow]));
+    var tbody = el("tbody");
+    sc.groups.forEach(function (g) {
+      g.rows.forEach(function (r, i) {
+        var tr = el("tr");
+        tr.appendChild(el("th", { scope: "row", text: (i === 0 ? g.label + ": " : "") + r.label }));
+        r.points.forEach(function (p) {
+          tr.appendChild(el("td", { class: "num " + (p > 0 ? "pos" : p < 0 ? "neg" : ""), text: signed(p) }));
+        });
+        tbody.appendChild(tr);
+      });
+    });
+    table.appendChild(tbody);
+    holder.appendChild(table);
+  }
+
   /* ------------------------------------------------------------
      Dialogs
      ------------------------------------------------------------ */
@@ -1412,7 +1438,7 @@
     initialised = true;
     if (!readParams()) return; // redirecting to the other page
     applyMode();
-    renderExampleButtons();
+    renderExampleSelect();
     buildAdjustGroup();
     updateLiteracyStatus();
     var acc = $("hiw-ml-acc");
@@ -1423,6 +1449,7 @@
     if (acc4 && ns.logitModel) acc4.textContent = String(Math.round(ns.logitModel.meta.cvAccuracy * 100));
     var acc3 = $("logit-panel-acc");
     if (acc3 && ns.logitModel) acc3.textContent = String(Math.round(ns.logitModel.meta.cvAccuracy * 100));
+    renderScorecard();
     session.load();
     renderSession();
     wireEvents();
