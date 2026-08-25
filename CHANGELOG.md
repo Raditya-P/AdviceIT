@@ -32,7 +32,9 @@ The version shown in the site footer, `package.json` and `src/lib/version.ts` mo
 - Neon database provisioned: schema from `db/schema.sql` applied, insert and read verified, credentials
   live only in `.env.local` (gitignored) and in Vercel environment variables.
 - Repository consolidated: the website now sits at the root of `Raditya-P/AdviceIT` and the original static
-  instrument is archived in `v1/`, so one repository holds both versions.
+  instrument is archived in `v1/`, so one repository holds both versions. The GitHub Pages copy of v1 stays
+  live at `/AdviceIT/v1/`, and `/AdviceIT/` redirects to it until the Vercel address replaces it.
+- The project README describes the instrument again, updated for 2.0, rather than only the deployment steps.
 
 ## 1.0.0 (2026-08-25)
 
