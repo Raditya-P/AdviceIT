@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { tr, useLang } from "@/lib/i18n";
@@ -9,6 +9,7 @@ import { tr, useLang } from "@/lib/i18n";
 export function SiteHeader() {
   const { locale, setLocale } = useLang();
   const router = useRouter();
+  const pathname = usePathname();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const NAV = [
     { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
@@ -21,26 +22,38 @@ export function SiteHeader() {
     router.refresh();
   };
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">
-            A
-          </span>
+    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
+        <Link
+          href="/"
+          className="text-[17px] font-semibold tracking-tight transition-opacity hover:opacity-80"
+        >
           AdviceIT
-          <span className="hidden text-xs font-normal text-muted-foreground sm:inline">by Radit</span>
+          <span className="ml-1.5 hidden text-sm font-normal text-muted-foreground sm:inline">by Radit</span>
         </Link>
-        <nav className="hidden items-center gap-1 md:flex">
-          {NAV.map((item) => (
-            <Button key={item.href} asChild variant="ghost" size="sm">
-              <Link href={item.href}>{item.label}</Link>
-            </Button>
-          ))}
+        <nav className="hidden items-center gap-0.5 md:flex">
+          {NAV.map((item) => {
+            const active = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-full px-3.5 py-2 text-sm transition-colors ${
+                  active
+                    ? "bg-secondary font-medium text-secondary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="ghost"
             size="sm"
+            className="rounded-full text-muted-foreground hover:text-foreground"
             onClick={toggle}
             aria-label={locale === "en" ? "Switch to Bahasa Indonesia" : "Ganti ke bahasa Inggris"}
             title={locale === "en" ? "Bahasa Indonesia" : "English"}
@@ -48,7 +61,7 @@ export function SiteHeader() {
             <Languages className="size-4" aria-hidden />
             {locale === "en" ? "ID" : "EN"}
           </Button>
-          <Button asChild size="sm">
+          <Button asChild size="sm" className="rounded-full px-4">
             <Link href="/participate">{t("Participate", "Ikut serta")}</Link>
           </Button>
         </div>

@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +39,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-equities: var(--equities);
+  --color-bonds: var(--bonds);
+  --color-cash: var(--cash);
+  --color-real-assets: var(--real-assets);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,73 +52,79 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Light blue accent, cool neutral greys, one warm amber for caution notes.
+   Asset-class colours are their own tokens so allocation bars read as four
+   distinct classes rather than four opacities of the same blue. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #ffffff;
+  --foreground: #0d1725;
+  --card: #ffffff;
+  --card-foreground: #0d1725;
+  --popover: #ffffff;
+  --popover-foreground: #0d1725;
+  --primary: #2f7fd0;
+  --primary-foreground: #ffffff;
+  --secondary: #eef4fb;
+  --secondary-foreground: #16456f;
+  --muted: #f3f6fa;
+  --muted-foreground: #5b6b80;
+  --accent: #e8f1fb;
+  --accent-foreground: #16456f;
+  --destructive: #d64545;
+  --border: #e3e9f1;
+  --input: #dbe3ed;
+  --ring: #2f7fd0;
+  --chart-1: #2f7fd0;
+  --chart-2: #3aa8a0;
+  --chart-3: #7c6cf0;
+  --chart-4: #e0a136;
+  --chart-5: #8595a8;
+  --equities: #2f7fd0;
+  --bonds: #3aa8a0;
+  --cash: #8fa3ba;
+  --real-assets: #e0a136;
+  --radius: 0.875rem;
+  --sidebar: #f8fafd;
+  --sidebar-foreground: #0d1725;
+  --sidebar-primary: #2f7fd0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8f1fb;
+  --sidebar-accent-foreground: #16456f;
+  --sidebar-border: #e3e9f1;
+  --sidebar-ring: #2f7fd0;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0b1220;
+  --foreground: #eaf0f8;
+  --card: #111a2b;
+  --card-foreground: #eaf0f8;
+  --popover: #111a2b;
+  --popover-foreground: #eaf0f8;
+  --primary: #61a5e8;
+  --primary-foreground: #06101d;
+  --secondary: #1a2740;
+  --secondary-foreground: #d5e5f7;
+  --muted: #162033;
+  --muted-foreground: #9fb0c6;
+  --accent: #1a2740;
+  --accent-foreground: #d5e5f7;
+  --destructive: #f07070;
+  --border: #22314a;
+  --input: #2a3a55;
+  --ring: #61a5e8;
+  --equities: #61a5e8;
+  --bonds: #4cc4ba;
+  --cash: #7f93ab;
+  --real-assets: #e8b357;
+  --sidebar: #111a2b;
+  --sidebar-foreground: #eaf0f8;
+  --sidebar-primary: #61a5e8;
+  --sidebar-primary-foreground: #06101d;
+  --sidebar-accent: #1a2740;
+  --sidebar-accent-foreground: #d5e5f7;
+  --sidebar-border: #22314a;
+  --sidebar-ring: #61a5e8;
 }
 
 @layer base {
@@ -123,8 +133,197 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
   html {
     @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-heading), var(--font-sans);
+    letter-spacing: -0.021em;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+}
+
+/* Page furniture used across the site. Plain classes, so they are available
+   everywhere without a utility-layer round trip. */
+
+.surface-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 44% at 50% -8%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 70%),
+    radial-gradient(38% 32% at 88% 8%, color-mix(in oklab, var(--bonds) 12%, transparent), transparent 72%);
+}
+
+.surface-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(70% 55% at 50% 0%, #000 10%, transparent 75%);
+}
+
+.panel {
+  background: linear-gradient(180deg, var(--card), color-mix(in oklab, var(--muted) 55%, var(--card)));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--foreground) 5%, transparent),
+    0 12px 30px -18px color-mix(in oklab, var(--foreground) 24%, transparent);
+}
+
+.lift {
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--primary) 38%, var(--border));
+  box-shadow: 0 18px 40px -24px color-mix(in oklab, var(--primary) 55%, transparent);
+}
+
+.rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.rise-1 {
+  animation-delay: 0.06s;
+}
+.rise-2 {
+  animation-delay: 0.12s;
+}
+.rise-3 {
+  animation-delay: 0.18s;
+}
+.rise-4 {
+  animation-delay: 0.24s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.sheen {
+  background: linear-gradient(
+    100deg,
+    color-mix(in oklab, var(--primary) 0%, transparent) 20%,
+    color-mix(in oklab, var(--primary) 18%, transparent) 45%,
+    color-mix(in oklab, var(--primary) 0%, transparent) 70%
+  );
+  background-size: 220% 100%;
+  animation: sheen 2.2s linear infinite;
+}
+
+@keyframes sheen {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+.grow-bar {
+  animation: grow-bar 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left center;
+}
+
+@keyframes grow-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.preview-glow {
+  position: absolute;
+  inset: -1.5rem;
+  z-index: -1;
+  border-radius: 2.5rem;
+  filter: blur(18px);
+  background: radial-gradient(65% 60% at 50% 40%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 70%);
+}
+
+.card-topglow {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 7rem;
+  pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 9%, transparent), transparent);
+}
+
+.band-soft {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 7%, transparent), transparent);
+}
+
+.cta-panel {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--primary) 12%, var(--card)),
+    color-mix(in oklab, var(--bonds) 10%, var(--card))
+  );
+}
+
+.text-gradient {
+  background: linear-gradient(100deg, var(--primary), color-mix(in oklab, var(--bonds) 70%, var(--primary)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ring-soft {
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 12%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .float-slow,
+  .sheen,
+  .grow-bar {
+    animation: none;
+  }
+  .lift:hover {
+    transform: none;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }

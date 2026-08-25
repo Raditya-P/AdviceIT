@@ -1,18 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Brain, FileSearch, MessageSquareText, Scale, ShieldCheck, SlidersHorizontal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  Brain,
+  FileSearch,
+  MessageSquareText,
+  Scale,
+  ShieldCheck,
+  SlidersHorizontal,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { AdvicePreview } from "@/components/marketing/advice-preview";
 import { logitMeta, mlMeta } from "@/lib/advisor/advisors";
 import { tr, useLang } from "@/lib/i18n";
 
 export default function HomePage() {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
+
+  const STEPS = [
+    {
+      title: t("Pick or be assigned an explanation style", "Pilih atau ditetapkan satu gaya penjelasan"),
+      text: t(
+        "Random assignment keeps the research clean. Choosing one yourself is allowed, and recorded as your choice.",
+        "Penetapan acak menjaga penelitian tetap bersih. Memilih sendiri diperbolehkan, dan dicatat sebagai pilihan Anda.",
+      ),
+    },
+    {
+      title: t("Read six short investor cases", "Baca enam kasus investor singkat"),
+      text: t(
+        "Each case comes with the advisor's recommendation and the explanation style you were given.",
+        "Tiap kasus disertai rekomendasi penasihat dan gaya penjelasan yang Anda terima.",
+      ),
+    },
+    {
+      title: t("Decide what you would do", "Putuskan apa yang akan Anda lakukan"),
+      text: t(
+        "Follow it, adjust it, reject it or send it to a human adviser. Those decisions are the data.",
+        "Ikuti, sesuaikan, tolak, atau serahkan ke penasihat manusia. Keputusan itulah datanya.",
+      ),
+    },
+  ];
 
   const FEATURES = [
     {
@@ -71,70 +102,89 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,--theme(--color-primary/8%),transparent)]"
-          />
-          <div className="mx-auto flex min-h-[62svh] max-w-6xl flex-col items-center justify-center gap-8 px-4 py-20 text-center">
-            <Badge variant="secondary" className="gap-2">
-              <span className="inline-block size-1.5 rounded-full bg-emerald-500" />
-              {t("Open research study · pilot · anonymous", "Studi penelitian terbuka · pilot · anonim")}
-            </Badge>
-            <h1 className="max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-              {locale === "id" ? (
-                <>
-                  Saat AI memberi Anda <span className="text-primary">saran keuangan</span>, apa yang membuat Anda
-                  memercayainya dengan tepat?
-                </>
-              ) : (
-                <>
-                  When an AI gives you <span className="text-primary">financial advice</span>, what makes you trust it
-                  right?
-                </>
-              )}
-            </h1>
-            <p className="max-w-2xl text-balance text-lg text-muted-foreground">
-              {t(
-                "People follow flawed AI advice and reject sound advice every day. This study tests which explanations help people rely on AI investment advice appropriately. Try the advisors, then lend us ten minutes.",
-                "Setiap hari orang mengikuti saran AI yang keliru dan menolak saran yang tepat. Studi ini menguji penjelasan mana yang membantu orang mengandalkan saran investasi AI secara tepat. Coba kedua penasihatnya, lalu luangkan sepuluh menit untuk kami.",
-              )}
-            </p>
-            <div className="flex flex-col items-center gap-3 sm:flex-row">
-              <Button asChild size="lg" className="h-11 px-6 text-base">
-                <Link href="/advisor/ml">
-                  {t("Try the AI advisor", "Coba penasihat AI")} <ArrowRight data-icon="inline-end" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-11 px-6 text-base">
-                <Link href="/advisor/logit">
-                  {t("Try the interpretable rule-based advisor", "Coba penasihat interpretable berbasis aturan")}
-                </Link>
-              </Button>
+          <div aria-hidden className="surface-glow" />
+          <div aria-hidden className="surface-grid" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:py-28">
+            <div className="space-y-7">
+              <span className="rise inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-3.5 py-1.5 text-sm text-muted-foreground backdrop-blur">
+                <span className="inline-block size-1.5 rounded-full bg-primary" />
+                {t("Open research study · anonymous · 10 minutes", "Studi penelitian terbuka · anonim · 10 menit")}
+              </span>
+              <h1 className="rise rise-1 text-balance text-4xl font-semibold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
+                {t("Know when to trust", "Tahu kapan harus memercayai")}{" "}
+                <span className="text-gradient">
+                  {t("AI investment advice", "saran investasi AI")}
+                </span>
+              </h1>
+              <p className="rise rise-2 max-w-xl text-lg leading-relaxed text-muted-foreground">
+                {t(
+                  "AdviceIT is an open study on which explanations help people follow AI advice when it is sound and push back when it is not. Try the advisors, then give ten minutes to the research.",
+                  "AdviceIT adalah studi terbuka tentang penjelasan mana yang membantu orang mengikuti saran AI saat saran itu tepat dan menolaknya saat keliru. Coba penasihatnya, lalu berikan sepuluh menit untuk penelitian ini.",
+                )}
+              </p>
+              <div className="rise rise-3 flex flex-col gap-3 sm:flex-row">
+                <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
+                  <Link href="/advisor/ml">
+                    {t("Try the AI advisor", "Coba penasihat AI")} <ArrowRight data-icon="inline-end" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-7 text-base">
+                  <Link href="/participate">{t("Take part in the study", "Ikut serta dalam studi")}</Link>
+                </Button>
+              </div>
+              <p className="rise rise-4 text-sm text-muted-foreground">
+                {t(
+                  "No account, no personal data, hypothetical cases only.",
+                  "Tanpa akun, tanpa data pribadi, hanya kasus hipotetis.",
+                )}
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {t("Ready to contribute?", "Siap berkontribusi?")}{" "}
-              <Link href="/participate" className="font-medium text-primary underline underline-offset-4">
-                {t("Join the study", "Ikuti studinya")}
-              </Link>{" "}
-              {t("· 10 to 15 minutes, fully anonymous", "· 10 sampai 15 menit, sepenuhnya anonim")}
-            </p>
+            <AdvicePreview />
+          </div>
+        </section>
+
+        {/* How a session works */}
+        <section className="border-y border-border/70 bg-muted/40">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <div className="max-w-2xl space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("How a session works", "Bagaimana satu sesi berjalan")}
+              </p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                {t("Three steps, ten minutes, fully anonymous", "Tiga langkah, sepuluh menit, sepenuhnya anonim")}
+              </h2>
+            </div>
+            <ol className="mt-10 grid gap-5 md:grid-cols-3">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="panel lift p-6">
+                  <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    {i + 1}
+                  </span>
+                  <h3 className="mt-4 text-lg font-semibold tracking-tight">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
 
         {/* Why this research */}
-        <section className="border-t border-border/60 bg-muted/30">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-2 md:gap-16">
+        <section>
+          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 md:gap-16">
             <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("The question", "Pertanyaannya")}
+              </p>
               <h2 className="text-3xl font-semibold tracking-tight">
                 {t("What this research is for", "Untuk apa penelitian ini")}
               </h2>
-              <p className="text-muted-foreground">
+              <p className="leading-relaxed text-muted-foreground">
                 {t(
                   "Robo-advisors already manage real money, and explainable AI promises to make their advice understandable. But an explanation is only useful if it calibrates trust: helping you follow advice when it is sound and push back when it is flawed. Which explanation styles actually do that is an open question, and it is the question behind this instrument, built as a follow-up to a systematic literature review on trust and algorithm aversion in AI financial advice (SSRAAI 2026).",
                   "Robo-advisor sudah mengelola uang sungguhan, dan explainable AI menjanjikan saran yang dapat dipahami. Namun sebuah penjelasan hanya berguna jika ia mengalibrasi kepercayaan: membantu Anda mengikuti saran saat saran itu tepat dan menolaknya saat keliru. Gaya penjelasan mana yang benar-benar melakukannya masih menjadi pertanyaan terbuka, dan itulah pertanyaan di balik instrumen ini, yang dibangun sebagai tindak lanjut dari systematic literature review tentang kepercayaan dan algorithm aversion dalam saran keuangan AI (SSRAAI 2026).",
                 )}
               </p>
-              <p className="text-muted-foreground">
+              <p className="leading-relaxed text-muted-foreground">
                 {t(
                   "Two advisors power the study, both trained on ILS-Bench, a benchmark of 400 investor cases validated by a panel of four financial-domain experts. One is a neural network whose explanations must be computed after the fact. One is an interpretable scorecard whose explanations are exact. Comparing them turns explanation faithfulness itself into something we can measure.",
                   "Dua penasihat menggerakkan studi ini, keduanya dilatih pada ILS-Bench, benchmark berisi 400 kasus investor yang divalidasi panel empat ahli keuangan. Satu berupa neural network yang penjelasannya harus dihitung setelah keputusan. Satu lagi scorecard interpretable yang penjelasannya eksak. Membandingkan keduanya menjadikan kesetiaan penjelasan itu sendiri sesuatu yang dapat diukur.",
@@ -142,16 +192,19 @@ export default function HomePage() {
               </p>
             </div>
             <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("Your part", "Peran Anda")}
+              </p>
               <h2 className="text-3xl font-semibold tracking-tight">
                 {t("Why we need your responses", "Mengapa kami membutuhkan jawaban Anda")}
               </h2>
-              <p className="text-muted-foreground">
+              <p className="leading-relaxed text-muted-foreground">
                 {t(
                   "Models can be benchmarked automatically. Trust cannot. Whether an explanation helps a person rely on advice appropriately can only be learned from people making decisions, which is exactly what the study session records: you read short hypothetical cases, see the advisor's recommendation with one explanation style, and tell us what you would do.",
                   "Model dapat diuji secara otomatis. Kepercayaan tidak. Apakah sebuah penjelasan membantu seseorang mengandalkan saran secara tepat hanya bisa dipelajari dari orang yang mengambil keputusan, dan itulah yang direkam sesi studi: Anda membaca kasus hipotetis singkat, melihat rekomendasi penasihat dengan satu gaya penjelasan, dan memberi tahu kami apa yang akan Anda lakukan.",
                 )}
               </p>
-              <p className="text-muted-foreground">
+              <p className="leading-relaxed text-muted-foreground">
                 {t(
                   "Everything is anonymous. No name, email or account data is collected, the cases are hypothetical, no real money is involved, and some recommendations are deliberately altered so that appropriate reliance can be measured at all. You are told which ones at the end.",
                   "Semuanya anonim. Tidak ada nama, email, atau data akun yang dikumpulkan, kasusnya hipotetis, tidak ada uang sungguhan, dan sebagian rekomendasi sengaja diubah agar reliance yang tepat dapat diukur. Anda diberi tahu yang mana di bagian akhir.",
@@ -161,29 +214,9 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* What is inside */}
-        <section>
-          <div className="mx-auto max-w-6xl px-4 py-16">
-            <h2 className="text-3xl font-semibold tracking-tight">
-              {t("What you will find inside", "Apa yang akan Anda temukan di dalamnya")}
-            </h2>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map((f) => (
-                <Card key={f.title} className="border-border/60">
-                  <CardContent className="space-y-2 pt-6">
-                    <f.icon className="size-5 text-primary" />
-                    <h3 className="font-medium">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground">{f.text}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Numbers strip */}
-        <section className="border-y border-border/60 bg-muted/30">
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-12 text-center md:grid-cols-4">
+        {/* Numbers */}
+        <section className="band-soft border-y border-border/70">
+          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-4 py-14 sm:px-6 md:grid-cols-4">
             <Stat
               value="400"
               label={t("expert-validated cases behind the advisors", "kasus tervalidasi ahli di balik para penasihat")}
@@ -194,35 +227,63 @@ export default function HomePage() {
             />
             <Stat
               value={`${Math.round((logitMeta.cvAccuracy as number) * 100)}%`}
-              label={t("cross-validated accuracy, interpretable advisor", "akurasi validasi silang, penasihat interpretable")}
+              label={t(
+                "cross-validated accuracy, interpretable advisor",
+                "akurasi validasi silang, penasihat interpretable",
+              )}
             />
-            <Stat
-              value="7"
-              label={t("explanation styles you can experience", "gaya penjelasan yang dapat Anda coba")}
-            />
+            <Stat value="7" label={t("explanation styles you can experience", "gaya penjelasan yang dapat Anda coba")} />
+          </div>
+        </section>
+
+        {/* Features */}
+        <section>
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <div className="max-w-2xl space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("Inside the instrument", "Di dalam instrumen")}
+              </p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                {t("What you will find here", "Apa yang akan Anda temukan di sini")}
+              </h2>
+            </div>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURES.map((f) => (
+                <article key={f.title} className="panel lift p-6">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <f.icon className="size-5" aria-hidden />
+                  </span>
+                  <h3 className="mt-4 font-semibold tracking-tight">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* Final CTA */}
-        <section>
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 py-20 text-center">
-            <h2 className="max-w-2xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              {t(
-                "Ten minutes of your judgement is a datapoint no model can fake.",
-                "Sepuluh menit penilaian Anda adalah satu titik data yang tidak bisa dipalsukan model mana pun.",
-              )}
-            </h2>
-            <Button asChild size="lg" className="h-11 px-6 text-base">
-              <Link href="/participate">
-                {t("Participate in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
-              </Link>
-            </Button>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "Anonymous · hypothetical cases · you see a debrief at the end",
-                "Anonim · kasus hipotetis · Anda melihat debrief di bagian akhir",
-              )}
-            </p>
+        <section className="px-4 pb-24 sm:px-6">
+          <div className="cta-panel relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-16 text-center">
+            <div aria-hidden className="surface-grid opacity-60" />
+            <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-5">
+              <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                {t(
+                  "Ten minutes of your judgement is a datapoint no model can fake.",
+                  "Sepuluh menit penilaian Anda adalah satu titik data yang tidak bisa dipalsukan model mana pun.",
+                )}
+              </h2>
+              <p className="text-muted-foreground">
+                {t(
+                  "Six short cases, one explanation style, a debrief at the end.",
+                  "Enam kasus singkat, satu gaya penjelasan, debrief di bagian akhir.",
+                )}
+              </p>
+              <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
+                <Link href="/participate">
+                  {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
@@ -233,9 +294,9 @@ export default function HomePage() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="space-y-1">
-      <div className="text-4xl font-semibold tracking-tight text-primary">{value}</div>
-      <div className="mx-auto max-w-[22ch] text-sm text-muted-foreground">{label}</div>
+    <div className="space-y-1 text-center">
+      <div className="text-4xl font-semibold tracking-tight text-primary sm:text-5xl">{value}</div>
+      <div className="mx-auto max-w-[24ch] text-sm text-muted-foreground">{label}</div>
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { outcomeName } from "@/lib/advisor/strings";
 import { contrastiveExplanation, featureExplanation } from "@/lib/advisor/explanations";
 import type { AdvisorResult, Profile, RawProfile } from "@/lib/advisor/types";
 import { tr, useLang } from "@/lib/i18n";
+import { SlidersHorizontal } from "lucide-react";
 import { ExplanationCard, ProbabilityBars } from "./explanation-boxes";
 
 type Ignored = Partial<Record<keyof Profile, boolean>>;
@@ -99,7 +100,7 @@ export function WhatIfPanel({
   );
 
   return (
-    <ExplanationCard title={t("Explore what would change the advice", "Jelajahi apa yang akan mengubah saran")}>
+    <ExplanationCard icon={SlidersHorizontal} title={t("Explore what would change the advice", "Jelajahi apa yang akan mengubah saran")}>
       <p className="text-muted-foreground">
         {t(
           "Move the controls to see how the advice would change. Tick ignore to see what the advisor would say if it did not know that input. Your actual profile and recommendation stay as they are.",
@@ -213,7 +214,7 @@ export function WhatIfPanel({
           </div>
         </div>
 
-        <div className="min-w-0 space-y-3 rounded-xl bg-muted/50 p-4" aria-live="polite">
+        <div className="min-w-0 space-y-3 rounded-2xl border border-border/70 bg-muted/50 p-4" aria-live="polite">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             {t("With these inputs the advice would be", "Dengan input ini sarannya akan menjadi")}
           </div>
@@ -231,7 +232,7 @@ export function WhatIfPanel({
           </p>
           <ProbabilityBars probabilities={preview.probabilities} topIndex={preview.portfolioIndex} />
           {top3.length > 0 && (
-            <div className="space-y-1 border-t pt-2">
+            <div className="space-y-1 border-t border-border/70 pt-2">
               <p className="text-xs text-muted-foreground">
                 {t("Largest contributions", "Kontribusi terbesar")} ({fx.targetUnit}):
               </p>

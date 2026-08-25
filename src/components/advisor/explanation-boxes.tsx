@@ -6,8 +6,8 @@
    them from the advisor's actual behaviour and renders in the current
    site language. */
 
+import { BarChart3, Gauge, Shuffle, Sparkles, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OUTCOMES } from "@/lib/advisor/model";
 import { CF, FX, outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
@@ -20,14 +20,27 @@ import { tr, useLang } from "@/lib/i18n";
 
 const signed = (v: number) => (v > 0 ? `+${v}` : String(v));
 
-export function ExplanationCard({ title, children }: { title: string; children: React.ReactNode }) {
+export function ExplanationCard({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon?: LucideIcon;
+  children: React.ReactNode;
+}) {
   return (
-    <Card className="border-l-4 border-l-primary">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">{children}</CardContent>
-    </Card>
+    <section className="panel overflow-hidden">
+      <header className="flex items-center gap-2.5 border-b border-border/70 px-5 py-4 sm:px-6">
+        {Icon && (
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Icon className="size-4" aria-hidden />
+          </span>
+        )}
+        <h3 className="font-semibold tracking-tight">{title}</h3>
+      </header>
+      <div className="space-y-3.5 p-5 text-sm sm:p-6">{children}</div>
+    </section>
   );
 }
 
@@ -41,7 +54,7 @@ export function FeatureBox({ result }: { result: AdvisorResult }) {
       ? FX.totalMl(result.baselineScore, result.rawScore, name)
       : FX.totalLogit(result.baselineScore, result.rawScore, name, Math.round(result.topProbability * 100));
   return (
-    <ExplanationCard title={tr(locale, { en: "Why this recommendation", id: "Mengapa rekomendasi ini" })}>
+    <ExplanationCard icon={BarChart3} title={tr(locale, { en: "Why this recommendation", id: "Mengapa rekomendasi ini" })}>
       <p className="text-muted-foreground">{intro}</p>
       <ul className="space-y-1.5">
         {fx.items.map((it) => (
@@ -50,22 +63,22 @@ export function FeatureBox({ result }: { result: AdvisorResult }) {
               <div className="truncate font-medium">{it.label}</div>
               <div className="truncate text-xs text-muted-foreground">{it.valueText}</div>
             </div>
-            <div aria-hidden className="relative h-3 overflow-hidden rounded-full bg-muted">
+            <div aria-hidden className="relative h-2.5 overflow-hidden rounded-full bg-muted">
               <div className="absolute inset-y-0 left-1/2 w-px bg-border" />
               {it.points !== 0 && (
                 <div
-                  className={`absolute inset-y-0.5 rounded-full ${it.points > 0 ? "left-1/2 bg-emerald-600" : "right-1/2 bg-red-600"}`}
+                  className={`absolute inset-y-0.5 rounded-full ${it.points > 0 ? "left-1/2 bg-primary" : "right-1/2 bg-destructive"}`}
                   style={{ width: `${fx.maxAbs ? (Math.abs(it.points) / fx.maxAbs) * 50 : 0}%` }}
                 />
               )}
             </div>
-            <div className={`text-right font-semibold tabular-nums ${it.points > 0 ? "text-emerald-700" : it.points < 0 ? "text-red-700" : "text-muted-foreground"}`}>
+            <div className={`text-right font-semibold tabular-nums ${it.points > 0 ? "text-primary" : it.points < 0 ? "text-destructive" : "text-muted-foreground"}`}>
               {signed(it.points)}
             </div>
           </li>
         ))}
       </ul>
-      <p className="border-t pt-2 font-medium">{total}</p>
+      <p className="border-t border-border/70 pt-3 font-medium">{total}</p>
       <p className="text-xs text-muted-foreground">{fx.methodNote}</p>
     </ExplanationCard>
   );
@@ -103,6 +116,7 @@ export function CounterfactualBox({ result }: { result: AdvisorResult }) {
   const cf = counterfactualExplanation(result);
   return (
     <ExplanationCard
+      icon={Shuffle}
       title={tr(locale, { en: "What would change this recommendation", id: "Apa yang akan mengubah rekomendasi ini" })}
     >
       <p className="text-muted-foreground">{cf.intro}</p>
@@ -137,8 +151,8 @@ export function ProbabilityBars({ probabilities, topIndex }: { probabilities: nu
         return (
           <li key={i} className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)_2.75rem] items-center gap-3 text-sm">
             <span className={`truncate ${top ? "font-semibold" : ""}`}>{outcomeName(OUTCOMES[i].name)}</span>
-            <span aria-hidden className="h-2.5 overflow-hidden rounded-full bg-muted">
-              <span className={`block h-full rounded-full ${top ? "bg-primary" : "bg-primary/40"}`} style={{ width: `${pct}%` }} />
+            <span aria-hidden className="h-3 overflow-hidden rounded-full bg-muted">
+              <span className={`block h-full rounded-full transition-[width] duration-500 ${top ? "bg-primary" : "bg-primary/35"}`} style={{ width: `${pct}%` }} />
             </span>
             <span className={`text-right tabular-nums ${top ? "font-semibold" : "text-muted-foreground"}`}>{pct}%</span>
           </li>
@@ -158,7 +172,7 @@ export function ConfidenceBox({ result }: { result: AdvisorResult }) {
         ? "bg-amber-100 text-amber-800"
         : "bg-red-100 text-red-800";
   return (
-    <ExplanationCard title={tr(locale, { en: "How sure is the model", id: "Seberapa yakin modelnya" })}>
+    <ExplanationCard icon={Gauge} title={tr(locale, { en: "How sure is the model", id: "Seberapa yakin modelnya" })}>
       <div className="flex flex-wrap items-center gap-3">
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${tone}`}>{cx.labelText}</span>
         <span className="text-xs tabular-nums text-muted-foreground">{cx.detail}</span>
@@ -212,7 +226,7 @@ export function AdaptiveBox({
         ? tr(locale, { en: "The advisor is fairly sure, but not certain.", id: "Penasihat lumayan yakin, tetapi tidak pasti." })
         : tr(locale, { en: "The advisor is not very sure about this.", id: "Penasihat tidak terlalu yakin tentang ini." });
   return (
-    <ExplanationCard title={tr(locale, { en: "In short", id: "Singkatnya" })}>
+    <ExplanationCard icon={Sparkles} title={tr(locale, { en: "In short", id: "Singkatnya" })}>
       <div className="space-y-2 text-[0.95rem] leading-relaxed">
         {parts.includes("feature") && items.length > 0 && (
           <>

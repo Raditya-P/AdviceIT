@@ -1,35 +1,30 @@
 "use client";
 
-/* The advisor playground: the public "try" mode of an advisor page.
+/* The advisor page: a three-step flow. Choose how the advice gets explained,
+   describe the investor, then read the recommendation with that explanation.
    Nothing here is logged as study data. The researcher flag (?researcher=1)
    unlocks the scenario toggle, the labels and comparison line, the ILS-Bench
    case loader and the example dropdown. */
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ADVISORS, logitMeta, mlMeta } from "@/lib/advisor/advisors";
 import { applyFlawedScenario } from "@/lib/advisor/model";
+import { labelValue } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
-import { CONTENT_PARTS, FORMS, PRESETS, presetFor, presetLabel, specFor, type ContentPart, type Form } from "@/lib/conditions";
+import { presetFor, presetLabel, specFor, type ContentPart, type Form } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
+import { Analyzing } from "./analyzing";
 import { ExplanationArea } from "./explanation-area";
-import { DEFAULT_PROFILE, ProfileForm, Seg, type FormProfile } from "./profile-form";
+import { OutcomeGuide } from "./outcome-guide";
+import { DEFAULT_PROFILE, ProfileForm, type FormProfile } from "./profile-form";
 import { RecommendationCard, advisorDisplayName } from "./recommendation-card";
 import { ScorecardTable } from "./scorecard";
+import { StylePicker } from "./style-picker";
 
-const FORM_LABELS: Record<Form, { en: string; id: string }> = {
-  static: { en: "Static", id: "Statis" },
-  interactive: { en: "Interactive what-if", id: "What-if interaktif" },
-  adaptive: { en: "Adaptive to literacy", id: "Adaptif terhadap literasi" },
-  llm: { en: "Conversational (LLM)", id: "Percakapan (LLM)" },
-};
+type Step = "style" | "profile" | "analyzing" | "result";
 
 function advisorDescription(advisorId: "ml" | "logit", locale: "en" | "id") {
   if (locale === "en") return ADVISORS[advisorId].description;
@@ -43,6 +38,7 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const advisor = ADVISORS[advisorId];
+  const [step, setStep] = useState<Step>("style");
   const [profile, setProfile] = useState<FormProfile>(DEFAULT_PROFILE);
   const [preset, setPreset] = useState<string>("feature");
   const [content, setContent] = useState<ContentPart[]>(["feature"]);
@@ -72,152 +68,199 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
   };
 
   const literacyLevel = profile.knowledge === "beginner" ? "low" : "high";
+  const name = advisorDisplayName(advisorId, locale);
+
+  const STEPS: { key: Step; label: string }[] = [
+    { key: "style", label: t("Explanation", "Penjelasan") },
+    { key: "profile", label: t("Your profile", "Profil Anda") },
+    { key: "result", label: t("Recommendation", "Rekomendasi") },
+  ];
+  const activeIndex = step === "analyzing" ? 2 : STEPS.findIndex((s) => s.key === step);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-      <Card className="border-l-4 border-l-primary bg-muted/30">
-        <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-6">
-          <div className="max-w-3xl space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight">{advisorDisplayName(advisorId, locale)}</h1>
-            <p className="text-sm text-muted-foreground">{advisorDescription(advisorId, locale)}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href={advisorId === "ml" ? "/advisor/logit" : "/advisor/ml"}>
-                {advisorId === "ml"
-                  ? t("Switch to the interpretable rule-based advisor", "Beralih ke penasihat interpretable berbasis aturan")
-                  : t("Switch to the AI advisor", "Beralih ke penasihat AI")}
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/training-data">{t("About the training data", "Tentang data pelatihan")}</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+      {/* Advisor identity */}
+      <header className="space-y-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{name}</h1>
+          <Link
+            href={advisorId === "ml" ? "/advisor/logit" : "/advisor/ml"}
+            className="rounded-full border border-border/80 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+          >
+            {advisorId === "ml"
+              ? t("Switch to the interpretable advisor", "Beralih ke penasihat interpretable")
+              : t("Switch to the AI advisor", "Beralih ke penasihat AI")}
+          </Link>
+        </div>
+        <p className="max-w-3xl leading-relaxed text-muted-foreground">{advisorDescription(advisorId, locale)}</p>
+      </header>
 
-      {/* Explanation and scenario controls */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">{t("Explanation", "Penjelasan")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="preset">{t("Preset", "Preset")}</Label>
-              <Select value={preset} onValueChange={choosePreset}>
-                <SelectTrigger id="preset" className="w-72">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {[...Object.keys(PRESETS), "custom"].map((name) => (
-                    <SelectItem key={name} value={name} disabled={name === "custom"}>
-                      {presetLabel(name, locale)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      {/* Stepper */}
+      <ol className="mt-8 flex items-center gap-2 sm:gap-3">
+        {STEPS.map((s, i) => {
+          const state = i < activeIndex ? "done" : i === activeIndex ? "active" : "todo";
+          const clickable = i < activeIndex;
+          return (
+            <li key={s.key} className="flex flex-1 items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                disabled={!clickable}
+                onClick={() => clickable && setStep(s.key)}
+                className={`flex items-center gap-2 rounded-full px-1 text-sm transition-colors ${
+                  clickable ? "cursor-pointer hover:text-foreground" : "cursor-default"
+                } ${state === "todo" ? "text-muted-foreground" : ""}`}
+              >
+                <span
+                  className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                    state === "active"
+                      ? "bg-primary text-primary-foreground"
+                      : state === "done"
+                        ? "bg-primary/15 text-primary"
+                        : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <span className={`hidden sm:inline ${state === "active" ? "font-medium" : ""}`}>{s.label}</span>
+              </button>
+              {i < STEPS.length - 1 && (
+                <span aria-hidden className={`h-px flex-1 ${i < activeIndex ? "bg-primary/40" : "bg-border"}`} />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+
+      <div className="mt-9">
+        {step === "style" && (
+          <div className="space-y-8">
+            <StylePicker
+              preset={preset}
+              onPreset={choosePreset}
+              content={content}
+              form={form}
+              onToggleContent={toggleContent}
+              onForm={chooseForm}
+              researcher={researcher}
+              scenario={scenario}
+              onScenario={setScenario}
+            />
+            <div className="flex justify-end">
+              <Button size="lg" className="h-12 rounded-full px-7" onClick={() => setStep("profile")}>
+                {t("Continue to your profile", "Lanjut ke profil Anda")} <ArrowRight data-icon="inline-end" />
+              </Button>
             </div>
-            {researcher && (
-              <div className="space-y-1.5">
-                <Label>{t("Scenario", "Skenario")}</Label>
-                <Seg
-                  name={t("Advice scenario", "Skenario saran")}
-                  options={[
-                    { value: "sound", label: t("Sound advice", "Saran tepat") },
-                    { value: "flawed", label: t("Flawed advice", "Saran keliru") },
-                  ]}
-                  value={scenario}
-                  onChange={(v) => setScenario(v as "sound" | "flawed")}
-                />
-              </div>
-            )}
           </div>
-          <details className="text-sm">
-            <summary className="cursor-pointer font-medium text-primary">{t("Customise", "Kustomisasi")}</summary>
-            <div className="mt-3 space-y-3">
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("Content", "Konten")}
-                </span>
-                {CONTENT_PARTS.map((part) => (
-                  <label key={part} className="flex items-center gap-1.5">
-                    <Checkbox checked={content.includes(part)} onCheckedChange={() => toggleContent(part)} />
-                    {presetLabel(part, locale)}
-                  </label>
-                ))}
-              </div>
-              <div className="flex flex-wrap items-center gap-4">
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("Delivery", "Penyajian")}
-                </span>
-                <RadioGroup value={form} onValueChange={(v: string) => chooseForm(v as Form)} className="flex flex-wrap gap-4">
-                  {FORMS.map((f) => (
-                    <label key={f} className="flex items-center gap-1.5 text-sm">
-                      <RadioGroupItem value={f} /> {tr(locale, FORM_LABELS[f])}
-                    </label>
-                  ))}
-                </RadioGroup>
-              </div>
-              <p className="text-xs text-muted-foreground">
+        )}
+
+        {step === "profile" && (
+          <div className="space-y-8">
+            <div className="max-w-2xl space-y-2">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                {t("Tell the advisor about the investor", "Ceritakan tentang investornya kepada penasihat")}
+              </h2>
+              <p className="text-muted-foreground">
                 {t(
-                  "Content is what is explained. Delivery is how it is shown. A preset is one combination, and the study log records both parts.",
-                  "Konten adalah apa yang dijelaskan. Penyajian adalah cara menampilkannya. Preset adalah satu kombinasi, dan log studi merekam keduanya.",
+                  "These are the questions a robo-advisor would ask before recommending anything. Everything here is hypothetical and nothing is stored.",
+                  "Ini pertanyaan yang akan diajukan robo-advisor sebelum merekomendasikan apa pun. Semuanya bersifat hipotetis dan tidak ada yang disimpan.",
                 )}
               </p>
             </div>
-          </details>
-        </CardContent>
-      </Card>
+            <div className="panel p-6 sm:p-7">
+              <ProfileForm profile={profile} onChange={setProfile} researcher={researcher} />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Button variant="ghost" className="rounded-full" onClick={() => setStep("style")}>
+                <ArrowLeft data-icon="inline-start" /> {t("Back to explanation styles", "Kembali ke gaya penjelasan")}
+              </Button>
+              <Button size="lg" className="h-12 rounded-full px-7" onClick={() => setStep("analyzing")}>
+                {t("See the recommendation", "Lihat rekomendasinya")} <ArrowRight data-icon="inline-end" />
+              </Button>
+            </div>
+          </div>
+        )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">{t("Investor profile", "Profil investor")}</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "Answer the questions a robo-advisor would ask. All fields are hypothetical.",
-                "Jawab pertanyaan yang akan diajukan robo-advisor. Semua isian bersifat hipotetis.",
-              )}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <ProfileForm profile={profile} onChange={setProfile} researcher={researcher} />
-          </CardContent>
-        </Card>
+        {step === "analyzing" && <Analyzing advisorName={name} onDone={() => setStep("result")} />}
 
-        <div className="space-y-4">
-          <RecommendationCard result={result} researcher={researcher} showCompare={researcher} />
-          <ExplanationArea
-            result={result}
-            content={content}
-            form={form}
-            literacyLevel={literacyLevel}
-            researcherNote={researcher}
-            showModelPicker
-          />
-          {advisorId === "logit" && <ScorecardTable />}
-        </div>
+        {step === "result" && (
+          <div className="space-y-6">
+            <RecommendationCard result={result} researcher={researcher} showCompare={researcher} />
+
+            <div className="rise space-y-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-4 text-primary" aria-hidden />
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("Explanation", "Penjelasan")}: {presetLabel(preset, locale)}
+                </h2>
+              </div>
+              <ExplanationArea
+                result={result}
+                content={content}
+                form={form}
+                literacyLevel={literacyLevel}
+                researcherNote={researcher}
+                showModelPicker
+              />
+            </div>
+
+            <OutcomeGuide result={result} />
+
+            {advisorId === "logit" && <ScorecardTable />}
+
+            {/* Profile recap */}
+            <section className="rounded-2xl border border-border/70 bg-muted/40 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("The profile behind this", "Profil di balik ini")}
+                </p>
+                <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setStep("profile")}>
+                  <Pencil data-icon="inline-start" /> {t("Edit", "Ubah")}
+                </Button>
+              </div>
+              <ul className="mt-3 flex flex-wrap gap-2 text-sm">
+                {[
+                  `${t("Age", "Usia")} ${profile.age}`,
+                  `${profile.horizon} ${t("year horizon", "tahun horizon")}`,
+                  `${t("Risk tolerance", "Toleransi risiko")}: ${labelValue(result.labels.tolerance)}`,
+                  `${t("Risk capacity", "Kapasitas risiko")}: ${labelValue(result.labels.capacity)}`,
+                  `${t("Liquidity need", "Kebutuhan likuiditas")}: ${labelValue(result.labels.liquidity)}`,
+                ].map((chip) => (
+                  <li key={chip} className="rounded-full border border-border/80 bg-background px-3 py-1">
+                    {chip}
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <div className="flex flex-wrap gap-3">
+              <Button variant="outline" className="rounded-full" onClick={() => setStep("style")}>
+                <RefreshCw data-icon="inline-start" /> {t("Try another explanation style", "Coba gaya penjelasan lain")}
+              </Button>
+              <Button variant="ghost" className="rounded-full" onClick={() => setStep("profile")}>
+                {t("Change the profile", "Ubah profilnya")}
+              </Button>
+            </div>
+
+            {/* Study CTA */}
+            <section className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                {t("Now the research question", "Sekarang pertanyaan penelitiannya")}
+              </h2>
+              <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                {t(
+                  "Did that explanation help you judge the advice, or just make it feel convincing? Ten anonymous minutes with six cases is how we find out.",
+                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Sepuluh menit anonim dengan enam kasus adalah cara kami mencari tahu.",
+                )}
+              </p>
+              <Button asChild className="mt-5 h-11 rounded-full px-6">
+                <Link href="/participate">
+                  {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                </Link>
+              </Button>
+            </section>
+          </div>
+        )}
       </div>
-
-      <Card className="bg-primary/5">
-        <CardContent className="flex flex-col items-center gap-3 py-8 text-center">
-          <h2 className="text-xl font-semibold tracking-tight">
-            {t("Enjoyed poking at the advisor?", "Senang mengutak-atik penasihatnya?")}
-          </h2>
-          <p className="max-w-xl text-sm text-muted-foreground">
-            {t(
-              "Contribute to the research: a 10 to 15 minute anonymous session with six short cases. Your decisions are the data this study exists for.",
-              "Berkontribusilah pada penelitian: sesi anonim 10 sampai 15 menit dengan enam kasus singkat. Keputusan Anda adalah data yang menjadi alasan studi ini ada.",
-            )}
-          </p>
-          <Button asChild>
-            <Link href="/participate">
-              {t("Participate in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }

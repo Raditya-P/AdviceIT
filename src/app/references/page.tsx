@@ -1,4 +1,5 @@
 import { SiteFooter } from "@/components/site-footer";
+import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -180,18 +181,15 @@ export default async function ReferencesPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <div className="mx-auto max-w-4xl space-y-6 px-4 py-10">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight">
-              {pick({ en: "References and tools", id: "Referensi dan perkakas" })}
-            </h1>
-            <p className="text-muted-foreground">
-              {pick({
-                en: "What AdviceIT directly builds on: the dataset the advisors are trained on, the works behind the design of the study and the explanations, and the software it runs on. Where a work informed a specific part, that part is named. Citations are kept in their original language.",
-                id: "Apa yang menjadi pijakan langsung AdviceIT: dataset tempat para penasihat dilatih, karya-karya di balik desain studi dan penjelasannya, dan perangkat lunak yang menjalankannya. Jika sebuah karya memengaruhi bagian tertentu, bagian itu disebutkan. Sitasi dibiarkan dalam bahasa aslinya.",
-              })}
-            </p>
-          </div>
+        <PageHero
+          eyebrow={pick({ en: "Credits", id: "Kredit" })}
+          title={pick({ en: "References and tools", id: "Referensi dan perkakas" })}
+          lead={pick({
+            en: "What AdviceIT directly builds on: the dataset the advisors are trained on, the works behind the design of the study and the explanations, and the software it runs on. Where a work informed a specific part, that part is named. Citations are kept in their original language.",
+            id: "Apa yang menjadi pijakan langsung AdviceIT: dataset tempat para penasihat dilatih, karya-karya di balik desain studi dan penjelasannya, dan perangkat lunak yang menjalankannya. Jika sebuah karya memengaruhi bagian tertentu, bagian itu disebutkan. Sitasi dibiarkan dalam bahasa aslinya.",
+          })}
+        />
+        <div className="mx-auto max-w-4xl space-y-6 px-4 py-12 sm:px-6">
           {SECTIONS.map((s) => (
             <Card key={s.title.en}>
               <CardHeader>

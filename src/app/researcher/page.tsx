@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SiteFooter } from "@/components/site-footer";
+import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import {
   exits,
@@ -76,10 +77,9 @@ export default function ResearcherPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <div className="mx-auto max-w-6xl space-y-6 px-4 py-10">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight">Researcher mode</h1>
-            <p className="max-w-3xl text-muted-foreground">
+        <PageHero eyebrow="Internal" title="Researcher mode" width="max-w-6xl">
+          <div className="mt-4 max-w-3xl text-muted-foreground">
+            <p>
               The collected responses, summarised descriptively. The access key protects the data, not the instrument:
               the advisor pages with researcher controls are open at{" "}
               <Link className="underline underline-offset-4" href="/advisor/ml?researcher=1">
@@ -93,7 +93,9 @@ export default function ResearcherPage() {
               live. Custom study links: /study?cond=&lt;preset&gt;&amp;pid=P07, or /study?content=feature,confidence&amp;form=interactive.
             </p>
           </div>
+        </PageHero>
 
+        <div className="mx-auto max-w-6xl space-y-6 px-4 py-12 sm:px-6">
           <Card>
             <CardContent className="flex flex-wrap items-end gap-3 pt-6">
               <div className="space-y-1.5">

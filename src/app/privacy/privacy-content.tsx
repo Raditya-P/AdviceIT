@@ -1,6 +1,7 @@
 "use client";
 
 import { SiteFooter } from "@/components/site-footer";
+import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import { tr, useLang } from "@/lib/i18n";
 
@@ -11,8 +12,12 @@ export function PrivacyContent() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <div className="prose-sm mx-auto max-w-2xl space-y-4 px-4 py-12">
-          <h1 className="text-3xl font-semibold tracking-tight">{t("Privacy and consent", "Privasi dan persetujuan")}</h1>
+        <PageHero
+          eyebrow={t("Transparency", "Transparansi")}
+          title={t("Privacy and consent", "Privasi dan persetujuan")}
+          width="max-w-2xl"
+        />
+        <div className="prose-sm mx-auto max-w-2xl space-y-4 px-4 py-12 sm:px-6">
           <p className="text-muted-foreground">
             {t(
               "AdviceIT is a research instrument run as a pilot study to develop the instrument itself. It is not a financial service, and nothing on this site is financial advice.",

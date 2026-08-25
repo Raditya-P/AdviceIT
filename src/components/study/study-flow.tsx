@@ -19,7 +19,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -30,6 +29,7 @@ import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
 import { outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import { presetLabel, type ContentPart, type Form } from "@/lib/conditions";
+import { UserRound } from "lucide-react";
 import { tr, useLang } from "@/lib/i18n";
 import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
 import {
@@ -298,13 +298,11 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
 
 function StageShell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl tracking-tight">{title}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">{children}</CardContent>
-      </Card>
+    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
+      <section className="panel rise p-6 sm:p-8">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
+        <div className="mt-5 space-y-4">{children}</div>
+      </section>
     </div>
   );
 }
@@ -412,18 +410,35 @@ function TrialStage({
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 px-4 py-8">
-      <p className="text-sm text-muted-foreground">
-        {t("Case", "Kasus")} {trial.index + 1} {t("of", "dari")} {total} · {t("condition", "kondisi")}{" "}
-        {presetLabel(assignment.condition, locale)}
-        {saved === "local" &&
-          t(" · offline, responses buffered in this browser", " · offline, respons disimpan sementara di browser ini")}
-      </p>
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-800">
-          {shown.label}. {t("Please answer as this person.", "Mohon jawab sebagai orang ini.")}
+    <div className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6">
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+          <p className="font-medium">
+            {t("Case", "Kasus")} {trial.index + 1} <span className="text-muted-foreground">{t("of", "dari")} {total}</span>
+          </p>
+          <p className="text-muted-foreground">
+            {presetLabel(assignment.condition, locale)}
+            {saved === "local" &&
+              t(" · offline, responses buffered in this browser", " · offline, respons disimpan sementara di browser ini")}
+          </p>
+        </div>
+        <div aria-hidden className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-[width] duration-500 ease-out"
+            style={{ width: `${((trial.index + 1) / total) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="panel p-5 sm:p-6">
+        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
+          <UserRound className="size-3.5" aria-hidden />
+          {shown.label}
         </p>
-        <p className="mt-1 text-[0.95rem] leading-relaxed text-amber-950">{shown.text}</p>
+        <p className="mt-2 text-[1.02rem] leading-relaxed">{shown.text}</p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          {t("Please answer as this person.", "Mohon jawab sebagai orang ini.")}
+        </p>
       </div>
 
       <RecommendationCard result={result} />
@@ -442,11 +457,11 @@ function TrialStage({
         onLlmTurn={() => (llmData.current.turns += 1)}
       />
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">{t("Your response", "Respons Anda")}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
+      <section className="panel overflow-hidden">
+        <header className="border-b border-border/70 px-5 py-4 sm:px-6">
+          <h2 className="font-semibold tracking-tight">{t("Your response", "Respons Anda")}</h2>
+        </header>
+        <div className="space-y-5 p-5 sm:p-6">
           {trial.attention && (
             <Alert>
               <AlertTitle>{t("Attention check", "Pemeriksaan atensi")}</AlertTitle>
@@ -535,11 +550,11 @@ function TrialStage({
           </details>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button onClick={submit} disabled={busy}>
+          <Button onClick={submit} disabled={busy} size="lg" className="h-11 rounded-full px-6">
             {trial.index + 1 < total ? t("Submit and continue", "Kirim dan lanjut") : t("Submit final case", "Kirim kasus terakhir")}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

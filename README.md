@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.0.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -46,6 +46,9 @@ The instrument moved from a single-page prototype to a public research website b
 - **A database instead of a local session log**: `POST /api/responses` writes sanitised rows to Neon Postgres, `GET` is gated by a researcher key, and the client buffers rows offline and flushes them later.
 - **Language toggle (EN and ID)**: see below.
 - **One repository**: the original instrument now lives in [`v1/`](v1/) and stays runnable.
+
+2.1 is a design pass on top of that: a light blue theme, real typography, a three-step advisor flow, and a
+plain-language guide to what each recommended mix actually holds.
 
 Everything is recorded in [CHANGELOG.md](CHANGELOG.md).
 
@@ -88,7 +91,7 @@ The conversational delivery and the free-text reading run an open-weight languag
 | Route | What it is |
 | --- | --- |
 | `/` | Home: try the two advisors, why the research exists, the participate call to action. |
-| `/advisor/ml`, `/advisor/logit` | The advisor playgrounds, try mode, nothing recorded. `?researcher=1` unlocks the scenario toggle, suitability labels, advisor comparison, example profiles and the ILS-Bench case loader. |
+| `/advisor/ml`, `/advisor/logit` | The advisor flow in three steps (explanation style, investor profile, recommendation), try mode, nothing recorded. `?researcher=1` unlocks the scenario toggle, suitability labels, advisor comparison, example profiles and the ILS-Bench case loader. |
 | `/participate` | The seven explanation-style cards. The primary button assigns at random (logged as `random`), choosing a card is allowed (logged as `chosen`). |
 | `/study` | The full flow: consent, literacy questions, six trials, attention check, exit questionnaire, debrief, completion code. Researcher links: `/study?cond=<preset>&pid=P07` or `/study?content=feature,confidence&form=interactive`. |
 | `/training-data` | ILS-Bench: description, citation, live statistics, the two-advisor results table, all 400 cases to browse. |

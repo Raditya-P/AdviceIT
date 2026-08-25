@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import * as llm from "@/lib/llm";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import { tr, useLang } from "@/lib/i18n";
+import { MessageSquareText } from "lucide-react";
 import { ExplanationCard } from "./explanation-boxes";
 
 type Bubble = { role: "user" | "assistant"; text: string };
@@ -127,7 +128,7 @@ export function LlmChat({
 
   if (!gpuOk) {
     return (
-      <ExplanationCard title={t("Ask the advisor", "Tanya penasihat")}>
+      <ExplanationCard icon={MessageSquareText} title={t("Ask the advisor", "Tanya penasihat")}>
         <p className="text-muted-foreground">
           {t(
             "This browser does not expose WebGPU, which the in-browser language model needs. Use a recent Chrome or Edge on a laptop with a GPU. All other explanation styles work everywhere.",
@@ -139,7 +140,7 @@ export function LlmChat({
   }
 
   return (
-    <ExplanationCard title={t("Ask the advisor", "Tanya penasihat")}>
+    <ExplanationCard icon={MessageSquareText} title={t("Ask the advisor", "Tanya penasihat")}>
       {showModelPicker && (
         <div className="flex flex-wrap items-center gap-2">
           <Select value={modelId} onValueChange={setModelId}>

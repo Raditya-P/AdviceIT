@@ -1,4 +1,5 @@
 import { SiteFooter } from "@/components/site-footer";
+import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -58,14 +59,12 @@ export default async function TrainingDataPage() {
     <>
       <SiteHeader />
       <main className="flex-1">
-        <div className="mx-auto max-w-6xl space-y-6 px-4 py-10">
-          <Card className="border-l-4 border-l-primary">
-            <CardHeader>
-              <CardTitle className="text-2xl tracking-tight">
-                {t("ILS-Bench: the data behind the advisors", "ILS-Bench: data di balik para penasihat")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-muted-foreground">
+        <PageHero
+          eyebrow={t("Training data", "Data pelatihan")}
+          title={t("ILS-Bench: the data behind the advisors", "ILS-Bench: data di balik para penasihat")}
+          width="max-w-6xl"
+        >
+          <div className="mt-5 max-w-3xl space-y-3 text-muted-foreground">
               <p>
                 {t(
                   "Both advisors are trained on ILS-Bench, published by Marco Bonelli (Ca' Foscari University of Venice) on Mendeley Data, DOI",
@@ -83,9 +82,10 @@ export default async function TrainingDataPage() {
                 {t("Citation", "Sitasi")}: Bonelli, M. (2026). ILS-Bench: Investor Language-to-Suitability Benchmark.
                 Mendeley Data, V1.
               </p>
-            </CardContent>
-          </Card>
+          </div>
+        </PageHero>
 
+        <div className="mx-auto max-w-6xl space-y-6 px-4 py-12 sm:px-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>

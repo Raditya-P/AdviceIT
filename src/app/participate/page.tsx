@@ -1,17 +1,28 @@
 "use client";
 
-/* The seven explanation-style cards. The primary action assigns a style at
-   random, which is the methodologically clean path and is logged as
-   "random". Picking a card is allowed and logged as "chosen", so the two
-   strata stay separable in the analysis. "No explanation" is not a card,
-   but it stays in the random pool as the control. */
+/* Taking part. The primary action assigns a style at random, which is the
+   methodologically clean path and is logged as "random". Picking a card is
+   allowed and logged as "chosen", so the two strata stay separable in the
+   analysis. "No explanation" is not a card, but it stays in the random pool
+   as the control. */
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Dices, Gpu } from "lucide-react";
+import {
+  BarChart3,
+  Clock3,
+  Dices,
+  Gauge,
+  GraduationCap,
+  Layers,
+  Lock,
+  MessageSquareText,
+  Shuffle,
+  SlidersHorizontal,
+  type LucideIcon,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { CARDS } from "@/lib/conditions";
@@ -38,6 +49,16 @@ const CARDS_ID: Record<string, { title: string; tagline: string }> = {
   llm: { title: "Percakapan", tagline: "Mengobrol dengan penjelas yang berjalan sepenuhnya di browser Anda." },
 };
 
+const ICONS: Record<string, LucideIcon> = {
+  feature: BarChart3,
+  counterfactual: Shuffle,
+  confidence: Gauge,
+  hybrid: Layers,
+  interactive: SlidersHorizontal,
+  adaptive: GraduationCap,
+  llm: MessageSquareText,
+};
+
 export default function ParticipatePage() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -49,76 +70,116 @@ export default function ParticipatePage() {
     router.push(`/study?cond=${condition}&by=${assignedBy}`);
   };
 
+  const FACTS = [
+    { icon: Clock3, text: t("10 to 15 minutes", "10 sampai 15 menit") },
+    { icon: Lock, text: t("Anonymous, no account", "Anonim, tanpa akun") },
+    { icon: Layers, text: t("Six hypothetical cases", "Enam kasus hipotetis") },
+  ];
+
   return (
     <>
       <SiteHeader />
       <main className="flex-1">
-        <div className="mx-auto max-w-5xl space-y-8 px-4 py-12">
-          <div className="space-y-3 text-center">
-            <h1 className="text-4xl font-semibold tracking-tight">
-              {t("Meet the explanation styles", "Kenali gaya-gaya penjelasan")}
+        <section className="relative overflow-hidden border-b border-border/70">
+          <div aria-hidden className="surface-glow" />
+          <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+              {t("Take part", "Ikut serta")}
+            </p>
+            <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+              {t("Help us find out what makes AI advice trustworthy", "Bantu kami menemukan apa yang membuat saran AI layak dipercaya")}
             </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground">
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {t(
-                "In the study you will see the advisor's recommendations with one of these explanation styles. For the research to be clean, the style should be assigned at random. You can also pick one, and we record that it was your choice.",
-                "Dalam studi Anda akan melihat rekomendasi penasihat dengan salah satu gaya penjelasan ini. Agar penelitiannya bersih, gaya sebaiknya ditetapkan secara acak. Anda juga boleh memilih satu, dan kami mencatat bahwa itu pilihan Anda.",
+                "You will read six short investor cases, each with a recommendation from the advisor and one style of explanation. Tell us what you would do with that advice, and the session is done.",
+                "Anda akan membaca enam kasus investor singkat, masing-masing dengan rekomendasi dari penasihat dan satu gaya penjelasan. Beri tahu kami apa yang akan Anda lakukan dengan saran itu, dan sesi pun selesai.",
+              )}
+            </p>
+            <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              {FACTS.map((f) => (
+                <li key={f.text} className="flex items-center gap-2">
+                  <f.icon className="size-4 text-primary" aria-hidden />
+                  {f.text}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-9 flex flex-col items-center gap-3">
+              <Button
+                size="lg"
+                className="h-12 rounded-full px-8 text-base"
+                disabled={busy}
+                onClick={() => go(randomCondition(), "random")}
+              >
+                <Dices data-icon="inline-start" />
+                {t("Start with a random style", "Mulai dengan gaya acak")}
+              </Button>
+              <p className="max-w-md text-sm text-muted-foreground">
+                {t(
+                  "Random assignment is what makes the results comparable, so this is the option we recommend. It can also give you a control session with no explanation at all.",
+                  "Penetapan acak itulah yang membuat hasilnya dapat dibandingkan, jadi inilah opsi yang kami sarankan. Opsi ini juga bisa memberi Anda sesi kontrol tanpa penjelasan sama sekali.",
+                )}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="max-w-2xl space-y-3">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {t("Or choose an explanation style yourself", "Atau pilih sendiri gaya penjelasannya")}
+            </h2>
+            <p className="text-muted-foreground">
+              {t(
+                "Every style below is one way of answering the same question: why this recommendation, and how much should you rely on it. Your choice is recorded as a choice, so it stays separable from the randomly assigned sessions.",
+                "Setiap gaya di bawah ini adalah satu cara menjawab pertanyaan yang sama: mengapa rekomendasi ini, dan seberapa besar Anda sebaiknya mengandalkannya. Pilihan Anda dicatat sebagai pilihan, sehingga tetap terpisah dari sesi yang ditetapkan secara acak.",
               )}
             </p>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
-            <Button size="lg" className="h-12 px-7 text-base" disabled={busy} onClick={() => go(randomCondition(), "random")}>
-              <Dices data-icon="inline-start" />{" "}
-              {t("Assign me randomly (recommended for the research)", "Tetapkan saya secara acak (disarankan untuk penelitian)")}
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              {t(
-                "Random assignment can also give you a control session without any explanation.",
-                "Penetapan acak juga bisa memberi Anda sesi kontrol tanpa penjelasan sama sekali.",
-              )}
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {CARDS.map((c) => {
               const gpuBlocked = c.needsGpu && !llm.supported();
               const disp = locale === "id" ? (CARDS_ID[c.id] ?? c) : c;
+              const Icon = ICONS[c.id] ?? Layers;
               return (
-                <Card key={c.id} className={`transition-shadow hover:shadow-md ${gpuBlocked ? "opacity-60" : ""}`}>
-                  <CardContent className="flex h-full flex-col gap-2 pt-6">
-                    <div className="flex items-center justify-between gap-2">
-                      <h2 className="text-lg font-semibold tracking-tight">{disp.title}</h2>
-                      {c.needsGpu && (
-                        <Badge variant="secondary" className="gap-1 text-[11px]">
-                          <Gpu className="size-3" /> {t("needs a modern GPU browser", "butuh browser dengan GPU modern")}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="flex-1 text-sm text-muted-foreground">{disp.tagline}</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="self-start"
-                      disabled={busy || gpuBlocked}
-                      onClick={() => go(c.id, "chosen")}
-                    >
-                      {gpuBlocked
-                        ? t("Not available in this browser", "Tidak tersedia di browser ini")
-                        : t("Choose this style", "Pilih gaya ini")}
-                    </Button>
-                  </CardContent>
-                </Card>
+                <article
+                  key={c.id}
+                  className={`panel lift flex flex-col p-6 ${gpuBlocked ? "opacity-60" : ""}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="size-5" aria-hidden />
+                    </span>
+                    {c.needsGpu && (
+                      <Badge variant="secondary" className="text-[11px]">
+                        {t("needs a modern GPU browser", "butuh browser dengan GPU modern")}
+                      </Badge>
+                    )}
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold tracking-tight">{disp.title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{disp.tagline}</p>
+                  <Button
+                    variant="outline"
+                    className="mt-5 w-full rounded-full"
+                    disabled={busy || gpuBlocked}
+                    onClick={() => go(c.id, "chosen")}
+                  >
+                    {gpuBlocked
+                      ? t("Not available in this browser", "Tidak tersedia di browser ini")
+                      : t("Start with this style", "Mulai dengan gaya ini")}
+                  </Button>
+                </article>
               );
             })}
           </div>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="mt-10 text-center text-sm text-muted-foreground">
             {t(
-              "The advisor itself (AI or interpretable rule-based) is assigned at random either way. The session takes 10 to 15 minutes and ends with a debrief.",
-              "Penasihatnya sendiri (AI atau interpretable berbasis aturan) tetap ditetapkan secara acak. Sesi memakan waktu 10 sampai 15 menit dan diakhiri dengan debrief.",
+              "The advisor itself, the neural network or the interpretable scorecard, is assigned at random either way. The session ends with a debrief that tells you which recommendations were deliberately flawed.",
+              "Penasihatnya sendiri, neural network atau scorecard interpretable, tetap ditetapkan secara acak. Sesi berakhir dengan debrief yang memberi tahu Anda rekomendasi mana yang sengaja dibuat keliru.",
             )}
           </p>
-        </div>
+        </section>
       </main>
       <SiteFooter />
     </>

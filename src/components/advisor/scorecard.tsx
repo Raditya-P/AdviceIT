@@ -29,7 +29,7 @@ export function ScorecardTable() {
   const t = (en: string, id: string) => tr(locale, { en, id });
   const sc = scorecard();
   return (
-    <Accordion type="single" collapsible className="rounded-xl border px-4">
+    <Accordion type="single" collapsible className="panel px-5">
       <AccordionItem value="scorecard" className="border-0">
         <AccordionTrigger className="text-sm font-medium">
           {t(
@@ -67,7 +67,7 @@ export function ScorecardTable() {
                       {r.points.map((p, j) => (
                         <TableCell
                           key={j}
-                          className={`text-right tabular-nums ${p > 0 ? "text-emerald-700" : p < 0 ? "text-red-700" : "text-muted-foreground"}`}
+                          className={`text-right tabular-nums ${p > 0 ? "text-primary" : p < 0 ? "text-destructive" : "text-muted-foreground"}`}
                         >
                           {p > 0 ? `+${p}` : p}
                         </TableCell>
