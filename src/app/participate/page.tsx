@@ -6,6 +6,7 @@
    analysis. "No explanation" is not a card, but it stays in the random pool
    as the control. */
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -42,8 +43,12 @@ const CARDS_ID: Record<string, { title: string; tagline: string }> = {
   },
   hybrid: { title: "Ketiganya", tagline: "Mengapa, apa yang mengubahnya, dan seberapa yakin, bersama-sama." },
   interactive: {
-    title: "What-if interaktif",
-    tagline: "Kendalikan sendiri inputnya dan lihat sarannya bereaksi seketika.",
+    title: "Hanya interaktif",
+    tagline: "Geser sendiri inputnya, tanpa tulisan apa pun yang menjelaskan sarannya.",
+  },
+  "interactive-hybrid": {
+    title: "Interaktif dengan ketiganya",
+    tagline: "Ketiga penjelasan sekaligus, ditambah kendali untuk menggeser input dan melihat sarannya bereaksi.",
   },
   adaptive: { title: "Adaptif", tagline: "Penjelasan yang menyesuaikan diri dengan literasi keuangan Anda." },
   llm: { title: "Percakapan", tagline: "Mengobrol dengan penjelas yang berjalan sepenuhnya di browser Anda." },
@@ -54,7 +59,7 @@ const CARDS_ID: Record<string, { title: string; tagline: string }> = {
    you. Card ids and logging are unchanged. */
 const GROUPS: { key: string; items: string[] }[] = [
   { key: "content", items: ["feature", "counterfactual", "confidence", "hybrid"] },
-  { key: "delivery", items: ["interactive", "adaptive", "llm"] },
+  { key: "delivery", items: ["interactive-hybrid", "adaptive", "llm", "interactive"] },
 ];
 
 const ICONS: Record<string, LucideIcon> = {
@@ -63,6 +68,7 @@ const ICONS: Record<string, LucideIcon> = {
   confidence: Gauge,
   hybrid: Layers,
   interactive: SlidersHorizontal,
+  "interactive-hybrid": SlidersHorizontal,
   adaptive: GraduationCap,
   llm: MessageSquareText,
 };
@@ -159,8 +165,8 @@ export default function ParticipatePage() {
                         "Materi yang berbeda tentang rekomendasi yang sama, ditampilkan sebagai panel statis.",
                       )
                     : t(
-                        "The same three contents, handed over in a different way.",
-                        "Ketiga konten yang sama, disampaikan dengan cara yang berbeda.",
+                        "The same three contents, handed over in a different way. The last one drops the written explanation entirely.",
+                        "Ketiga konten yang sama, disampaikan dengan cara berbeda. Yang terakhir menghilangkan penjelasan tertulis sepenuhnya.",
                       )}
                 </p>
               </div>
@@ -207,7 +213,11 @@ export default function ParticipatePage() {
             {t(
               "The advisor itself, the neural network or the interpretable scorecard, is assigned at random either way. The session ends with a debrief that tells you which recommendations were deliberately flawed.",
               "Penasihatnya sendiri, neural network atau scorecard interpretable, tetap ditetapkan secara acak. Sesi berakhir dengan debrief yang memberi tahu Anda rekomendasi mana yang sengaja dibuat keliru.",
-            )}
+            )}{" "}
+            <Link href="/design" className="font-medium text-primary underline underline-offset-4">
+              {t("How the study is designed", "Bagaimana studi ini dirancang")}
+            </Link>
+            .
           </p>
         </section>
       </main>

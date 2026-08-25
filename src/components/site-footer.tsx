@@ -21,6 +21,7 @@ export function SiteFooter() {
       title: t("The research", "Penelitiannya"),
       links: [
         { href: "/participate", label: t("Take part", "Ikut serta") },
+        { href: "/design", label: t("Study design", "Rancangan studi") },
         { href: "/references", label: t("References", "Referensi") },
         { href: "/privacy", label: t("Privacy and consent", "Privasi dan persetujuan") },
       ],

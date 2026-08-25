@@ -3,14 +3,15 @@
 
 export type Row = Record<string, unknown>;
 
-export const CONDITION_ORDER = ["none", "feature", "counterfactual", "confidence", "hybrid", "interactive", "adaptive", "llm", "custom"];
+export const CONDITION_ORDER = ["none", "feature", "counterfactual", "confidence", "hybrid", "interactive", "interactive-hybrid", "adaptive", "llm", "custom"];
 export const CONDITION_LABELS: Record<string, string> = {
   none: "No explanation",
   feature: "Why (feature-based)",
   counterfactual: "What would change it",
   confidence: "How sure",
   hybrid: "All three (hybrid)",
-  interactive: "Interactive what-if",
+  interactive: "Interactive only",
+  "interactive-hybrid": "Interactive with all three",
   adaptive: "Adaptive to literacy",
   llm: "Conversational",
   custom: "Custom",

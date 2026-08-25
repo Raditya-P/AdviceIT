@@ -31,6 +31,7 @@ const ICONS: Record<string, LucideIcon> = {
   confidence: Gauge,
   hybrid: Layers,
   interactive: SlidersHorizontal,
+  "interactive-hybrid": SlidersHorizontal,
   adaptive: GraduationCap,
   llm: MessageSquareText,
 };
@@ -57,8 +58,12 @@ const TAGLINES: Record<string, { en: string; id: string }> = {
     id: "Mengapa, apa yang mengubahnya, dan seberapa yakin, bersama-sama.",
   },
   interactive: {
-    en: "Move the inputs yourself and watch the advice react live.",
-    id: "Geser sendiri inputnya dan lihat sarannya bereaksi seketika.",
+    en: "Move the inputs yourself, with nothing written to explain the advice.",
+    id: "Geser sendiri inputnya, tanpa tulisan apa pun yang menjelaskan sarannya.",
+  },
+  "interactive-hybrid": {
+    en: "All three explanations, plus controls to move the inputs and watch the advice react.",
+    id: "Ketiga penjelasan sekaligus, ditambah kendali untuk menggeser input dan melihat sarannya bereaksi.",
   },
   adaptive: {
     en: "An explanation that adjusts to your financial literacy.",
@@ -88,10 +93,10 @@ const GROUPS: { key: string; title: { en: string; id: string }; note: { en: stri
     key: "delivery",
     title: { en: "How it is delivered", id: "Bagaimana penyajiannya" },
     note: {
-      en: "The same three contents, handed over in a different way.",
-      id: "Ketiga konten yang sama, disampaikan dengan cara yang berbeda.",
+      en: "The same three contents, handed over in a different way. The last one drops the written explanation entirely.",
+      id: "Ketiga konten yang sama, disampaikan dengan cara berbeda. Yang terakhir menghilangkan penjelasan tertulis sepenuhnya.",
     },
-    items: ["interactive", "adaptive", "llm"],
+    items: ["interactive-hybrid", "adaptive", "llm", "interactive"],
   },
 ];
 

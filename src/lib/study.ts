@@ -128,7 +128,18 @@ export function buildPlan(participantId: string, n = 6): Trial[] {
 /* Random assignment for the public study. "none" stays in the pool as the
    control. The conversational condition is excluded from random assignment
    because it needs WebGPU and a large download. */
-export const ASSIGNABLE_CONDITIONS = ["none", "feature", "counterfactual", "confidence", "hybrid", "interactive", "adaptive"] as const;
+/* The random pool: the nine cells of the fractional design minus the
+   conversational one, which needs WebGPU and is offered by choice only. */
+export const ASSIGNABLE_CONDITIONS = [
+  "none",
+  "feature",
+  "counterfactual",
+  "confidence",
+  "hybrid",
+  "interactive",
+  "interactive-hybrid",
+  "adaptive",
+] as const;
 export type Condition = (typeof ASSIGNABLE_CONDITIONS)[number] | "llm";
 
 export function randomParticipantId() {

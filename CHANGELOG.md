@@ -3,6 +3,27 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.3.0 (2026-08-25)
+
+### Added
+
+- A ninth condition, "Interactive with all three", which pairs interactive delivery with the full content.
+  It completes the delivery arm, so interactive delivery can be compared against the all-three static
+  condition without changing content at the same time. It is in the random pool.
+- `/design`, a public page in both languages stating the design: the two factors and their levels, the nine
+  cells this pilot fills out of twenty possible, which contrasts are interpretable and which one is
+  confounded and therefore not reported, appropriate reliance as a condition by scenario interaction, the
+  convergent mixed-methods structure, and the analysis and exclusion rules.
+
+### Changed
+
+- The existing interactive condition is now named "Interactive only", because that is what it is: interactive
+  delivery with no written explanation content. Its clean comparator is the no-explanation control, not the
+  all-three condition.
+- Explanation conditions are presented as two factors everywhere: content (what is explained) and delivery
+  (how it reaches the participant). The delivery presets carry the same three contents, so they are no
+  longer presented as rival kinds of explanation.
+
 ## 2.2.0 (2026-08-25)
 
 ### Added

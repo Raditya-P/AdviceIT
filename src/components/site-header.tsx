@@ -15,6 +15,7 @@ export function SiteHeader() {
     { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
     { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat interpretable") },
     { href: "/training-data", label: t("Training data", "Data pelatihan") },
+    { href: "/design", label: t("Study design", "Rancangan studi") },
     { href: "/references", label: t("References", "Referensi") },
   ];
   const toggle = () => {

@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.2.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.3.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -30,7 +30,7 @@ It is a research instrument, not a financial service. Nothing here is investment
 | --- | --- |
 | **Two advisors, same data** | A neural network (the AI advisor) and an interpretable rule-based advisor (a scorecard fitted by logistic regression), both trained on ILS-Bench, 400 investor cases whose suitability labels and outcomes were validated by a panel of four financial-domain experts. One opaque, one transparent, so explanation fidelity becomes a factor. |
 | **Six outcomes** | Capital preservation, Conservative, Balanced, Growth, Aggressive growth, or **Human review**. The experts refused to automate almost half the cases. Both advisors learned when to hand off to a person. |
-| **Explanations as content times delivery** | Content: *why* (exact contributions or exact Shapley values), *what would change it* (counterfactuals found by search), *how sure* (calibrated probabilities). Delivery: static, interactive what-if, adaptive to literacy, or conversational with a language model running in the browser. Eight named presets, any custom combination. |
+| **Explanations as content times delivery** | Content: *why* (exact contributions or exact Shapley values), *what would change it* (counterfactuals found by search), *how sure* (calibrated probabilities). Delivery: static, interactive what-if, adaptive to literacy, or conversational with a language model running in the browser. Nine named cells of a fractional design, any custom combination, and the reasoning is on [`/design`](https://advice-it.vercel.app/design). |
 | **Sound and flawed advice** | The flawed scenario shifts the recommendation two portfolios the wrong way while the explanation stays honest. Following sound advice and overriding flawed advice is appropriate reliance, computed per condition. |
 | **A full study flow** | Consent, the Lusardi and Mitchell literacy questions, six fixed cases in an order seeded by the participant ID, an attention check, a debrief, a completion code. Participants are assigned an explanation condition and an advisor at random, and both assignments are logged. |
 | **Rich responses** | Trust, Follow / Adjust (to which portfolio) / Reject / Ask a human adviser, understanding, decision confidence, mental demand, free-text reason, decision time. |
@@ -96,6 +96,7 @@ The conversational delivery and the free-text reading run an open-weight languag
 | `/study` | The full flow: consent, literacy questions, six trials (each one read the case, watch the analysis, judge the advice), attention check, exit questionnaire, debrief, completion code. Researcher links: `/study?cond=<preset>&pid=P07` or `/study?content=feature,confidence&form=interactive`. |
 | `/training-data` | ILS-Bench: description, citation, live statistics, the two-advisor results table, all 400 cases to browse. |
 | `/researcher` | Key-gated dashboard: reliance, trust, time, secondary measures, attention checks, literacy moderator, exit answers, CSV download. |
+| `/design` | The design stated publicly: two factors, the nine cells of the fractional design, the interpretable contrasts, the mixed-methods structure and the analysis plan. |
 | `/references`, `/privacy` | References and tools, privacy and consent. |
 | `POST /api/responses` | The collector. Sanitised, capped, key-whitelisted rows. `GET` requires the researcher key. |
 
@@ -231,7 +232,7 @@ The advisors are trained on **ILS-Bench**: Bonelli, M. (2026). *ILS-Bench: Inves
 
 ## Study design in one paragraph
 
-Between-subjects on explanation condition (content times delivery) and advisor type, with sound and flawed trials within each participant and financial literacy as a measured moderator. Dependent variables: appropriate reliance, trust, decision time, the adjusted portfolio, deferral to a human, and the secondary measures. The quantitative core is complemented by embedded qualitative strands: the per-trial reasons, the two exit questions and the logged conversational transcripts. Analysis: mixed-effects models with participant as random effect. Ethics: consent, hypothetical cases, no real advice, debrief about the flawed trials. Full text in [v1/docs/study-design.md](v1/docs/study-design.md), reasoning in [v1/docs/design-decisions.md](v1/docs/design-decisions.md).
+Between-subjects on explanation condition (content times delivery, a nine-cell fractional design set out on `/design`) and advisor type, with sound and flawed trials within each participant and financial literacy as a measured moderator. Dependent variables: appropriate reliance, trust, decision time, the adjusted portfolio, deferral to a human, and the secondary measures. The quantitative core is complemented by embedded qualitative strands: the per-trial reasons, the two exit questions and the logged conversational transcripts. Analysis: mixed-effects models with participant as random effect. Ethics: consent, hypothetical cases, no real advice, debrief about the flawed trials. Full text in [v1/docs/study-design.md](v1/docs/study-design.md), reasoning in [v1/docs/design-decisions.md](v1/docs/design-decisions.md).
 
 ## Limitations, plainly
 

@@ -12,6 +12,10 @@ export interface ConditionSpec {
   form: Form;
 }
 
+/* The nine cells of the pilot's fractional design. Five vary content at
+   static delivery, three vary delivery at the full content, and
+   "interactive" keeps interactivity with no written explanation, whose
+   clean comparator is "none" rather than "hybrid". */
 export const PRESETS: Record<string, ConditionSpec> = {
   none: { content: [], form: "static" },
   feature: { content: ["feature"], form: "static" },
@@ -19,6 +23,7 @@ export const PRESETS: Record<string, ConditionSpec> = {
   confidence: { content: ["confidence"], form: "static" },
   hybrid: { content: ["feature", "counterfactual", "confidence"], form: "static" },
   interactive: { content: [], form: "interactive" },
+  "interactive-hybrid": { content: ["feature", "counterfactual", "confidence"], form: "interactive" },
   adaptive: { content: ["feature", "counterfactual", "confidence"], form: "adaptive" },
   llm: { content: ["feature", "counterfactual", "confidence"], form: "llm" },
 };
@@ -29,7 +34,8 @@ export const PRESET_LABELS: Record<string, string> = {
   counterfactual: "What would change it (counterfactual)",
   confidence: "How sure (confidence)",
   hybrid: "All three (hybrid)",
-  interactive: "Interactive what-if",
+  interactive: "Interactive only",
+  "interactive-hybrid": "Interactive with all three",
   adaptive: "Adaptive to literacy",
   llm: "Conversational (LLM)",
   custom: "Custom",
@@ -41,7 +47,8 @@ const PRESET_LABELS_ID: Record<string, string> = {
   counterfactual: "Apa yang mengubahnya (kontrafaktual)",
   confidence: "Seberapa yakin (keyakinan)",
   hybrid: "Ketiganya (hibrida)",
-  interactive: "What-if interaktif",
+  interactive: "Hanya interaktif",
+  "interactive-hybrid": "Interaktif dengan ketiganya",
   adaptive: "Adaptif terhadap literasi",
   llm: "Percakapan (LLM)",
   custom: "Kustom",
@@ -72,7 +79,16 @@ export const CARDS: { id: string; title: string; tagline: string; needsGpu?: boo
   { id: "counterfactual", title: "What would change it", tagline: "The smallest change to your situation that would flip the advice." },
   { id: "confidence", title: "How sure", tagline: "The advisor's calibrated confidence, with the full probability picture." },
   { id: "hybrid", title: "All three", tagline: "Why, what would change it, and how sure, together." },
-  { id: "interactive", title: "Interactive what-if", tagline: "Steer the inputs yourself and watch the advice react live." },
+  {
+    id: "interactive-hybrid",
+    title: "Interactive with all three",
+    tagline: "All three explanations, plus controls to move the inputs and watch the advice react.",
+  },
   { id: "adaptive", title: "Adaptive", tagline: "An explanation that adjusts to your financial literacy." },
   { id: "llm", title: "Conversational", tagline: "Chat with an explainer running entirely in your browser.", needsGpu: true },
+  {
+    id: "interactive",
+    title: "Interactive only",
+    tagline: "Move the inputs yourself, with nothing written to explain the advice.",
+  },
 ];
