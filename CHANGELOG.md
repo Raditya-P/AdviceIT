@@ -3,6 +3,35 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.2.0 (2026-08-25)
+
+### Added
+
+- "Your response" on the advisor pages. Visitors can rate trust, decide what they would do and answer the
+  secondary measures. Rows are stored as `rowType=explore` with a per-browser visitor id, kept out of every
+  experimental table, and reported separately in the researcher dashboard as a convenience sample.
+- The explanation picker now shows its two factors as two groups, what is explained and how it is
+  delivered, on the advisor pages and on the participate page.
+- Custom content times delivery combinations are open to everyone, not only to researcher mode.
+- The example profiles, the ILS-Bench case loader and the expert consensus for a loaded case are open to
+  everyone as well. Researcher mode keeps only the flawed-advice scenario toggle, the suitability labels
+  and the advisor comparison line, so that the study manipulation is not on display to participants.
+- Study trials run in three phases: read the case, watch the advisor work, then judge the advice. The case
+  and its facts stay on screen while the advice is judged, and the reading time is logged as `caseReadMs`.
+- Adaptive delivery now states which variant it is showing and why, with a switch to see the other one.
+  On the advisor pages it follows the self-rated knowledge field, since nobody has answered the literacy
+  questions there.
+
+### Changed
+
+- The interpretable advisor shows its full scorecard directly under the page header instead of at the
+  bottom of the results.
+
+### Fixed
+
+- The collector dropped the `language` field: it was written by the client but missing from the API key
+  whitelist, so it never reached the database. Rows carry the language again.
+
 ## 2.1.0 (2026-08-25)
 
 ### Added

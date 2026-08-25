@@ -15,7 +15,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import {
+  CONDITION_LABELS,
   exits,
+  fmt,
+  mean,
   measuresTable,
   overview,
   quality,
@@ -72,6 +75,21 @@ export default function ResearcherPage() {
   const meas = rows ? measuresTable(rows) : [];
   const qual = rows ? quality(rows) : null;
   const exitRows = rows ? exits(rows) : [];
+  /* Visitor tryouts from the advisor pages. Self-chosen condition and
+     self-written profile, so they are a convenience sample, reported apart
+     from the experiment and excluded from every table above. */
+  const exploreRows = rows ? rows.filter((r) => r.rowType === "explore") : [];
+  const exploreVisitors = new Set(exploreRows.map((r) => r.participantId)).size;
+  const exploreByCondition = Object.entries(
+    exploreRows.reduce<Record<string, number>>((acc, r) => {
+      const k = String(r.condition ?? "unknown");
+      acc[k] = (acc[k] ?? 0) + 1;
+      return acc;
+    }, {}),
+  )
+    .sort((a, b) => b[1] - a[1])
+    .map(([key, n]) => ({ key: CONDITION_LABELS[key] ?? key, n }));
+  const exploreTrust = mean(exploreRows.map((r) => Number(r.trustRating)).filter((n) => !isNaN(n)));
 
   return (
     <>
@@ -132,6 +150,24 @@ export default function ResearcherPage() {
                     <BarList title="Scenario" items={ov.byScenario} />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {exploreRows.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Visitor tryouts, outside the experiment</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <p>
+                  <strong>{exploreRows.length}</strong> responses from <strong>{exploreVisitors}</strong> browsers on the
+                  advisor pages. These people chose their own explanation style and wrote their own profile, so they are a
+                  convenience sample: useful as a preference and usability signal, not as experimental data. They are
+                  excluded from every table above and are marked <code>rowType=explore</code> in the CSV.
+                </p>
+                {exploreTrust !== null && <p>Mean trust rating across tryouts: {fmt(exploreTrust, 2)} of 7.</p>}
+                <BarList title="Per chosen style" items={exploreByCondition} />
               </CardContent>
             </Card>
           )}

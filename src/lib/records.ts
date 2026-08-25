@@ -3,7 +3,7 @@
    flushing the buffer on the next successful submit. */
 
 export interface StudyRow {
-  rowType: "trial" | "exit";
+  rowType: "trial" | "exit" | "explore";
   timestamp: string;
   participantId: string;
   condition: string;
@@ -55,6 +55,11 @@ export interface StudyRow {
   exitDistrustMoment?: string;
   exitMissingExplanation?: string;
   userAgentMobile?: boolean;
+  caseReadMs?: number;
+  /* explore rows only: where the profile came from, and how many tries this
+     visitor has submitted in this browser session */
+  profileSource?: "form" | "example" | "ils-bench" | "narrative";
+  tryIndex?: number;
 }
 
 const BUFFER_KEY = "adviceit-web-buffer-v1";
@@ -94,6 +99,22 @@ export async function submitRow(row: StudyRow): Promise<boolean> {
   }
   writeBuffer(pending);
   return false;
+}
+
+/* A per-browser id for visitor tryouts, so several tries by the same
+   person can be grouped without identifying anybody. */
+const VISITOR_KEY = "adviceit-web-visitor-v1";
+
+export function visitorId(): string {
+  try {
+    const v = localStorage.getItem(VISITOR_KEY);
+    if (v) return v;
+    const made = "V-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+    localStorage.setItem(VISITOR_KEY, made);
+    return made;
+  } catch {
+    return "V-ANON";
+  }
 }
 
 const DONE_KEY = "adviceit-web-participated-v1";

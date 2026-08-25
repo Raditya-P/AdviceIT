@@ -49,6 +49,14 @@ const CARDS_ID: Record<string, { title: string; tagline: string }> = {
   llm: { title: "Percakapan", tagline: "Mengobrol dengan penjelas yang berjalan sepenuhnya di browser Anda." },
 };
 
+/* Two factors, shown as two groups: the content presets change what is
+   explained, the delivery presets change how the same three contents reach
+   you. Card ids and logging are unchanged. */
+const GROUPS: { key: string; items: string[] }[] = [
+  { key: "content", items: ["feature", "counterfactual", "confidence", "hybrid"] },
+  { key: "delivery", items: ["interactive", "adaptive", "llm"] },
+];
+
 const ICONS: Record<string, LucideIcon> = {
   feature: BarChart3,
   counterfactual: Shuffle,
@@ -136,8 +144,28 @@ export default function ParticipatePage() {
             </p>
           </div>
 
-          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {CARDS.map((c) => {
+          {GROUPS.map((group) => (
+            <div key={group.key} className="mt-9 space-y-4">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">
+                  {group.key === "content"
+                    ? t("What is explained", "Apa yang dijelaskan")
+                    : t("How it is delivered", "Bagaimana penyajiannya")}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {group.key === "content"
+                    ? t(
+                        "Different material about the same recommendation, shown as a static panel.",
+                        "Materi yang berbeda tentang rekomendasi yang sama, ditampilkan sebagai panel statis.",
+                      )
+                    : t(
+                        "The same three contents, handed over in a different way.",
+                        "Ketiga konten yang sama, disampaikan dengan cara yang berbeda.",
+                      )}
+                </p>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {CARDS.filter((c) => group.items.includes(c.id)).map((c) => {
               const gpuBlocked = c.needsGpu && !llm.supported();
               const disp = locale === "id" ? (CARDS_ID[c.id] ?? c) : c;
               const Icon = ICONS[c.id] ?? Layers;
@@ -171,7 +199,9 @@ export default function ParticipatePage() {
                 </article>
               );
             })}
-          </div>
+              </div>
+            </div>
+          ))}
 
           <p className="mt-10 text-center text-sm text-muted-foreground">
             {t(

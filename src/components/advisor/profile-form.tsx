@@ -93,13 +93,13 @@ export function Seg({
 export function ProfileForm({
   profile,
   onChange,
-  researcher,
   showNarrative = true,
+  onSourceChange,
 }: {
   profile: FormProfile;
   onChange: (p: FormProfile) => void;
-  researcher?: boolean;
   showNarrative?: boolean;
+  onSourceChange?: (source: "form" | "example" | "ils-bench" | "narrative") => void;
 }) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
@@ -114,6 +114,7 @@ export function ProfileForm({
     const ex = EXAMPLE_PROFILES.find((e) => e.id === id);
     if (!ex) return;
     setIlsCase(null);
+    onSourceChange?.("example");
     onChange({ ...DEFAULT_PROFILE, ...ex.profile, toleranceInconsistent: false } as FormProfile);
   };
 
@@ -123,6 +124,7 @@ export function ProfileForm({
     setNarrative(c.narrative);
     setIlsCase(c);
     setNarrativeStatus("");
+    onSourceChange?.("ils-bench");
   };
 
   const readNarrative = async () => {
@@ -191,6 +193,7 @@ export function ProfileForm({
       if (pf.nearTermNeed !== null) (next.nearTermNeed = pf.nearTermNeed), filled.push(F.need);
       else missing.push(F.need);
       set(next);
+      onSourceChange?.(ilsCase ? "ils-bench" : "narrative");
       const filledText = filled.join(", ") || t("nothing", "tidak ada");
       const missingText = missing.length
         ? t(
@@ -221,8 +224,7 @@ export function ProfileForm({
 
   return (
     <div className="space-y-5">
-      {researcher && (
-        <div className="space-y-1.5">
+      <div className="space-y-1.5">
           <Label htmlFor="example-select">{t("Load an example profile", "Muat profil contoh")}</Label>
           <Select onValueChange={loadExample}>
             <SelectTrigger id="example-select" className="w-full max-w-72">
@@ -236,8 +238,7 @@ export function ProfileForm({
               ))}
             </SelectContent>
           </Select>
-        </div>
-      )}
+      </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="age">{t("Age", "Usia")}</Label>
@@ -404,18 +405,16 @@ export function ProfileForm({
             <Button size="sm" variant="outline" onClick={readNarrative} disabled={reading}>
               {t("Read description into the form", "Baca deskripsi ke dalam formulir")}
             </Button>
-            {researcher && (
-              <Button size="sm" variant="ghost" onClick={loadIlsCase}>
-                {t("Load an ILS-Bench case", "Muat kasus ILS-Bench")}
-              </Button>
-            )}
+            <Button size="sm" variant="ghost" onClick={loadIlsCase}>
+              {t("Load an ILS-Bench case", "Muat kasus ILS-Bench")}
+            </Button>
           </div>
           {narrativeStatus && (
             <p className="text-xs text-muted-foreground" role="status" aria-live="polite">
               {narrativeStatus}
             </p>
           )}
-          {researcher && ilsCase && (
+          {ilsCase && (
             <div className="space-y-1 rounded-lg border bg-background p-3 text-xs">
               <p className="font-semibold text-primary">{ilsCase.id} (ILS-Bench, {t("expert consensus", "konsensus ahli")})</p>
               <p>

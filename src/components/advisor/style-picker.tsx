@@ -70,7 +70,30 @@ const TAGLINES: Record<string, { en: string; id: string }> = {
   },
 };
 
-const ORDER = ["feature", "counterfactual", "confidence", "hybrid", "interactive", "adaptive", "llm", "none"];
+/* The two factors of the design, kept visible: what is explained, and how
+   that content is delivered. The delivery presets all carry the same three
+   contents, so they are not rival "explanation types" but ways of handing
+   the same material over. */
+const GROUPS: { key: string; title: { en: string; id: string }; note: { en: string; id: string }; items: string[] }[] = [
+  {
+    key: "content",
+    title: { en: "What is explained", id: "Apa yang dijelaskan" },
+    note: {
+      en: "Different material about the same recommendation, shown as a static panel.",
+      id: "Materi yang berbeda tentang rekomendasi yang sama, ditampilkan sebagai panel statis.",
+    },
+    items: ["feature", "counterfactual", "confidence", "hybrid", "none"],
+  },
+  {
+    key: "delivery",
+    title: { en: "How it is delivered", id: "Bagaimana penyajiannya" },
+    note: {
+      en: "The same three contents, handed over in a different way.",
+      id: "Ketiga konten yang sama, disampaikan dengan cara yang berbeda.",
+    },
+    items: ["interactive", "adaptive", "llm"],
+  },
+];
 
 export function StylePicker({
   preset,
@@ -111,8 +134,14 @@ export function StylePicker({
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ORDER.map((name) => {
+      {GROUPS.map((group) => (
+        <div key={group.key} className="space-y-4">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">{tr(locale, group.title)}</h3>
+            <p className="text-sm text-muted-foreground">{tr(locale, group.note)}</p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {group.items.map((name) => {
           const Icon = ICONS[name] ?? Layers;
           const selected = preset === name;
           const blocked = name === "llm" && gpuMissing;
@@ -153,12 +182,13 @@ export function StylePicker({
             </button>
           );
         })}
-      </div>
+          </div>
+        </div>
+      ))}
 
-      {researcher && (
-        <details className="rounded-2xl border border-border/70 bg-muted/40 p-5 text-sm">
+      <details className="rounded-2xl border border-border/70 bg-muted/40 p-5 text-sm">
           <summary className="cursor-pointer font-medium text-primary">
-            {t("Researcher controls", "Kontrol peneliti")}
+            {t("Build your own combination", "Susun kombinasi Anda sendiri")}
           </summary>
           <div className="mt-4 space-y-4">
             <div className="flex flex-wrap items-center gap-4">
@@ -192,29 +222,30 @@ export function StylePicker({
                 ))}
               </RadioGroup>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {t("Scenario", "Skenario")}
-              </span>
-              <Seg
-                name={t("Advice scenario", "Skenario saran")}
-                options={[
-                  { value: "sound", label: t("Sound advice", "Saran tepat") },
-                  { value: "flawed", label: t("Flawed advice", "Saran keliru") },
-                ]}
-                value={scenario}
-                onChange={(v) => onScenario(v as "sound" | "flawed")}
-              />
-            </div>
+            {researcher && (
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("Scenario", "Skenario")}
+                </span>
+                <Seg
+                  name={t("Advice scenario", "Skenario saran")}
+                  options={[
+                    { value: "sound", label: t("Sound advice", "Saran tepat") },
+                    { value: "flawed", label: t("Flawed advice", "Saran keliru") },
+                  ]}
+                  value={scenario}
+                  onChange={(v) => onScenario(v as "sound" | "flawed")}
+                />
+              </div>
+            )}
             <p className="text-xs text-muted-foreground">
               {t(
-                "Content is what is explained. Delivery is how it is shown. A preset is one combination, and the study log records both parts.",
-                "Konten adalah apa yang dijelaskan. Penyajian adalah cara menampilkannya. Preset adalah satu kombinasi, dan log studi merekam keduanya.",
+                "Content is what is explained: why, what would change it, how sure. Delivery is how it reaches you: static, interactive, adapted to literacy, or conversational. A preset is one combination of the two, and both parts are recorded.",
+                "Konten adalah apa yang dijelaskan: mengapa, apa yang mengubahnya, seberapa yakin. Penyajian adalah cara sampainya kepada Anda: statis, interaktif, disesuaikan dengan literasi, atau percakapan. Preset adalah satu kombinasi keduanya, dan kedua bagian itu dicatat.",
               )}
             </p>
           </div>
         </details>
-      )}
     </div>
   );
 }

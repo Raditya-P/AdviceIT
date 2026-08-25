@@ -29,7 +29,7 @@ import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
 import { outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import { presetLabel, type ContentPart, type Form } from "@/lib/conditions";
-import { UserRound } from "lucide-react";
+import { ArrowRight, UserRound } from "lucide-react";
 import { tr, useLang } from "@/lib/i18n";
 import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
 import {
@@ -44,8 +44,10 @@ import {
   type Trial,
 } from "@/lib/study";
 import { ExplanationArea } from "@/components/advisor/explanation-area";
-import { RecommendationCard } from "@/components/advisor/recommendation-card";
+import { RecommendationCard, advisorDisplayName } from "@/components/advisor/recommendation-card";
+import { Analyzing } from "@/components/advisor/analyzing";
 import { Seg } from "@/components/advisor/profile-form";
+import { RatingSlider } from "@/components/rating-slider";
 
 type Stage = "consent" | "literacy" | "trial" | "exit" | "debrief" | "done";
 
@@ -329,7 +331,14 @@ function TrialStage({
   const t = (en: string, id: string) => tr(locale, { en, id });
   const shown = caseDisplay(trial, locale);
   const result = useMemo(() => advisorRecommend(trial.profile), [advisorRecommend, trial.profile]);
-  const displayedAt = useRef(Date.now());
+  /* Each trial runs in three phases: read the case, watch the advisor work,
+     then judge the advice. Reading the case on its own page is what stops
+     people from jumping straight to the recommendation, and the case stays
+     on screen afterwards. */
+  const [phase, setPhase] = useState<"case" | "analyzing" | "advice">("case");
+  const caseShownAt = useRef(0);
+  const caseReadMs = useRef(0);
+  const displayedAt = useRef(0);
   const [trust, setTrust] = useState(4);
   const [decision, setDecision] = useState("");
   const [adjustedTo, setAdjustedTo] = useState("");
@@ -343,10 +352,16 @@ function TrialStage({
   const [whyNotAsked, setWhyNotAsked] = useState(0);
   const llmData = useRef<{ opening: string; model: string; turns: number }>({ opening: "", model: "", turns: 0 });
 
+  /* TrialStage is keyed by trial index, so a new trial remounts it and every
+     ref and phase starts fresh. Clocks are read in effects, never in render. */
   useEffect(() => {
-    displayedAt.current = Date.now();
+    caseShownAt.current = Date.now();
+  }, []);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
-  }, [trial.index]);
+    if (phase === "advice") displayedAt.current = Date.now();
+  }, [phase]);
 
   const submit = async () => {
     if (!decision) {
@@ -402,12 +417,38 @@ function TrialStage({
       adaptiveVariant: assignment.form === "adaptive" ? (literacyLevel === "low" ? "plain" : "detailed") : "",
       attentionCheck: trial.attention ? (decision === "reject" ? "passed" : "failed") : "",
       decisionTimeMs: Date.now() - displayedAt.current,
+      caseReadMs: caseReadMs.current,
       llmModel: assignment.form === "llm" ? llmData.current.model : "",
       llmExplanation: assignment.form === "llm" ? llmData.current.opening.slice(0, 4000) : "",
       llmTurns: assignment.form === "llm" ? llmData.current.turns : "",
     });
     setBusy(false);
   };
+
+  /* The raw facts the narrative already states, repeated as chips so nobody
+     has to scroll back. Derived suitability labels stay out of this: they
+     are explanation content and belong only to the assigned condition. */
+  const p0 = trial.profile;
+  const facts = [
+    `${t("Age", "Usia")} ${p0.age}`,
+    `${p0.horizon} ${t("year horizon", "tahun horizon")}`,
+    `${t("Stated risk tolerance", "Toleransi risiko yang dinyatakan")}: ${
+      p0.tolerance === "low" ? t("Low", "Rendah") : p0.tolerance === "high" ? t("High", "Tinggi") : t("Medium", "Sedang")
+    }`,
+    p0.emergencyFund ? t("Has an emergency fund", "Punya dana darurat") : t("No emergency fund", "Tanpa dana darurat"),
+    p0.incomeStable ? t("Stable income", "Pendapatan stabil") : t("Variable income", "Pendapatan tidak tetap"),
+    ...(p0.debtObligations ? [t("Significant debt or obligations", "Utang atau kewajiban besar")] : []),
+    ...(p0.nearTermNeed ? [t("May need the money sooner", "Mungkin membutuhkan uangnya lebih cepat")] : []),
+  ];
+  const caseFacts = (
+    <ul className="mt-3 flex flex-wrap gap-2 text-xs">
+      {facts.map((f) => (
+        <li key={f} className="rounded-full border border-border/80 bg-background px-2.5 py-1">
+          {f}
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6">
@@ -430,16 +471,53 @@ function TrialStage({
         </div>
       </div>
 
-      <div className="panel p-5 sm:p-6">
-        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
-          <UserRound className="size-3.5" aria-hidden />
+      {phase === "case" && (
+        <div className="space-y-5">
+          <section className="panel rise p-6 sm:p-8">
+            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
+              <UserRound className="size-3.5" aria-hidden />
+              {shown.label}
+            </p>
+            <h2 className="mt-3 text-xl font-semibold tracking-tight sm:text-2xl">
+              {t("Read this person's situation", "Baca situasi orang ini")}
+            </h2>
+            <p className="mt-3 text-[1.05rem] leading-relaxed">{shown.text}</p>
+            {caseFacts}
+            <p className="mt-5 text-sm text-muted-foreground">
+              {t(
+                "In a moment the advisor will recommend something for this person, and you will judge that advice as if it were being given to them.",
+                "Sebentar lagi penasihat akan merekomendasikan sesuatu untuk orang ini, dan Anda akan menilai saran itu seolah-olah diberikan kepadanya.",
+              )}
+            </p>
+          </section>
+          <div className="flex justify-end">
+            <Button
+              size="lg"
+              className="h-12 rounded-full px-7"
+              onClick={() => {
+                caseReadMs.current = Date.now() - caseShownAt.current;
+                setPhase("analyzing");
+              }}
+            >
+              {t("Ask the advisor", "Tanya penasihatnya")} <ArrowRight data-icon="inline-end" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {phase === "analyzing" && (
+        <Analyzing advisorName={advisorDisplayName(result.advisor, locale)} onDone={() => setPhase("advice")} />
+      )}
+
+      {phase === "advice" && (
+        <>
+      <details className="panel px-5 py-4 sm:px-6" open>
+        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-widest text-primary">
           {shown.label}
-        </p>
-        <p className="mt-2 text-[1.02rem] leading-relaxed">{shown.text}</p>
-        <p className="mt-3 text-xs text-muted-foreground">
-          {t("Please answer as this person.", "Mohon jawab sebagai orang ini.")}
-        </p>
-      </div>
+        </summary>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{shown.text}</p>
+        {caseFacts}
+      </details>
 
       <RecommendationCard result={result} />
       <ExplanationArea
@@ -555,34 +633,8 @@ function TrialStage({
           </Button>
         </div>
       </section>
-    </div>
-  );
-}
-
-function RatingSlider({
-  label,
-  value,
-  onChange,
-  low,
-  high,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-  low: string;
-  high: string;
-}) {
-  const { locale } = useLang();
-  return (
-    <div className="space-y-1.5">
-      <Label>
-        {label} <span className="tabular-nums text-primary">{value}</span> {locale === "id" ? "dari" : "of"} 7
-      </Label>
-      <Slider min={1} max={7} step={1} value={[value]} onValueChange={(v: number[]) => onChange(v[0])} aria-label={label} />
-      <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{low}</span>
-        <span>{high}</span>
-      </div>
+        </>
+      )}
     </div>
   );
 }

@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.1.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -91,9 +91,9 @@ The conversational delivery and the free-text reading run an open-weight languag
 | Route | What it is |
 | --- | --- |
 | `/` | Home: try the two advisors, why the research exists, the participate call to action. |
-| `/advisor/ml`, `/advisor/logit` | The advisor flow in three steps (explanation style, investor profile, recommendation), try mode, nothing recorded. `?researcher=1` unlocks the scenario toggle, suitability labels, advisor comparison, example profiles and the ILS-Bench case loader. |
+| `/advisor/ml`, `/advisor/logit` | The advisor flow in three steps (explanation style, investor profile, recommendation), plus an optional response panel logged as `explore`. `?researcher=1` unlocks the flawed-advice scenario toggle, the suitability labels and the advisor comparison line. |
 | `/participate` | The seven explanation-style cards. The primary button assigns at random (logged as `random`), choosing a card is allowed (logged as `chosen`). |
-| `/study` | The full flow: consent, literacy questions, six trials, attention check, exit questionnaire, debrief, completion code. Researcher links: `/study?cond=<preset>&pid=P07` or `/study?content=feature,confidence&form=interactive`. |
+| `/study` | The full flow: consent, literacy questions, six trials (each one read the case, watch the analysis, judge the advice), attention check, exit questionnaire, debrief, completion code. Researcher links: `/study?cond=<preset>&pid=P07` or `/study?content=feature,confidence&form=interactive`. |
 | `/training-data` | ILS-Bench: description, citation, live statistics, the two-advisor results table, all 400 cases to browse. |
 | `/researcher` | Key-gated dashboard: reliance, trust, time, secondary measures, attention checks, literacy moderator, exit answers, CSV download. |
 | `/references`, `/privacy` | References and tools, privacy and consent. |
@@ -170,6 +170,8 @@ Sound advice is the advisor's real outcome. **Flawed advice** shifts it two port
 Participants get a random ID, an explanation condition, an advisor, and a completion code derived from the ID. The assignment audit fields are `assignedBy` (`random` or `chosen`) and `advisorAssignedBy` (always `random`). Analyse the `random` stratum as the experiment. The `chosen` rows are a quasi-experimental stratum and a preference signal in their own right.
 
 Rows are anonymous by construction: no name, email, IP profile or tracker exists anywhere in the flow. One table, `responses`, holds `participant_id`, `row_type`, `condition`, `advisor`, `scenario`, `language`, `created_at` and the full sanitised row as jsonb.
+
+Three row types. `trial` and `exit` are the experiment. `explore` is a visitor answering the optional response panel on an advisor page: the same measures, but a self-chosen explanation style and a self-written profile, so it is a convenience sample. Analyse `trial` rows for the experiment and read `explore` rows as a preference and usability signal.
 
 This deployment is a pilot to develop the instrument. The consent text says so, and pilot data is not for publication before a formal ethics review.
 

@@ -1,20 +1,26 @@
-/* The data collector. POST stores study rows in Neon (anonymous, capped,
+/* The data collector. POST stores rows in Neon (anonymous, capped,
    key-whitelisted). GET returns all rows to the researcher and requires the
    RESEARCHER_KEY. Without a DATABASE_URL the POST answers 503 and the
-   client keeps rows buffered in the participant's browser. */
+   client keeps rows buffered in the participant's browser.
+
+   Three row types. "trial" and "exit" are the study proper, from /study.
+   "explore" is a visitor trying an advisor on the advisor pages: same
+   measures, but self-chosen condition and self-written profile, so it is a
+   convenience sample kept out of the experimental analysis by row type. */
 
 import { neon } from "@neondatabase/serverless";
 
 const ALLOWED_KEYS = new Set([
   "rowType", "timestamp", "participantId", "condition", "explanationContent", "explanationForm",
-  "assignedBy", "advisorModel", "advisorAssignedBy", "scenario", "trialIndex", "trialProfileId",
+  "assignedBy", "advisorModel", "advisorAssignedBy", "language", "scenario", "trialIndex", "trialProfileId",
   "age", "horizon", "tolerance", "toleranceInconsistent", "emergencyFund", "incomeStable",
   "debtObligations", "nearTermNeed", "knowledge", "suitabilityTolerance", "suitabilityCapacity",
   "suitabilityLiquidity", "recommendedPortfolio", "soundPortfolio", "score", "margin", "confidence",
   "trustRating", "decision", "adjustedTo", "adjustSteps", "understanding", "decisionConfidence",
   "mentalDemand", "reason", "literacyScore", "literacyAnswers", "literacyLevel", "whatIfMoves",
   "whyNotAsked", "adaptiveVariant", "attentionCheck", "decisionTimeMs", "llmModel", "llmExplanation",
-  "llmTurns", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile",
+  "llmTurns", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile", "caseReadMs",
+  "profileSource", "tryIndex",
 ]);
 
 function sanitize(row: Record<string, unknown>): Record<string, unknown> | null {
@@ -27,7 +33,7 @@ function sanitize(row: Record<string, unknown>): Record<string, unknown> | null 
     else if (typeof v === "boolean") out[k] = v;
   }
   if (typeof out.participantId !== "string" || !out.participantId || typeof out.rowType !== "string") return null;
-  if (out.rowType !== "trial" && out.rowType !== "exit") return null;
+  if (out.rowType !== "trial" && out.rowType !== "exit" && out.rowType !== "explore") return null;
   return out;
 }
 
