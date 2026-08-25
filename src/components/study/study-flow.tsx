@@ -8,7 +8,12 @@
    Assignment: the explanation condition comes from /participate (random by
    default, a chosen card is allowed and logged as chosen). The advisor is
    randomised here and logged. One row is POSTed per trial plus one exit
-   row, with a localStorage buffer as fallback. */
+   row, with a localStorage buffer as fallback.
+
+   Language: the participant-facing texts follow the site language toggle.
+   Logged values (decisions, portfolio names, labels, option values) stay
+   English canonical whatever the display language, and the language is
+   logged per row. */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -22,17 +27,20 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { ADVISORS } from "@/lib/advisor/advisors";
 import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
+import { outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
-import { PRESET_LABELS, type ContentPart, type Form } from "@/lib/conditions";
+import { presetLabel, type ContentPart, type Form } from "@/lib/conditions";
+import { tr, useLang } from "@/lib/i18n";
 import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
 import {
   LITERACY_CORRECT,
-  LITERACY_QUESTIONS,
-  TEXTS,
   buildPlan,
+  caseDisplay,
   completionCode,
+  literacyFor,
   randomAdvisor,
   randomParticipantId,
+  textsFor,
   type Trial,
 } from "@/lib/study";
 import { ExplanationArea } from "@/components/advisor/explanation-area";
@@ -50,6 +58,11 @@ export interface Assignment {
 }
 
 export function StudyFlow({ assignment }: { assignment: Assignment }) {
+  const { locale } = useLang();
+  const t = (en: string, id: string) => tr(locale, { en, id });
+  const TX = textsFor(locale);
+  const LQ = literacyFor(locale);
+
   const [pid] = useState(() => assignment.pid || randomParticipantId());
   const [advisorId] = useState<"ml" | "logit">(() => randomAdvisor());
   const [stage, setStage] = useState<Stage>("consent");
@@ -68,7 +81,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   const literacyScore = useMemo(() => {
     let score = 0;
     let answered = 0;
-    for (const q of LITERACY_QUESTIONS) {
+    for (const q of LQ) {
       const v = litAnswers[q.name];
       if (v) {
         answered++;
@@ -76,7 +89,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
       }
     }
     return { score, answered };
-  }, [litAnswers]);
+  }, [litAnswers, LQ]);
   const literacyLevel: "low" | "high" = literacyScore.score >= 2 ? "high" : "low";
 
   const baseRow = (): Omit<StudyRow, "rowType" | "timestamp"> => ({
@@ -87,8 +100,9 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
     assignedBy: assignment.assignedBy,
     advisorModel: advisorId,
     advisorAssignedBy: "random",
+    language: locale,
     literacyScore: literacyScore.answered ? literacyScore.score : "",
-    literacyAnswers: LITERACY_QUESTIONS.map((q) => litAnswers[q.name] || "").join("|"),
+    literacyAnswers: LQ.map((q) => litAnswers[q.name] || "").join("|"),
     literacyLevel,
     userAgentMobile: typeof navigator !== "undefined" && /Mobi|Android/i.test(navigator.userAgent),
   });
@@ -113,31 +127,36 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   /* ---------------------------- Stages ---------------------------- */
   if (stage === "consent") {
     return (
-      <StageShell title={TEXTS.consentTitle}>
+      <StageShell title={TX.consentTitle}>
         {prior && (
           <Alert>
-            <AlertTitle>It looks like you already took part</AlertTitle>
+            <AlertTitle>{t("It looks like you already took part", "Sepertinya Anda sudah pernah ikut serta")}</AlertTitle>
             <AlertDescription>
-              This browser completed a session as {prior.pid}. A second run is fine for trying things out, but the
-              researcher may exclude repeat sessions from the analysis.
+              {t(
+                `This browser completed a session as ${prior.pid}. A second run is fine for trying things out, but the researcher may exclude repeat sessions from the analysis.`,
+                `Browser ini menyelesaikan sesi sebagai ${prior.pid}. Menjalankan sesi kedua boleh saja untuk mencoba-coba, tetapi peneliti dapat mengecualikan sesi berulang dari analisis.`,
+              )}
             </AlertDescription>
           </Alert>
         )}
-        {TEXTS.consent.map((t, i) => (
+        {TX.consent.map((para, i) => (
           <p key={i} className="text-muted-foreground">
-            {t}
+            {para}
           </p>
         ))}
         <label className="flex items-start gap-2 pt-2 font-medium">
           <Checkbox checked={consented} onCheckedChange={(v) => setConsented(v === true)} className="mt-0.5" />
-          I have read the information above and I agree to take part.
+          {t(
+            "I have read the information above and I agree to take part.",
+            "Saya telah membaca informasi di atas dan setuju untuk ikut serta.",
+          )}
         </label>
         <div className="flex items-center gap-3 pt-2">
           <Button disabled={!consented} onClick={() => setStage("literacy")}>
-            Start
+            {t("Start", "Mulai")}
           </Button>
           <Button asChild variant="ghost">
-            <Link href="/">Back to the homepage</Link>
+            <Link href="/">{t("Back to the homepage", "Kembali ke beranda")}</Link>
           </Button>
         </div>
       </StageShell>
@@ -146,15 +165,15 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
 
   if (stage === "literacy") {
     return (
-      <StageShell title={TEXTS.literacyTitle}>
-        <p className="text-muted-foreground">{TEXTS.literacyIntro}</p>
-        {LITERACY_QUESTIONS.map((q, i) => (
+      <StageShell title={TX.literacyTitle}>
+        <p className="text-muted-foreground">{TX.literacyIntro}</p>
+        {LQ.map((q, i) => (
           <div key={q.name} className="space-y-2">
             <p className="font-medium">
               {i + 1}. {q.text}
             </p>
             <Seg
-              name={`Literacy question ${i + 1}`}
+              name={t(`Literacy question ${i + 1}`, `Pertanyaan literasi ${i + 1}`)}
               options={q.options}
               value={litAnswers[q.name] || ""}
               onChange={(v) => setLitAnswers((a) => ({ ...a, [q.name]: v }))}
@@ -165,13 +184,18 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
         <Button
           onClick={() => {
             if (literacyScore.answered < 3) {
-              setLitError('Please answer all three questions ("Do not know" is a valid answer).');
+              setLitError(
+                t(
+                  'Please answer all three questions ("Do not know" is a valid answer).',
+                  'Mohon jawab ketiga pertanyaan ("Tidak tahu" adalah jawaban yang sah).',
+                ),
+              );
               return;
             }
             setStage("trial");
           }}
         >
-          Continue
+          {t("Continue", "Lanjut")}
         </Button>
       </StageShell>
     );
@@ -202,58 +226,70 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
 
   if (stage === "exit") {
     return (
-      <StageShell title={TEXTS.exitTitle}>
-        <p className="text-muted-foreground">{TEXTS.exitIntro}</p>
+      <StageShell title={TX.exitTitle}>
+        <p className="text-muted-foreground">{TX.exitIntro}</p>
         <div className="space-y-1.5">
-          <Label htmlFor="exit1">{TEXTS.exitQ1}</Label>
+          <Label htmlFor="exit1">{TX.exitQ1}</Label>
           <Textarea id="exit1" rows={3} value={exit1} onChange={(e) => setExit1(e.target.value)} />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="exit2">{TEXTS.exitQ2}</Label>
+          <Label htmlFor="exit2">{TX.exitQ2}</Label>
           <Textarea id="exit2" rows={3} value={exit2} onChange={(e) => setExit2(e.target.value)} />
         </div>
-        <Button onClick={finishExit}>Continue</Button>
+        <Button onClick={finishExit}>{t("Continue", "Lanjut")}</Button>
       </StageShell>
     );
   }
 
   if (stage === "debrief") {
     return (
-      <StageShell title={TEXTS.debriefTitle}>
-        <p className="text-muted-foreground">{TEXTS.debriefIntro}</p>
+      <StageShell title={TX.debriefTitle}>
+        <p className="text-muted-foreground">{TX.debriefIntro}</p>
         <ul className="list-disc pl-5">
           {plan
-            .filter((t) => t.scenario === "flawed")
-            .map((t) => (
-              <li key={t.index}>
-                Case {t.index + 1} ({t.label})
+            .filter((tt) => tt.scenario === "flawed")
+            .map((tt) => (
+              <li key={tt.index}>
+                {t("Case", "Kasus")} {tt.index + 1} ({caseDisplay(tt, locale).label})
               </li>
             ))}
         </ul>
-        <p className="text-muted-foreground">{TEXTS.debriefOutro}</p>
-        <Button onClick={() => setStage("done")}>Finish</Button>
+        <p className="text-muted-foreground">{TX.debriefOutro}</p>
+        <Button onClick={() => setStage("done")}>{t("Finish", "Selesai")}</Button>
       </StageShell>
     );
   }
 
   return (
-    <StageShell title={TEXTS.doneTitle}>
-      <p className="text-muted-foreground">{TEXTS.done}</p>
+    <StageShell title={TX.doneTitle}>
+      <p className="text-muted-foreground">{TX.done}</p>
       <p className="rounded-lg border bg-muted/40 px-4 py-3 text-center font-mono text-2xl tracking-widest">
         {completionCode(pid)}
       </p>
       <p className="text-sm text-muted-foreground">
-        Your participant ID is <span className="font-mono">{pid}</span>. Keep it if you may want your data deleted
-        later.
+        {locale === "id" ? (
+          <>
+            ID partisipan Anda adalah <span className="font-mono">{pid}</span>. Simpan jika suatu saat Anda ingin data
+            Anda dihapus.
+          </>
+        ) : (
+          <>
+            Your participant ID is <span className="font-mono">{pid}</span>. Keep it if you may want your data deleted
+            later.
+          </>
+        )}
         {saved === "local" &&
-          " Note: the responses could not reach the server and are stored in this browser. They will be sent when you revisit this site online."}
+          t(
+            " Note: the responses could not reach the server and are stored in this browser. They will be sent when you revisit this site online.",
+            " Catatan: respons belum bisa mencapai server dan tersimpan di browser ini. Respons akan terkirim saat Anda membuka kembali situs ini dalam keadaan online.",
+          )}
       </p>
       <div className="flex gap-3">
         <Button asChild>
-          <Link href="/">Back to the homepage</Link>
+          <Link href="/">{t("Back to the homepage", "Kembali ke beranda")}</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/training-data">See what powers the advisors</Link>
+          <Link href="/training-data">{t("See what powers the advisors", "Lihat apa yang menggerakkan para penasihat")}</Link>
         </Button>
       </div>
     </StageShell>
@@ -291,6 +327,9 @@ function TrialStage({
   saved: "server" | "local" | null;
   onSubmit: (row: Partial<StudyRow>) => Promise<void>;
 }) {
+  const { locale } = useLang();
+  const t = (en: string, id: string) => tr(locale, { en, id });
+  const shown = caseDisplay(trial, locale);
   const result = useMemo(() => advisorRecommend(trial.profile), [advisorRecommend, trial.profile]);
   const displayedAt = useRef(Date.now());
   const [trust, setTrust] = useState(4);
@@ -313,11 +352,16 @@ function TrialStage({
 
   const submit = async () => {
     if (!decision) {
-      setError("Please choose Follow, Adjust, Reject, or Ask a human adviser.");
+      setError(
+        t(
+          "Please choose Follow, Adjust, Reject, or Ask a human adviser.",
+          "Silakan pilih Ikuti, Sesuaikan, Tolak, atau Tanya penasihat manusia.",
+        ),
+      );
       return;
     }
     if (decision === "adjust" && !adjustedTo) {
-      setError("Please choose which portfolio you would adjust to.");
+      setError(t("Please choose which portfolio you would adjust to.", "Silakan pilih portofolio tujuan penyesuaian Anda."));
       return;
     }
     setError("");
@@ -370,14 +414,16 @@ function TrialStage({
   return (
     <div className="mx-auto max-w-3xl space-y-4 px-4 py-8">
       <p className="text-sm text-muted-foreground">
-        Case {trial.index + 1} of {total} · condition {PRESET_LABELS[assignment.condition] ?? assignment.condition}
-        {saved === "local" && " · offline, responses buffered in this browser"}
+        {t("Case", "Kasus")} {trial.index + 1} {t("of", "dari")} {total} · {t("condition", "kondisi")}{" "}
+        {presetLabel(assignment.condition, locale)}
+        {saved === "local" &&
+          t(" · offline, responses buffered in this browser", " · offline, respons disimpan sementara di browser ini")}
       </p>
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-800">
-          {trial.label}. Please answer as this person.
+          {shown.label}. {t("Please answer as this person.", "Mohon jawab sebagai orang ini.")}
         </p>
-        <p className="mt-1 text-[0.95rem] leading-relaxed text-amber-950">{trial.text}</p>
+        <p className="mt-1 text-[0.95rem] leading-relaxed text-amber-950">{shown.text}</p>
       </div>
 
       <RecommendationCard result={result} />
@@ -398,49 +444,55 @@ function TrialStage({
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Your response</CardTitle>
+          <CardTitle className="text-base">{t("Your response", "Respons Anda")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           {trial.attention && (
             <Alert>
-              <AlertTitle>Attention check</AlertTitle>
-              <AlertDescription>For this case, please choose Reject whatever the advice says.</AlertDescription>
+              <AlertTitle>{t("Attention check", "Pemeriksaan atensi")}</AlertTitle>
+              <AlertDescription>
+                {t(
+                  "For this case, please choose Reject whatever the advice says.",
+                  "Untuk kasus ini, pilih Tolak apa pun sarannya.",
+                )}
+              </AlertDescription>
             </Alert>
           )}
           <div className="space-y-1.5">
             <Label>
-              How much do you trust this recommendation? <span className="tabular-nums text-primary">{trust}</span> of 7
+              {t("How much do you trust this recommendation?", "Seberapa besar Anda memercayai rekomendasi ini?")}{" "}
+              <span className="tabular-nums text-primary">{trust}</span> {t("of", "dari")} 7
             </Label>
-            <Slider min={1} max={7} step={1} value={[trust]} onValueChange={(v: number[]) => setTrust(v[0])} aria-label="Trust rating" />
+            <Slider min={1} max={7} step={1} value={[trust]} onValueChange={(v: number[]) => setTrust(v[0])} aria-label={t("Trust rating", "Penilaian kepercayaan")} />
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>1, not at all</span>
-              <span>7, completely</span>
+              <span>{t("1, not at all", "1, tidak sama sekali")}</span>
+              <span>{t("7, completely", "7, sepenuhnya")}</span>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Would you follow this advice?</Label>
+            <Label>{t("Would you follow this advice?", "Apakah Anda akan mengikuti saran ini?")}</Label>
             <Seg
-              name="Decision"
+              name={t("Decision", "Keputusan")}
               options={[
-                { value: "follow", label: "Follow" },
-                { value: "adjust", label: "Adjust" },
-                { value: "reject", label: "Reject" },
-                { value: "ask-human", label: "Ask a human adviser" },
+                { value: "follow", label: t("Follow", "Ikuti") },
+                { value: "adjust", label: t("Adjust", "Sesuaikan") },
+                { value: "reject", label: t("Reject", "Tolak") },
+                { value: "ask-human", label: t("Ask a human adviser", "Tanya penasihat manusia") },
               ]}
               value={decision}
               onChange={setDecision}
             />
             {decision === "adjust" && (
               <div className="mt-2 space-y-1.5 rounded-lg bg-muted/50 p-3">
-                <Label>Adjust to which portfolio?</Label>
+                <Label>{t("Adjust to which portfolio?", "Menyesuaikan ke portofolio yang mana?")}</Label>
                 <Select value={adjustedTo || undefined} onValueChange={setAdjustedTo}>
                   <SelectTrigger className="w-full max-w-64">
-                    <SelectValue placeholder="Choose a portfolio" />
+                    <SelectValue placeholder={t("Choose a portfolio", "Pilih portofolio")} />
                   </SelectTrigger>
                   <SelectContent>
                     {PORTFOLIOS.map((pf) => (
                       <SelectItem key={pf.id} value={pf.name}>
-                        {pf.name}
+                        {outcomeName(pf.name)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -450,21 +502,41 @@ function TrialStage({
           </div>
 
           <details className="rounded-lg border px-3 py-2 text-sm">
-            <summary className="cursor-pointer font-medium text-primary">A few more questions about this decision</summary>
+            <summary className="cursor-pointer font-medium text-primary">
+              {t("A few more questions about this decision", "Beberapa pertanyaan lagi tentang keputusan ini")}
+            </summary>
             <div className="mt-3 space-y-4">
-              <RatingSlider label="How well do you understand why this advice was given?" value={understanding} onChange={setUnderstanding} low="1, not at all" high="7, completely" />
-              <RatingSlider label="How confident are you in your decision?" value={decisionConfidence} onChange={setDecisionConfidence} low="1, not at all" high="7, completely" />
-              <RatingSlider label="How mentally demanding was this decision?" value={mentalDemand} onChange={setMentalDemand} low="1, very low" high="7, very high" />
+              <RatingSlider
+                label={t("How well do you understand why this advice was given?", "Seberapa baik Anda memahami mengapa saran ini diberikan?")}
+                value={understanding}
+                onChange={setUnderstanding}
+                low={t("1, not at all", "1, tidak sama sekali")}
+                high={t("7, completely", "7, sepenuhnya")}
+              />
+              <RatingSlider
+                label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan Anda?")}
+                value={decisionConfidence}
+                onChange={setDecisionConfidence}
+                low={t("1, not at all", "1, tidak sama sekali")}
+                high={t("7, completely", "7, sepenuhnya")}
+              />
+              <RatingSlider
+                label={t("How mentally demanding was this decision?", "Seberapa menuntut secara mental keputusan ini?")}
+                value={mentalDemand}
+                onChange={setMentalDemand}
+                low={t("1, very low", "1, sangat rendah")}
+                high={t("7, very high", "7, sangat tinggi")}
+              />
               <div className="space-y-1.5">
-                <Label htmlFor="reason">Why did you decide this? (optional)</Label>
-                <Textarea id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="In your own words" />
+                <Label htmlFor="reason">{t("Why did you decide this? (optional)", "Mengapa Anda memutuskan demikian? (opsional)")}</Label>
+                <Textarea id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("In your own words", "Dengan kata-kata Anda sendiri")} />
               </div>
             </div>
           </details>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button onClick={submit} disabled={busy}>
-            {trial.index + 1 < total ? "Submit and continue" : "Submit final case"}
+            {trial.index + 1 < total ? t("Submit and continue", "Kirim dan lanjut") : t("Submit final case", "Kirim kasus terakhir")}
           </Button>
         </CardContent>
       </Card>
@@ -485,10 +557,11 @@ function RatingSlider({
   low: string;
   high: string;
 }) {
+  const { locale } = useLang();
   return (
     <div className="space-y-1.5">
       <Label>
-        {label} <span className="tabular-nums text-primary">{value}</span> of 7
+        {label} <span className="tabular-nums text-primary">{value}</span> {locale === "id" ? "dari" : "of"} 7
       </Label>
       <Slider min={1} max={7} step={1} value={[value]} onValueChange={(v: number[]) => onChange(v[0])} aria-label={label} />
       <div className="flex justify-between text-xs text-muted-foreground">

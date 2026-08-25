@@ -12,6 +12,7 @@ export interface StudyRow {
   assignedBy: "random" | "chosen";
   advisorModel: "ml" | "logit";
   advisorAssignedBy: "random" | "chosen";
+  language?: "en" | "id";
   scenario?: "sound" | "flawed";
   trialIndex?: number;
   trialProfileId?: string;

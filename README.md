@@ -4,6 +4,10 @@ The public research website of **AdviceIT by Radit**: an open study on which exp
 investment advice the right amount. Next.js App Router, TypeScript, Tailwind CSS 4, shadcn/ui (radix-nova), with the
 verified advisor logic ported from the original static instrument (`../AdviceIT`, kept as the working archive).
 
+Version 2.0.0 (see `CHANGELOG.md`). The whole site, including the study flow and the generated explanations, runs in
+English and Bahasa Indonesia via the header toggle. Logged values stay English canonical and each row records the
+participant's language.
+
 Nothing on this site is financial advice.
 
 ## What is here
@@ -26,8 +30,9 @@ the v1 logic. `scripts/verify.ts` re-checks all of it: both training accuracies 
 counterfactual truth, plan seeding, the scorecard.
 
 ```bash
-npx tsx scripts/verify.ts   # 22 checks, all must pass
-npx tsc --noEmit            # types
+npx tsx scripts/verify.ts       # 22 checks, all must pass
+npx tsx scripts/i18n-smoke.ts   # EN output byte-identical, ID translations complete
+npx tsc --noEmit                # types
 ```
 
 Note: production builds need roughly 2 GB of free memory. On small machines skip local builds entirely and let Vercel
@@ -39,6 +44,8 @@ build (below).
 
 - neon.tech, create a project, open the SQL editor and run the contents of `db/schema.sql` (one table, two indexes).
 - Copy the pooled connection string (Connection details), it becomes `DATABASE_URL`.
+- Already done for this deployment (2026-08-25): schema applied and roundtrip-tested, credentials in `.env.local`
+  (gitignored, never commit it).
 
 **2. Push this folder to GitHub.**
 

@@ -35,6 +35,23 @@ export const PRESET_LABELS: Record<string, string> = {
   custom: "Custom",
 };
 
+const PRESET_LABELS_ID: Record<string, string> = {
+  none: "Tanpa penjelasan",
+  feature: "Mengapa (berbasis fitur)",
+  counterfactual: "Apa yang mengubahnya (kontrafaktual)",
+  confidence: "Seberapa yakin (keyakinan)",
+  hybrid: "Ketiganya (hibrida)",
+  interactive: "What-if interaktif",
+  adaptive: "Adaptif terhadap literasi",
+  llm: "Percakapan (LLM)",
+  custom: "Kustom",
+};
+
+export function presetLabel(name: string, locale: "en" | "id") {
+  if (locale === "id") return PRESET_LABELS_ID[name] ?? PRESET_LABELS[name] ?? name;
+  return PRESET_LABELS[name] ?? name;
+}
+
 export function presetFor(content: ContentPart[], form: Form): string {
   const key = [...content].sort().join("+") + "|" + form;
   for (const name of Object.keys(PRESETS)) {

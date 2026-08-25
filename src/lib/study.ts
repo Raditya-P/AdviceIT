@@ -177,6 +177,114 @@ export const TEXTS = {
   done: "Your responses have been recorded. Thank you for contributing to this research. Your completion code:",
 };
 
+/* ---------------- Bahasa Indonesia variants ----------------
+   Same study, same logged values (ids, option values, labels in the data
+   stay English canonical). Only what the participant reads is translated. */
+
+export const CASES_ID: Record<string, { label: string; text: string }> = {
+  C1: {
+    label: "Penabung awal karier",
+    text: "Anda berusia 27 tahun, bekerja tetap dengan gaji stabil, dan memiliki enam bulan pengeluaran di rekening tabungan. Anda berinvestasi untuk pensiun, sekitar 30 tahun lagi, dan Anda menyatakan nyaman dengan naik turunnya nilai yang besar di sepanjang jalan.",
+  },
+  C2: {
+    label: "Karier menengah, tanpa penyangga",
+    text: "Anda berusia 40 tahun, bekerja dengan pendapatan stabil, tetapi belum menyisihkan dana darurat. Uang ini untuk tujuan sekitar 15 tahun lagi, dan Anda menggambarkan sikap Anda terhadap risiko sebagai moderat.",
+  },
+  C3: {
+    label: "Menjelang pensiun",
+    text: "Anda berusia 61 tahun, masih bekerja dengan pendapatan stabil, dengan cadangan kas yang kokoh. Anda memperkirakan mulai memakai uang ini sekitar 6 tahun lagi, dan Anda memilih menghindari kerugian besar meski itu berarti imbal hasil lebih rendah.",
+  },
+  C4: {
+    label: "Pekerja lepas dengan kebutuhan jangka pendek",
+    text: "Anda berusia 34 tahun, bekerja mandiri dengan pendapatan yang sangat bervariasi dari bulan ke bulan, dan hanya punya cadangan kas kecil. Anda mungkin membutuhkan uang ini dalam sekitar 2 tahun untuk uang muka rumah, tetapi Anda menyatakan ingin imbal hasil setinggi mungkin.",
+  },
+  C5: {
+    label: "Investor paruh baya yang mapan",
+    text: "Anda berusia 48 tahun, dengan pekerjaan stabil dan dana darurat yang memadai. Uang ini untuk tujuan sekitar 12 tahun lagi, dan Anda menggambarkan diri cukup nyaman dengan risiko.",
+  },
+  C6: {
+    label: "Muda, pendapatan tidak tetap",
+    text: "Anda berusia 30 tahun, bekerja dengan kontrak pendek sehingga pendapatan Anda tidak teratur, tetapi Anda menyimpan enam bulan pengeluaran dalam bentuk kas. Anda berinvestasi untuk sekitar 20 tahun dan bersedia menerima naik turun yang moderat.",
+  },
+  C7: {
+    label: "Penabung hati-hati, horizon panjang",
+    text: "Anda berusia 36 tahun, dengan pekerjaan aman dan dana darurat penuh. Anda berinvestasi untuk sekitar 25 tahun, tetapi Anda menyatakan akan stres melihat kerugian yang berarti dan memilih pendekatan hati-hati.",
+  },
+  C8: {
+    label: "Pemula yang terlambat",
+    text: "Anda berusia 55 tahun, bekerja dengan pendapatan stabil, tanpa dana darurat dan masih melunasi pinjaman yang cukup besar. Anda ingin mengejar tabungan pensiun dalam 10 tahun ke depan dan menyatakan bersedia mengambil risiko besar untuk itu.",
+  },
+};
+
+export function caseDisplay(trial: { profileId: string; label: string; text: string }, locale: "en" | "id") {
+  if (locale === "id" && CASES_ID[trial.profileId]) return CASES_ID[trial.profileId];
+  return { label: trial.label, text: trial.text };
+}
+
+const TEXTS_ID: typeof TEXTS = {
+  consentTitle: "Sebelum Anda mulai",
+  consent: [
+    "Ini adalah studi penelitian tentang bagaimana orang menggunakan saran investasi dari penasihat otomatis. Waktunya sekitar 10 sampai 15 menit.",
+    "Anda akan membaca beberapa deskripsi singkat investor hipotetis, melihat rekomendasi penasihat untuk masing-masing, dan memberi tahu kami apakah Anda akan mengikutinya serta seberapa besar Anda memercayainya. Tiga pertanyaan tentang pengetahuan keuangan datang lebih dulu, dan dua pertanyaan terbuka ada di bagian akhir.",
+    "Tidak ada saran keuangan sungguhan di sini, dan tidak ada uang sungguhan yang terlibat. Mohon jawab sebagai orang yang digambarkan dalam setiap kasus.",
+    "Jawaban Anda disimpan di bawah ID partisipan anonim bersama rekomendasi yang Anda lihat dan respons Anda. Tidak ada nama, email, atau informasi akun yang dikumpulkan, dan tidak ada yang dapat mengidentifikasi Anda. Anda dapat berhenti kapan saja dengan menutup halaman ini, dan Anda dapat meminta data Anda dihapus dengan menyebutkan ID partisipan Anda.",
+    "Ini adalah studi pilot untuk mengembangkan instrumen. Dengan melanjutkan, Anda menyatakan telah membaca ini dan setuju untuk ikut serta.",
+  ],
+  literacyTitle: "Tiga pertanyaan singkat",
+  literacyIntro: "Pertanyaan berikut tentang pengetahuan keuangan umum. Tidak ada penalti untuk menjawab “Tidak tahu”.",
+  exitTitle: "Dua pertanyaan terakhir",
+  exitIntro: "Dengan kata-kata Anda sendiri. Satu dua kalimat sudah cukup, dan Anda boleh mengosongkannya.",
+  exitQ1: "Adakah momen Anda tidak memercayai sarannya? Apa yang membuat Anda menyadarinya?",
+  exitQ2: "Apa yang Anda ingin penasihat jelaskan tetapi tidak dijelaskannya?",
+  debriefTitle: "Terima kasih. Satu hal lagi yang perlu Anda ketahui",
+  debriefIntro:
+    "Dalam studi ini sebagian rekomendasi yang Anda lihat sengaja diubah agar tidak sesuai untuk kasusnya, untuk mengukur bagaimana orang bereaksi terhadap saran otomatis yang baik dan yang buruk. Trial yang diubah adalah:",
+  debriefOutro:
+    "Penasihat dan rekomendasinya adalah bagian dari instrumen penelitian, bukan layanan keuangan. Jika Anda punya pertanyaan tentang studi ini, silakan hubungi peneliti.",
+  doneTitle: "Selesai",
+  done: "Respons Anda telah terekam. Terima kasih telah berkontribusi pada penelitian ini. Kode penyelesaian Anda:",
+};
+
+export function textsFor(locale: "en" | "id") {
+  return locale === "id" ? TEXTS_ID : TEXTS;
+}
+
+const LITERACY_QUESTIONS_ID: typeof LITERACY_QUESTIONS = [
+  {
+    name: "lit1",
+    text: "Misalkan Anda punya 100 di rekening tabungan dengan bunga 2 persen per tahun. Setelah 5 tahun, menurut Anda berapa isi rekening itu jika uangnya dibiarkan tumbuh?",
+    options: [
+      { value: "more", label: "Lebih dari 102" },
+      { value: "exact", label: "Tepat 102" },
+      { value: "less", label: "Kurang dari 102" },
+      { value: "dk", label: "Tidak tahu" },
+    ],
+  },
+  {
+    name: "lit2",
+    text: "Bayangkan bunga rekening tabungan Anda 1 persen per tahun dan inflasi 2 persen per tahun. Setelah 1 tahun, seberapa banyak yang bisa Anda beli dengan uang di rekening ini?",
+    options: [
+      { value: "more", label: "Lebih banyak dari hari ini" },
+      { value: "same", label: "Sama persis" },
+      { value: "less", label: "Lebih sedikit dari hari ini" },
+      { value: "dk", label: "Tidak tahu" },
+    ],
+  },
+  {
+    name: "lit3",
+    text: "Membeli saham satu perusahaan biasanya memberi imbal hasil yang lebih aman daripada reksa dana saham.",
+    options: [
+      { value: "true", label: "Benar" },
+      { value: "false", label: "Salah" },
+      { value: "dk", label: "Tidak tahu" },
+    ],
+  },
+];
+
+export function literacyFor(locale: "en" | "id") {
+  return locale === "id" ? LITERACY_QUESTIONS_ID : LITERACY_QUESTIONS;
+}
+
 export const LITERACY_CORRECT: Record<string, string> = { lit1: "more", lit2: "less", lit3: "false" };
 
 export const LITERACY_QUESTIONS = [

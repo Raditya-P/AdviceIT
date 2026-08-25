@@ -151,21 +151,30 @@ export function factsFor(result: AdvisorResult, content: string[]) {
   return facts;
 }
 
-export function systemPrompt(result: AdvisorResult, content: string[]) {
+export function systemPrompt(result: AdvisorResult, content: string[], locale: "en" | "id" = "en") {
+  const facts = factsFor(result, content);
   return [
     "You are the explanation assistant of AdviceIT, a research tool about AI investment advice.",
-    `You explain a recommendation that was produced by ${(factsFor(result, content) as { advisor: string }).advisor}. You did not produce it yourself.`,
+    `You explain a recommendation that was produced by ${(facts as { advisor: string }).advisor}. You did not produce it yourself.`,
     "Use ONLY the facts below. Do not add products, numbers, market views or advice that are not in the facts.",
     "If asked something the facts do not cover, say that you do not have that information.",
     "Write plainly, in short sentences, for a non-expert. Never use em dashes or semicolons.",
+    ...(locale === "id" ? ["Always reply in Bahasa Indonesia, whatever language the facts are in."] : []),
     "",
     "FACTS (JSON):",
-    JSON.stringify(factsFor(result, content), null, 2),
+    JSON.stringify(facts, null, 2),
   ].join("\n");
 }
 
 export const OPENING_REQUEST =
   "In three or four sentences, explain to me why I received this recommendation, what mattered most, and how sure the model is. Then invite me to ask a follow-up question.";
+
+const OPENING_REQUEST_ID =
+  "Dalam tiga atau empat kalimat, jelaskan kepada saya mengapa saya menerima rekomendasi ini, apa yang paling berpengaruh, dan seberapa yakin modelnya. Lalu persilakan saya mengajukan pertanyaan lanjutan.";
+
+export function openingRequest(locale: "en" | "id" = "en") {
+  return locale === "id" ? OPENING_REQUEST_ID : OPENING_REQUEST;
+}
 
 /* ---------------- Language to suitability (extraction v4) --------------- */
 export function extractionMessages(narrative: string): ChatMessage[] {

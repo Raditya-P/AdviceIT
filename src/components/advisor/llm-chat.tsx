@@ -3,7 +3,8 @@
 /* Conversational delivery: an open-weight language model runs in the
    browser through WebLLM, grounded ONLY on the ticked content facts. The
    opening explanation and the number of follow-up turns are reported to
-   the parent so the study can log them verbatim. */
+   the parent so the study can log them verbatim. In Bahasa Indonesia mode
+   the model is instructed to reply in Indonesian. */
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import * as llm from "@/lib/llm";
 import type { AdvisorResult } from "@/lib/advisor/types";
+import { tr, useLang } from "@/lib/i18n";
 import { ExplanationCard } from "./explanation-boxes";
 
 type Bubble = { role: "user" | "assistant"; text: string };
@@ -31,6 +33,8 @@ export function LlmChat({
   onOpening?: (text: string, modelId: string) => void;
   onTurn?: () => void;
 }) {
+  const { locale } = useLang();
+  const t = (en: string, id: string) => tr(locale, { en, id });
   const [modelId, setModelId] = useState(llm.MODELS[0].id);
   const [status, setStatus] = useState("");
   const [progress, setProgress] = useState(0);
@@ -59,17 +63,19 @@ export function LlmChat({
     try {
       await llm.load(modelId);
       messagesRef.current = [
-        { role: "system", content: llm.systemPrompt(result, content) },
-        { role: "user", content: llm.OPENING_REQUEST },
+        { role: "system", content: llm.systemPrompt(result, content, locale) },
+        { role: "user", content: llm.openingRequest(locale) },
       ];
       setBubbles([{ role: "assistant", text: "" }]);
-      const text = await llm.chat(messagesRef.current, (t) =>
-        setBubbles((b) => [...b.slice(0, -1), { role: "assistant", text: t }]),
+      const text = await llm.chat(messagesRef.current, (tk) =>
+        setBubbles((b) => [...b.slice(0, -1), { role: "assistant", text: tk }]),
       );
       messagesRef.current.push({ role: "assistant", content: text });
       onOpening?.(text, modelId);
       setReady(true);
-      setStatus("Model ready. You can ask a follow-up question.");
+      setStatus(
+        t("Model ready. You can ask a follow-up question.", "Model siap. Anda bisa mengajukan pertanyaan lanjutan."),
+      );
     } catch {
       /* status already shows the error via onProgress */
     } finally {
@@ -80,7 +86,12 @@ export function LlmChat({
   useEffect(() => {
     if (autoStart && gpuOk && !startedRef.current) {
       startedRef.current = true;
-      setStatus("Loading the language model. This can take a minute the first time.");
+      setStatus(
+        t(
+          "Loading the language model. This can take a minute the first time.",
+          "Memuat model bahasa. Kali pertama bisa memakan waktu sekitar satu menit.",
+        ),
+      );
       void start();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,14 +106,19 @@ export function LlmChat({
     messagesRef.current.push({ role: "user", content: q });
     setBubbles((b) => [...b, { role: "user", text: q }, { role: "assistant", text: "" }]);
     try {
-      const text = await llm.chat(messagesRef.current, (t) =>
-        setBubbles((b) => [...b.slice(0, -1), { role: "assistant", text: t }]),
+      const text = await llm.chat(messagesRef.current, (tk) =>
+        setBubbles((b) => [...b.slice(0, -1), { role: "assistant", text: tk }]),
       );
       messagesRef.current.push({ role: "assistant", content: text });
     } catch (err) {
       setBubbles((b) => [
         ...b.slice(0, -1),
-        { role: "assistant", text: "The model could not answer: " + (err instanceof Error ? err.message : String(err)) },
+        {
+          role: "assistant",
+          text:
+            t("The model could not answer: ", "Model tidak bisa menjawab: ") +
+            (err instanceof Error ? err.message : String(err)),
+        },
       ]);
     } finally {
       setBusy(false);
@@ -111,21 +127,23 @@ export function LlmChat({
 
   if (!gpuOk) {
     return (
-      <ExplanationCard title="Ask the advisor">
+      <ExplanationCard title={t("Ask the advisor", "Tanya penasihat")}>
         <p className="text-muted-foreground">
-          This browser does not expose WebGPU, which the in-browser language model needs. Use a recent Chrome or Edge on
-          a laptop with a GPU. All other explanation styles work everywhere.
+          {t(
+            "This browser does not expose WebGPU, which the in-browser language model needs. Use a recent Chrome or Edge on a laptop with a GPU. All other explanation styles work everywhere.",
+            "Browser ini tidak menyediakan WebGPU, yang dibutuhkan model bahasa dalam browser. Gunakan Chrome atau Edge terbaru di laptop dengan GPU. Semua gaya penjelasan lain berfungsi di mana saja.",
+          )}
         </p>
       </ExplanationCard>
     );
   }
 
   return (
-    <ExplanationCard title="Ask the advisor">
+    <ExplanationCard title={t("Ask the advisor", "Tanya penasihat")}>
       {showModelPicker && (
         <div className="flex flex-wrap items-center gap-2">
           <Select value={modelId} onValueChange={setModelId}>
-            <SelectTrigger className="w-full max-w-md" aria-label="Language model">
+            <SelectTrigger className="w-full max-w-md" aria-label={t("Language model", "Model bahasa")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -137,7 +155,7 @@ export function LlmChat({
             </SelectContent>
           </Select>
           <Button size="sm" onClick={start} disabled={busy}>
-            {ready && llm.loadedModelId() === modelId ? "Restart" : "Load model"}
+            {ready && llm.loadedModelId() === modelId ? t("Restart", "Mulai ulang") : t("Load model", "Muat model")}
           </Button>
         </div>
       )}
@@ -157,7 +175,7 @@ export function LlmChat({
                 b.role === "assistant" ? "bg-muted" : "ml-auto bg-primary text-primary-foreground"
               }`}
             >
-              {b.text || <span className="italic text-muted-foreground">Thinking</span>}
+              {b.text || <span className="italic text-muted-foreground">{t("Thinking", "Berpikir")}</span>}
             </div>
           ))}
         </div>
@@ -174,18 +192,19 @@ export function LlmChat({
                 void ask();
               }
             }}
-            placeholder="Ask a follow-up question"
-            aria-label="Your question"
+            placeholder={t("Ask a follow-up question", "Ajukan pertanyaan lanjutan")}
+            aria-label={t("Your question", "Pertanyaan Anda")}
           />
           <Button onClick={ask} disabled={busy || !input.trim()}>
-            Ask
+            {t("Ask", "Tanya")}
           </Button>
         </div>
       )}
       <p className="text-xs text-muted-foreground">
-        The language model only sees the facts computed by the advisor and is instructed to explain those. Its text is
-        recorded in the study log. The model downloads once (about 1 GB) and is cached by your browser, then runs on
-        your device&apos;s GPU. Nothing you type here leaves your device.
+        {t(
+          "The language model only sees the facts computed by the advisor and is instructed to explain those. Its text is recorded in the study log. The model downloads once (about 1 GB) and is cached by your browser, then runs on your device's GPU. Nothing you type here leaves your device.",
+          "Model bahasa hanya melihat fakta yang dihitung penasihat dan diinstruksikan menjelaskannya. Teksnya direkam dalam log studi. Model diunduh sekali (sekitar 1 GB) dan disimpan cache oleh browser Anda, lalu berjalan di GPU perangkat Anda. Tidak ada yang Anda ketik di sini yang meninggalkan perangkat Anda.",
+        )}
       </p>
     </ExplanationCard>
   );

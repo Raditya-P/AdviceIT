@@ -14,8 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { ADVISORS, BASELINE } from "@/lib/advisor/advisors";
 import { OUTCOMES } from "@/lib/advisor/model";
+import { outcomeName } from "@/lib/advisor/strings";
 import { contrastiveExplanation, featureExplanation } from "@/lib/advisor/explanations";
 import type { AdvisorResult, Profile, RawProfile } from "@/lib/advisor/types";
+import { tr, useLang } from "@/lib/i18n";
 import { ExplanationCard, ProbabilityBars } from "./explanation-boxes";
 
 type Ignored = Partial<Record<keyof Profile, boolean>>;
@@ -27,6 +29,8 @@ export function WhatIfPanel({
   result: AdvisorResult;
   onInteract?: (kind: "move" | "whynot") => void;
 }) {
+  const { locale } = useLang();
+  const t = (en: string, id: string) => tr(locale, { en, id });
   const advisor = ADVISORS[result.advisor];
   const [whatIf, setWhatIf] = useState<RawProfile>({ ...result.profile });
   const [ignored, setIgnored] = useState<Ignored>({});
@@ -60,8 +64,8 @@ export function WhatIfPanel({
 
   const IgnoreToggle = ({ k }: { k: keyof Profile }) => (
     <label className="ml-2 inline-flex items-center gap-1 text-xs font-normal text-muted-foreground">
-      <Checkbox checked={!!ignored[k]} onCheckedChange={() => toggleIgnore(k)} aria-label={`Ignore ${k}`} className="size-3.5" />
-      ignore
+      <Checkbox checked={!!ignored[k]} onCheckedChange={() => toggleIgnore(k)} aria-label={`${t("Ignore", "Abaikan")} ${k}`} className="size-3.5" />
+      {t("ignore", "abaikan")}
     </label>
   );
 
@@ -95,16 +99,18 @@ export function WhatIfPanel({
   );
 
   return (
-    <ExplanationCard title="Explore what would change the advice">
+    <ExplanationCard title={t("Explore what would change the advice", "Jelajahi apa yang akan mengubah saran")}>
       <p className="text-muted-foreground">
-        Move the controls to see how the advice would change. Tick ignore to see what the advisor would say if it did
-        not know that input. Your actual profile and recommendation stay as they are.
+        {t(
+          "Move the controls to see how the advice would change. Tick ignore to see what the advisor would say if it did not know that input. Your actual profile and recommendation stay as they are.",
+          "Gerakkan kontrolnya untuk melihat bagaimana saran akan berubah. Centang abaikan untuk melihat apa kata penasihat jika ia tidak mengetahui input itu. Profil dan rekomendasi Anda yang sebenarnya tidak berubah.",
+        )}
       </p>
       <div className="grid gap-5 min-[680px]:grid-cols-2">
         <div className="min-w-0 space-y-4">
           <div className="space-y-1.5">
             <Label>
-              Age <IgnoreToggle k="age" />
+              {t("Age", "Usia")} <IgnoreToggle k="age" />
             </Label>
             <Input
               type="number"
@@ -116,12 +122,13 @@ export function WhatIfPanel({
                 const v = Number(e.target.value);
                 if (v >= 18 && v <= 80) bump({ age: Math.round(v) });
               }}
-              aria-label="What-if age"
+              aria-label={t("What-if age", "Usia what-if")}
             />
           </div>
           <div className="space-y-1.5">
             <Label>
-              Investment horizon: <span className="tabular-nums text-primary">{whatIf.horizon}</span> years
+              {t("Investment horizon:", "Horizon investasi:")} <span className="tabular-nums text-primary">{whatIf.horizon}</span>{" "}
+              {t("years", "tahun")}
               <IgnoreToggle k="horizon" />
             </Label>
             <Slider
@@ -130,19 +137,19 @@ export function WhatIfPanel({
               step={1}
               value={[whatIf.horizon]}
               onValueChange={(v: number[]) => bump({ horizon: v[0] })}
-              aria-label="What-if horizon"
+              aria-label={t("What-if horizon", "Horizon what-if")}
             />
           </div>
           <div className="space-y-1.5">
             <Label>
-              Risk tolerance <IgnoreToggle k="tolerance" />
+              {t("Risk tolerance", "Toleransi risiko")} <IgnoreToggle k="tolerance" />
             </Label>
             <Seg
-              name="What-if tolerance"
+              name={t("What-if tolerance", "Toleransi what-if")}
               options={[
-                { value: "low", label: "Low" },
-                { value: "medium", label: "Medium" },
-                { value: "high", label: "High" },
+                { value: "low", label: t("Low", "Rendah") },
+                { value: "medium", label: t("Medium", "Sedang") },
+                { value: "high", label: t("High", "Tinggi") },
               ]}
               value={whatIf.tolerance ?? "medium"}
               onChange={(v) => bump({ tolerance: v as RawProfile["tolerance"] })}
@@ -150,13 +157,13 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              Emergency fund <IgnoreToggle k="emergencyFund" />
+              {t("Emergency fund", "Dana darurat")} <IgnoreToggle k="emergencyFund" />
             </Label>
             <Seg
-              name="What-if emergency fund"
+              name={t("What-if emergency fund", "Dana darurat what-if")}
               options={[
-                { value: "yes", label: "Yes" },
-                { value: "no", label: "No" },
+                { value: "yes", label: t("Yes", "Ya") },
+                { value: "no", label: t("No", "Tidak") },
               ]}
               value={whatIf.emergencyFund ? "yes" : "no"}
               onChange={(v) => bump({ emergencyFund: v === "yes" })}
@@ -164,13 +171,13 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              Income stability <IgnoreToggle k="incomeStable" />
+              {t("Income stability", "Stabilitas pendapatan")} <IgnoreToggle k="incomeStable" />
             </Label>
             <Seg
-              name="What-if income"
+              name={t("What-if income", "Pendapatan what-if")}
               options={[
-                { value: "stable", label: "Stable" },
-                { value: "variable", label: "Variable" },
+                { value: "stable", label: t("Stable", "Stabil") },
+                { value: "variable", label: t("Variable", "Tidak tetap") },
               ]}
               value={whatIf.incomeStable ? "stable" : "variable"}
               onChange={(v) => bump({ incomeStable: v === "stable" })}
@@ -178,13 +185,13 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              Significant debt or obligations <IgnoreToggle k="debtObligations" />
+              {t("Significant debt or obligations", "Utang atau kewajiban besar")} <IgnoreToggle k="debtObligations" />
             </Label>
             <Seg
-              name="What-if debt"
+              name={t("What-if debt", "Utang what-if")}
               options={[
-                { value: "no", label: "No" },
-                { value: "yes", label: "Yes" },
+                { value: "no", label: t("No", "Tidak") },
+                { value: "yes", label: t("Yes", "Ya") },
               ]}
               value={whatIf.debtObligations ? "yes" : "no"}
               onChange={(v) => bump({ debtObligations: v === "yes" })}
@@ -192,13 +199,13 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              Money needed in the near term <IgnoreToggle k="nearTermNeed" />
+              {t("Money needed in the near term", "Dana dibutuhkan dalam waktu dekat")} <IgnoreToggle k="nearTermNeed" />
             </Label>
             <Seg
-              name="What-if near-term need"
+              name={t("What-if near-term need", "Kebutuhan jangka pendek what-if")}
               options={[
-                { value: "no", label: "No" },
-                { value: "yes", label: "Yes" },
+                { value: "no", label: t("No", "Tidak") },
+                { value: "yes", label: t("Yes", "Ya") },
               ]}
               value={whatIf.nearTermNeed ? "yes" : "no"}
               onChange={(v) => bump({ nearTermNeed: v === "yes" })}
@@ -208,18 +215,26 @@ export function WhatIfPanel({
 
         <div className="min-w-0 space-y-3 rounded-xl bg-muted/50 p-4" aria-live="polite">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            With these inputs the advice would be
+            {t("With these inputs the advice would be", "Dengan input ini sarannya akan menjadi")}
           </div>
-          <div className="text-2xl font-semibold tracking-tight">{preview.portfolio.name}</div>
+          <div className="text-2xl font-semibold tracking-tight">{outcomeName(preview.portfolio.name)}</div>
           <p className="text-xs text-muted-foreground">
             {preview.portfolio.name === result.portfolio.name
-              ? `Same as your recommendation (${result.portfolio.name}).`
-              : `Different from your recommendation (${result.portfolio.name}).`}
+              ? t(
+                  `Same as your recommendation (${result.portfolio.name}).`,
+                  `Sama dengan rekomendasi Anda (${outcomeName(result.portfolio.name)}).`,
+                )
+              : t(
+                  `Different from your recommendation (${result.portfolio.name}).`,
+                  `Berbeda dari rekomendasi Anda (${outcomeName(result.portfolio.name)}).`,
+                )}
           </p>
           <ProbabilityBars probabilities={preview.probabilities} topIndex={preview.portfolioIndex} />
           {top3.length > 0 && (
             <div className="space-y-1 border-t pt-2">
-              <p className="text-xs text-muted-foreground">Largest contributions ({fx.targetUnit}):</p>
+              <p className="text-xs text-muted-foreground">
+                {t("Largest contributions", "Kontribusi terbesar")} ({fx.targetUnit}):
+              </p>
               {top3.map((it) => (
                 <div key={it.key} className="flex items-center justify-between gap-2 text-sm">
                   <span className="min-w-0 truncate">
@@ -243,13 +258,13 @@ export function WhatIfPanel({
             onInteract?.("whynot");
           }}
         >
-          <SelectTrigger className="w-full max-w-72" aria-label="Why not another outcome">
-            <SelectValue placeholder="Why not another outcome?" />
+          <SelectTrigger className="w-full max-w-72" aria-label={t("Why not another outcome", "Mengapa bukan hasil lain")}>
+            <SelectValue placeholder={t("Why not another outcome?", "Mengapa bukan hasil lain?")} />
           </SelectTrigger>
           <SelectContent>
             {OUTCOMES.filter((o) => o.name !== result.portfolio.name).map((o) => (
               <SelectItem key={o.id} value={o.name}>
-                Why not {o.name}?
+                {t(`Why not ${o.name}?`, `Mengapa bukan ${outcomeName(o.name)}?`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -257,7 +272,10 @@ export function WhatIfPanel({
         {whyNotAnswer && <p aria-live="polite">{whyNotAnswer}</p>}
       </div>
       <p className="text-xs text-muted-foreground">
-        Every preview is a real re-run of the same advisor. Interactions are counted in the study log.
+        {t(
+          "Every preview is a real re-run of the same advisor. Interactions are counted in the study log.",
+          "Setiap pratinjau adalah eksekusi ulang penasihat yang sama. Interaksi dihitung dalam log studi.",
+        )}
       </p>
     </ExplanationCard>
   );
