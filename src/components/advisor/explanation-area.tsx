@@ -16,6 +16,7 @@ export function ExplanationArea({
   researcherNote,
   showModelPicker,
   autoStartLlm,
+  studyMode,
   onInteract,
   onLlmOpening,
   onLlmTurn,
@@ -27,6 +28,9 @@ export function ExplanationArea({
   researcherNote?: boolean;
   showModelPicker?: boolean;
   autoStartLlm?: boolean;
+  /* Set by study trials: the what-if panel stops comparing its preview
+     against the shown recommendation, so a flawed trial is not announced. */
+  studyMode?: boolean;
   onInteract?: (kind: "move" | "whynot") => void;
   onLlmOpening?: (text: string, modelId: string) => void;
   onLlmTurn?: () => void;
@@ -62,7 +66,7 @@ export function ExplanationArea({
   );
   return (
     <div className="space-y-3">
-      {form === "interactive" && <WhatIfPanel result={result} onInteract={onInteract} />}
+      {form === "interactive" && <WhatIfPanel result={result} onInteract={onInteract} assess={!studyMode} />}
       {boxes}
       {form === "static" && content.length === 0 && researcherNote && (
         <p className="text-sm italic text-muted-foreground">

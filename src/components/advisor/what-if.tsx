@@ -26,9 +26,15 @@ type Ignored = Partial<Record<keyof Profile, boolean>>;
 export function WhatIfPanel({
   result,
   onInteract,
+  assess = true,
 }: {
   result: AdvisorResult;
   onInteract?: (kind: "move" | "whynot") => void;
+  /* When false, the panel does not compare the preview against the shown
+     recommendation. Study trials set this, because on a flawed trial that
+     sentence would perform the detection the study measures and announce
+     the verdict at rest. The previews themselves stay real re-runs. */
+  assess?: boolean;
 }) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
@@ -219,17 +225,19 @@ export function WhatIfPanel({
             {t("With these inputs the advice would be", "Dengan input ini sarannya akan menjadi")}
           </div>
           <div className="text-2xl font-semibold tracking-tight">{outcomeName(preview.portfolio.name)}</div>
-          <p className="text-xs text-muted-foreground">
-            {preview.portfolio.name === result.portfolio.name
-              ? t(
-                  `Same as your recommendation (${result.portfolio.name}).`,
-                  `Sama dengan rekomendasi Anda (${outcomeName(result.portfolio.name)}).`,
-                )
-              : t(
-                  `Different from your recommendation (${result.portfolio.name}).`,
-                  `Berbeda dari rekomendasi Anda (${outcomeName(result.portfolio.name)}).`,
-                )}
-          </p>
+          {assess && (
+            <p className="text-xs text-muted-foreground">
+              {preview.portfolio.name === result.portfolio.name
+                ? t(
+                    `Same as your recommendation (${result.portfolio.name}).`,
+                    `Sama dengan rekomendasi Anda (${outcomeName(result.portfolio.name)}).`,
+                  )
+                : t(
+                    `Different from your recommendation (${result.portfolio.name}).`,
+                    `Berbeda dari rekomendasi Anda (${outcomeName(result.portfolio.name)}).`,
+                  )}
+            </p>
+          )}
           <ProbabilityBars probabilities={preview.probabilities} topIndex={preview.portfolioIndex} />
           {top3.length > 0 && (
             <div className="space-y-1 border-t border-border/70 pt-2">

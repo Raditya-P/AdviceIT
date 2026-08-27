@@ -299,6 +299,12 @@ export function DesignContent() {
                 "Separuh rekomendasi yang dilihat tiap peserta sengaja digeser ke arah yang salah sementara penjelasannya tetap menggambarkan penalaran sesungguhnya si penasihat. Reliance yang tepat berarti mengikuti yang benar dan menolak yang keliru. Kondisi yang menaikkan kepatuhan pada keduanya menghasilkan kepatuhan, bukan kalibrasi, dan itulah sebabnya besaran yang dicari adalah interaksi kondisi dengan skenario, bukan efek utama pada kepercayaan.",
               )}
             </p>
+            <p className="leading-relaxed text-muted-foreground">
+              {t(
+                "The flaw is detectable in every condition, through that condition's own honest content: the confidence bars peak at a different outcome than the headline, the attribution describes evidence that does not fit the shown portfolio, the counterfactual reports that a trivial change would flip the advice, and the interactive previews re-run the real advisor. What the instrument never does is state the mismatch itself. During study trials the interactive panel therefore shows its previews without a sentence comparing them to the shown recommendation, because that sentence would perform the detection for the participant.",
+                "Kekeliruan itu dapat dideteksi di setiap kondisi, melalui konten jujur milik kondisi itu sendiri: batang keyakinan memuncak di hasil yang berbeda dari judulnya, atribusi menggambarkan bukti yang tidak cocok dengan portofolio yang ditampilkan, kontrafaktual melaporkan bahwa perubahan sepele akan membalik sarannya, dan pratinjau interaktif menjalankan ulang penasihat yang sesungguhnya. Yang tidak pernah dilakukan instrumen ini adalah menyatakan ketidakcocokan itu sendiri. Karena itu selama percobaan studi panel interaktif menampilkan pratinjaunya tanpa kalimat yang membandingkannya dengan rekomendasi yang ditampilkan, sebab kalimat itu akan melakukan deteksi menggantikan peserta.",
+              )}
+            </p>
             <div className="panel p-6 text-sm">
               <p className="font-medium">{t("Measures per trial", "Ukuran per percobaan")}</p>
               <p className="mt-2 leading-relaxed text-muted-foreground">

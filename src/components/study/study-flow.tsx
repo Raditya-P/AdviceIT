@@ -525,6 +525,7 @@ function TrialStage({
         content={assignment.content}
         form={assignment.form}
         literacyLevel={literacyLevel}
+        studyMode
         autoStartLlm={assignment.form === "llm"}
         onInteract={(kind) => (kind === "move" ? setWhatIfMoves((n) => n + 1) : setWhyNotAsked((n) => n + 1))}
         onLlmOpening={(text, model) => {

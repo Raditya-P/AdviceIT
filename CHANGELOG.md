@@ -3,6 +3,20 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.3.1 (2026-08-27)
+
+### Fixed
+
+- The interactive what-if panel gave flawed trials away. Its preview box compared every re-run against the
+  shown recommendation and printed the verdict ("Different from your recommendation") before the
+  participant had touched anything, which on a flawed trial performs the detection the study measures.
+  During study trials the comparison sentence is now omitted. The previews themselves are unchanged and
+  remain real re-runs of the advisor: noticing that they disagree with the shown recommendation is left to
+  the participant, which puts the interactive conditions on the same footing as the confidence bars and
+  the attribution sentences. The advisor try-out pages keep the sentence, where it is a useful aid.
+- `/design` now states the detectability principle: the flaw is detectable in every condition through that
+  condition's own honest content, and the instrument never states the mismatch itself.
+
 ## 2.3.0 (2026-08-25)
 
 ### Added
