@@ -14,7 +14,7 @@ import { ADVISORS, logitMeta, mlMeta } from "@/lib/advisor/advisors";
 import { applyFlawedScenario } from "@/lib/advisor/model";
 import { labelValue } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
-import { presetFor, presetLabel, specFor, type ContentPart, type Form } from "@/lib/conditions";
+import { modalityOf, presetFor, presetLabel, specFor, type ContentPart, type Form, type Modality } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
 import { Analyzing } from "./analyzing";
 import { ExplanationArea } from "./explanation-area";
@@ -44,6 +44,7 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
   const [preset, setPreset] = useState<string>("feature");
   const [content, setContent] = useState<ContentPart[]>(["feature"]);
   const [form, setForm] = useState<Form>("static");
+  const [modality, setModality] = useState<Modality>("visual");
   const [scenario, setScenario] = useState<"sound" | "flawed">("sound");
   const [profileSource, setProfileSource] = useState<"form" | "example" | "ils-bench" | "narrative">("form");
   const [shownAt, setShownAt] = useState(0);
@@ -63,15 +64,16 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
     setPreset(name);
     setContent([...spec.content]);
     setForm(spec.form);
+    setModality(modalityOf(spec));
   };
   const toggleContent = (part: ContentPart) => {
     const next = content.includes(part) ? content.filter((c) => c !== part) : [...content, part];
     setContent(next);
-    setPreset(presetFor(next, form));
+    setPreset(presetFor(next, form, modality));
   };
   const chooseForm = (f: Form) => {
     setForm(f);
-    setPreset(presetFor(content, f));
+    setPreset(presetFor(content, f, modality));
   };
 
   const autoLevel: "low" | "high" = profile.knowledge === "beginner" ? "low" : "high";
@@ -154,6 +156,11 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
               form={form}
               onToggleContent={toggleContent}
               onForm={chooseForm}
+              modality={modality}
+              onModality={(m: Modality) => {
+                setModality(m);
+                setPreset(presetFor(content, form, m));
+              }}
               researcher={researcher}
               scenario={scenario}
               onScenario={setScenario}
@@ -244,6 +251,7 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
                 result={result}
                 content={content}
                 form={form}
+                modality={modality}
                 literacyLevel={literacyLevel}
                 researcherNote={researcher}
                 showModelPicker
@@ -287,7 +295,7 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
             </div>
 
             <TryResponse
-              key={`${preset}|${form}|${content.join("+")}|${JSON.stringify(profile)}|${scenario}`}
+              key={`${preset}|${form}|${modality}|${content.join("+")}|${JSON.stringify(profile)}|${scenario}`}
               result={result}
               condition={preset}
               content={content}

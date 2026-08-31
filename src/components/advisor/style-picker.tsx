@@ -5,6 +5,7 @@
    custom combination is still one click away. */
 
 import {
+  AlignLeft,
   BarChart3,
   Check,
   CircleSlash,
@@ -19,7 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CONTENT_PARTS, FORMS, presetLabel, type ContentPart, type Form } from "@/lib/conditions";
+import { CONTENT_PARTS, FORMS, MODALITIES, presetLabel, type ContentPart, type Form, type Modality } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
 import * as llm from "@/lib/llm";
 import { Seg } from "./profile-form";
@@ -32,6 +33,8 @@ const ICONS: Record<string, LucideIcon> = {
   hybrid: Layers,
   interactive: SlidersHorizontal,
   "interactive-hybrid": SlidersHorizontal,
+  "feature-textual": AlignLeft,
+  "feature-hybrid": Layers,
   adaptive: GraduationCap,
   llm: MessageSquareText,
 };
@@ -42,8 +45,16 @@ const TAGLINES: Record<string, { en: string; id: string }> = {
     id: "Hanya rekomendasinya. Ini adalah kondisi kontrol dalam studi.",
   },
   feature: {
-    en: "See which of your answers pushed the advice, and by how much.",
-    id: "Lihat jawaban Anda yang mana yang mendorong saran, dan seberapa besar.",
+    en: "See which of your answers pushed the advice, and by how much, as bars.",
+    id: "Lihat jawaban Anda yang mana yang mendorong saran dan seberapa besar, dalam bentuk batang.",
+  },
+  "feature-textual": {
+    en: "The same reasoning, written out as sentences instead of bars.",
+    id: "Penalaran yang sama, ditulis sebagai kalimat alih-alih batang.",
+  },
+  "feature-hybrid": {
+    en: "The bars and the sentences together, each covering what the other misses.",
+    id: "Batang dan kalimat sekaligus, saling menutupi kekurangan masing-masing.",
   },
   counterfactual: {
     en: "The smallest change to your situation that would flip the advice.",
@@ -98,6 +109,15 @@ const GROUPS: { key: string; title: { en: string; id: string }; note: { en: stri
     },
     items: ["interactive-hybrid", "adaptive", "llm", "interactive"],
   },
+  {
+    key: "modality",
+    title: { en: "How the why is presented", id: "Bagaimana bagian mengapa ditampilkan" },
+    note: {
+      en: "The same attribution, as bars, as sentences, or as both. Not in the random pool, these are for the modality study.",
+      id: "Atribusi yang sama, sebagai batang, sebagai kalimat, atau keduanya. Tidak masuk kumpulan acak, ini untuk studi modalitas.",
+    },
+    items: ["feature-textual", "feature-hybrid"],
+  },
 ];
 
 export function StylePicker({
@@ -107,6 +127,8 @@ export function StylePicker({
   form,
   onToggleContent,
   onForm,
+  modality,
+  onModality,
   researcher,
   scenario,
   onScenario,
@@ -117,6 +139,8 @@ export function StylePicker({
   form: Form;
   onToggleContent: (part: ContentPart) => void;
   onForm: (f: Form) => void;
+  modality: Modality;
+  onModality: (m: Modality) => void;
   researcher: boolean;
   scenario: "sound" | "flawed";
   onScenario: (s: "sound" | "flawed") => void;
@@ -222,6 +246,26 @@ export function StylePicker({
                     {tr(locale, {
                       en: { static: "Static", interactive: "Interactive what-if", adaptive: "Adaptive to literacy", llm: "Conversational (LLM)" }[f],
                       id: { static: "Statis", interactive: "What-if interaktif", adaptive: "Adaptif terhadap literasi", llm: "Percakapan (LLM)" }[f],
+                    })}
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                {t("Modality of the why", "Modalitas bagian mengapa")}
+              </span>
+              <RadioGroup
+                value={modality}
+                onValueChange={(v: string) => onModality(v as Modality)}
+                className="flex flex-wrap gap-4"
+              >
+                {MODALITIES.map((m) => (
+                  <label key={m} className="flex items-center gap-1.5">
+                    <RadioGroupItem value={m} />{" "}
+                    {tr(locale, {
+                      en: { visual: "Visual", textual: "Textual", hybrid: "Hybrid" }[m],
+                      id: { visual: "Visual", textual: "Tekstual", hybrid: "Hibrida" }[m],
                     })}
                   </label>
                 ))}

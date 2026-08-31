@@ -329,3 +329,129 @@ export const LITERACY_QUESTIONS = [
     ],
   },
 ];
+
+/* ---------------------------------------------------------------------------
+   Personal characteristics and explanation perception.
+
+   Need for cognition: the six-item version, Lins de Holanda Coelho, Hanel and
+   Wolf (2020), Assessment 27(8). Items 3 and 4 are reverse scored. The English
+   wording is transcribed from Table 2 of Szymanski et al. (TIIS 2025), which
+   used the same instrument, so our scores are directly comparable to theirs.
+
+   Ease-of-satisfaction: three items from Kouki et al. (2020) as adapted by
+   Szymanski et al., with "health recommendations" replaced by "investment
+   recommendations" for this domain.
+
+   Explanation perception: five constructs (trust, transparency,
+   persuasiveness, usefulness, satisfaction) which Szymanski et al. adapt from
+   Tsai and Brusilovsky (2019) and Van Der Laan et al. (1997). Those two papers
+   do not print their items inside the TIIS article, so the wordings below are
+   ours and MUST be checked against the source scales before data collection.
+   --------------------------------------------------------------------------- */
+
+export interface LikertItem {
+  name: string;
+  en: string;
+  id: string;
+  reverse?: boolean;
+}
+
+export const LIKERT_LABELS = {
+  en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  id: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"],
+};
+
+export const NFC_ITEMS: LikertItem[] = [
+  {
+    name: "nfc1",
+    en: "I would prefer complex to simple problems.",
+    id: "Saya lebih menyukai masalah yang rumit daripada yang sederhana.",
+  },
+  {
+    name: "nfc2",
+    en: "I like to have the responsibility of handling a situation that requires a lot of thinking.",
+    id: "Saya suka memikul tanggung jawab menangani situasi yang membutuhkan banyak pemikiran.",
+  },
+  {
+    name: "nfc3",
+    en: "Thinking is not my idea of fun.",
+    id: "Berpikir bukanlah hal yang menyenangkan bagi saya.",
+    reverse: true,
+  },
+  {
+    name: "nfc4",
+    en: "I would rather do something that requires little thought than something that is sure to challenge my thinking abilities.",
+    id: "Saya lebih suka melakukan sesuatu yang hanya butuh sedikit pemikiran daripada sesuatu yang pasti menantang kemampuan berpikir saya.",
+    reverse: true,
+  },
+  {
+    name: "nfc5",
+    en: "I really enjoy a task that involves coming up with new solutions to problems.",
+    id: "Saya sangat menikmati tugas yang melibatkan pencarian solusi baru untuk suatu masalah.",
+  },
+  {
+    name: "nfc6",
+    en: "I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought.",
+    id: "Saya lebih menyukai tugas yang bersifat intelektual, sulit, dan penting daripada tugas yang cukup penting tetapi tidak menuntut banyak pemikiran.",
+  },
+];
+
+export const EOS_ITEMS: LikertItem[] = [
+  {
+    name: "eos1",
+    en: "I think I will trust the investment recommendations given in this task.",
+    id: "Saya rasa saya akan memercayai rekomendasi investasi yang diberikan dalam tugas ini.",
+  },
+  {
+    name: "eos2",
+    en: "I think I will be satisfied with the investment recommendations given in this task.",
+    id: "Saya rasa saya akan puas dengan rekomendasi investasi yang diberikan dalam tugas ini.",
+  },
+  {
+    name: "eos3",
+    en: "I think the investment recommendations in this task will be accurate.",
+    id: "Saya rasa rekomendasi investasi dalam tugas ini akan akurat.",
+  },
+];
+
+export const PERCEPTION_ITEMS: LikertItem[] = [
+  {
+    name: "percTrust",
+    en: "The explanations made me trust the advisor's recommendations.",
+    id: "Penjelasan tersebut membuat saya memercayai rekomendasi penasihat.",
+  },
+  {
+    name: "percTransparency",
+    en: "The explanations helped me understand how the advisor reached its recommendations.",
+    id: "Penjelasan tersebut membantu saya memahami bagaimana penasihat sampai pada rekomendasinya.",
+  },
+  {
+    name: "percPersuasiveness",
+    en: "The explanations made the recommendations more convincing.",
+    id: "Penjelasan tersebut membuat rekomendasinya terasa lebih meyakinkan.",
+  },
+  {
+    name: "percUsefulness",
+    en: "The explanations were useful when I decided what to do.",
+    id: "Penjelasan tersebut berguna ketika saya memutuskan apa yang akan saya lakukan.",
+  },
+  {
+    name: "percSatisfaction",
+    en: "I am satisfied with the explanations I was shown.",
+    id: "Saya puas dengan penjelasan yang ditampilkan kepada saya.",
+  },
+];
+
+/** Mean score on a 1 to 5 scale, reverse items flipped. Empty when nothing
+ *  has been answered, so partial sessions do not produce a fake score. */
+export function scaleScore(items: LikertItem[], answers: Record<string, number>): number | "" {
+  const vals = items
+    .filter((it) => answers[it.name])
+    .map((it) => (it.reverse ? 6 - answers[it.name] : answers[it.name]));
+  if (!vals.length) return "";
+  return Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100;
+}
+
+export function itemsFor(items: LikertItem[], locale: "en" | "id") {
+  return items.map((it) => ({ ...it, text: locale === "id" ? it.id : it.en }));
+}

@@ -28,18 +28,23 @@ import { ADVISORS } from "@/lib/advisor/advisors";
 import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
 import { outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
-import { presetLabel, type ContentPart, type Form } from "@/lib/conditions";
+import { presetLabel, type ContentPart, type Form, type Modality } from "@/lib/conditions";
 import { ArrowRight, UserRound } from "lucide-react";
 import { tr, useLang } from "@/lib/i18n";
 import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
 import {
+  EOS_ITEMS,
   LITERACY_CORRECT,
+  NFC_ITEMS,
+  PERCEPTION_ITEMS,
   buildPlan,
   caseDisplay,
   completionCode,
   literacyFor,
   randomAdvisor,
+  itemsFor,
   randomParticipantId,
+  scaleScore,
   textsFor,
   type Trial,
 } from "@/lib/study";
@@ -48,13 +53,15 @@ import { RecommendationCard, advisorDisplayName } from "@/components/advisor/rec
 import { Analyzing } from "@/components/advisor/analyzing";
 import { Seg } from "@/components/advisor/profile-form";
 import { RatingSlider } from "@/components/rating-slider";
+import { LikertRow } from "./likert";
 
-type Stage = "consent" | "literacy" | "trial" | "exit" | "debrief" | "done";
+type Stage = "consent" | "literacy" | "characteristics" | "trial" | "exit" | "debrief" | "done";
 
 export interface Assignment {
   condition: string;
   content: ContentPart[];
   form: Form;
+  modality?: Modality;
   assignedBy: "random" | "chosen";
   pid?: string;
 }
@@ -73,6 +80,9 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   const [litError, setLitError] = useState("");
   const [trialIdx, setTrialIdx] = useState(0);
   const [saved, setSaved] = useState<"server" | "local" | null>(null);
+  const [pcAnswers, setPcAnswers] = useState<Record<string, number>>({});
+  const [pcError, setPcError] = useState("");
+  const [perception, setPerception] = useState<Record<string, number>>({});
   const [exit1, setExit1] = useState("");
   const [exit2, setExit2] = useState("");
   const prior = useMemo(() => (typeof window === "undefined" ? null : priorParticipation()), []);
@@ -99,6 +109,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
     condition: assignment.condition,
     explanationContent: assignment.content.join("+"),
     explanationForm: assignment.form,
+    explanationModality: assignment.modality ?? "visual",
     assignedBy: assignment.assignedBy,
     advisorModel: advisorId,
     advisorAssignedBy: "random",
@@ -106,6 +117,10 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
     literacyScore: literacyScore.answered ? literacyScore.score : "",
     literacyAnswers: LQ.map((q) => litAnswers[q.name] || "").join("|"),
     literacyLevel,
+    nfcScore: scaleScore(NFC_ITEMS, pcAnswers),
+    nfcAnswers: NFC_ITEMS.map((it) => pcAnswers[it.name] ?? "").join("|"),
+    easeOfSatisfaction: scaleScore(EOS_ITEMS, pcAnswers),
+    easeAnswers: EOS_ITEMS.map((it) => pcAnswers[it.name] ?? "").join("|"),
     userAgentMobile: typeof navigator !== "undefined" && /Mobi|Android/i.test(navigator.userAgent),
   });
 
@@ -119,6 +134,11 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
       ...baseRow(),
       rowType: "exit",
       timestamp: new Date().toISOString(),
+      percTrust: perception.percTrust ?? "",
+      percTransparency: perception.percTransparency ?? "",
+      percPersuasiveness: perception.percPersuasiveness ?? "",
+      percUsefulness: perception.percUsefulness ?? "",
+      percSatisfaction: perception.percSatisfaction ?? "",
       exitDistrustMoment: exit1.trim().slice(0, 2000),
       exitMissingExplanation: exit2.trim().slice(0, 2000),
     } as StudyRow);
@@ -194,10 +214,69 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
               );
               return;
             }
-            setStage("trial");
+            setStage("characteristics");
           }}
         >
           {t("Continue", "Lanjut")}
+        </Button>
+      </StageShell>
+    );
+  }
+
+  if (stage === "characteristics") {
+    const nfc = itemsFor(NFC_ITEMS, locale);
+    const eos = itemsFor(EOS_ITEMS, locale);
+    const answered = [...NFC_ITEMS, ...EOS_ITEMS].filter((it) => pcAnswers[it.name]).length;
+    return (
+      <StageShell title={t("A little about how you think", "Sedikit tentang cara Anda berpikir")}>
+        <p className="text-muted-foreground">
+          {t(
+            "These nine statements are not a test and have no right answers. They measure two traits that are known to change how people respond to explanations, so that we can account for them.",
+            "Sembilan pernyataan berikut bukan tes dan tidak ada jawaban benar. Keduanya mengukur dua sifat yang diketahui memengaruhi cara orang menanggapi penjelasan, agar kami dapat memperhitungkannya.",
+          )}
+        </p>
+        <div className="space-y-4">
+          {nfc.map((it, i) => (
+            <LikertRow
+              key={it.name}
+              index={i + 1}
+              label={it.text}
+              value={pcAnswers[it.name]}
+              onChange={(v) => setPcAnswers((a) => ({ ...a, [it.name]: v }))}
+            />
+          ))}
+        </div>
+        <p className="pt-2 text-muted-foreground">
+          {t(
+            "And three statements about what you expect from the advice you are about to see.",
+            "Dan tiga pernyataan tentang apa yang Anda harapkan dari saran yang akan Anda lihat.",
+          )}
+        </p>
+        <div className="space-y-4">
+          {eos.map((it, i) => (
+            <LikertRow
+              key={it.name}
+              index={nfc.length + i + 1}
+              label={it.text}
+              value={pcAnswers[it.name]}
+              onChange={(v) => setPcAnswers((a) => ({ ...a, [it.name]: v }))}
+            />
+          ))}
+        </div>
+        {pcError && <p className="text-sm text-destructive">{pcError}</p>}
+        <Button
+          size="lg"
+          className="h-11 rounded-full px-6"
+          onClick={() => {
+            if (answered < NFC_ITEMS.length + EOS_ITEMS.length) {
+              setPcError(t("Please answer every statement.", "Mohon jawab setiap pernyataan."));
+              return;
+            }
+            setPcError("");
+            setStage("trial");
+          }}
+        >
+          {t("Start the cases", "Mulai kasusnya")}
         </Button>
       </StageShell>
     );
@@ -229,7 +308,24 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   if (stage === "exit") {
     return (
       <StageShell title={TX.exitTitle}>
-        <p className="text-muted-foreground">{TX.exitIntro}</p>
+        <p className="text-muted-foreground">
+          {t(
+            "First, how did you find the explanations you were shown?",
+            "Pertama, bagaimana menurut Anda penjelasan yang ditampilkan tadi?",
+          )}
+        </p>
+        <div className="space-y-4">
+          {itemsFor(PERCEPTION_ITEMS, locale).map((it, i) => (
+            <LikertRow
+              key={it.name}
+              index={i + 1}
+              label={it.text}
+              value={perception[it.name]}
+              onChange={(v) => setPerception((a) => ({ ...a, [it.name]: v }))}
+            />
+          ))}
+        </div>
+        <p className="pt-2 text-muted-foreground">{TX.exitIntro}</p>
         <div className="space-y-1.5">
           <Label htmlFor="exit1">{TX.exitQ1}</Label>
           <Textarea id="exit1" rows={3} value={exit1} onChange={(e) => setExit1(e.target.value)} />
@@ -238,7 +334,9 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
           <Label htmlFor="exit2">{TX.exitQ2}</Label>
           <Textarea id="exit2" rows={3} value={exit2} onChange={(e) => setExit2(e.target.value)} />
         </div>
-        <Button onClick={finishExit}>{t("Continue", "Lanjut")}</Button>
+        <Button size="lg" className="h-11 rounded-full px-6" onClick={finishExit}>
+          {t("Continue", "Lanjut")}
+        </Button>
       </StageShell>
     );
   }
@@ -524,6 +622,7 @@ function TrialStage({
         result={result}
         content={assignment.content}
         form={assignment.form}
+        modality={assignment.modality ?? "visual"}
         literacyLevel={literacyLevel}
         studyMode
         autoStartLlm={assignment.form === "llm"}

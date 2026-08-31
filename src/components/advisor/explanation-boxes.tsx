@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { OUTCOMES } from "@/lib/advisor/model";
 import { CF, FX, outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
+import type { Modality } from "@/lib/conditions";
 import {
   confidenceExplanation,
   counterfactualExplanation,
@@ -44,9 +45,11 @@ export function ExplanationCard({
   );
 }
 
-export function FeatureBox({ result }: { result: AdvisorResult }) {
+export function FeatureBox({ result, modality = "visual" }: { result: AdvisorResult; modality?: Modality }) {
   const { locale } = useLang();
   const fx = featureExplanation(result);
+  const showBars = modality === "visual" || modality === "hybrid";
+  const showSentences = modality === "textual" || modality === "hybrid";
   const name = result.portfolio.name;
   const intro = result.advisor === "ml" ? FX.introMl(name) : FX.introLogit(name);
   const total =
@@ -56,6 +59,7 @@ export function FeatureBox({ result }: { result: AdvisorResult }) {
   return (
     <ExplanationCard icon={BarChart3} title={tr(locale, { en: "Why this recommendation", id: "Mengapa rekomendasi ini" })}>
       <p className="text-muted-foreground">{intro}</p>
+      {showBars && (
       <ul className="space-y-1.5">
         {fx.items.map((it) => (
           <li key={it.key} className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,2fr)_3.5rem] items-center gap-3">
@@ -78,6 +82,14 @@ export function FeatureBox({ result }: { result: AdvisorResult }) {
           </li>
         ))}
       </ul>
+      )}
+      {showSentences && (
+        <ul className={`space-y-2 leading-relaxed ${showBars ? "border-t border-border/70 pt-3" : ""}`}>
+          {fx.items.map((it) => (
+            <li key={`s-${it.key}`}>{it.sentence}</li>
+          ))}
+        </ul>
+      )}
       <p className="border-t border-border/70 pt-3 font-medium">{total}</p>
       <p className="text-xs text-muted-foreground">{fx.methodNote}</p>
     </ExplanationCard>
@@ -196,11 +208,13 @@ export function AdaptiveBox({
   content,
   level,
   showNote,
+  modality = "visual",
 }: {
   result: AdvisorResult;
   content: string[];
   level: "low" | "high";
   showNote?: string;
+  modality?: Modality;
 }) {
   const { locale } = useLang();
   const parts = content.length ? content : ["feature", "counterfactual", "confidence"];
@@ -210,7 +224,7 @@ export function AdaptiveBox({
   if (level === "high") {
     return (
       <div className="space-y-3">
-        {parts.includes("feature") && <FeatureBox result={result} />}
+        {parts.includes("feature") && <FeatureBox result={result} modality={modality} />}
         {parts.includes("counterfactual") && <CounterfactualBox result={result} />}
         {parts.includes("confidence") && <ConfidenceBox result={result} />}
         {showNote && <p className="text-xs text-muted-foreground">{showNote}</p>}

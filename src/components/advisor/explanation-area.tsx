@@ -3,7 +3,7 @@
 /* Dispatches an explanation condition (content x delivery) to renderers. */
 
 import type { AdvisorResult } from "@/lib/advisor/types";
-import type { ContentPart, Form } from "@/lib/conditions";
+import type { ContentPart, Form, Modality } from "@/lib/conditions";
 import { AdaptiveBox, ConfidenceBox, CounterfactualBox, FeatureBox } from "./explanation-boxes";
 import { LlmChat } from "./llm-chat";
 import { WhatIfPanel } from "./what-if";
@@ -12,6 +12,7 @@ export function ExplanationArea({
   result,
   content,
   form,
+  modality = "visual",
   literacyLevel,
   researcherNote,
   showModelPicker,
@@ -24,6 +25,7 @@ export function ExplanationArea({
   result: AdvisorResult;
   content: ContentPart[];
   form: Form;
+  modality?: Modality;
   literacyLevel: "low" | "high";
   researcherNote?: boolean;
   showModelPicker?: boolean;
@@ -53,13 +55,14 @@ export function ExplanationArea({
         result={result}
         content={content}
         level={literacyLevel}
+        modality={modality}
         showNote={researcherNote ? `Adaptive variant: ${literacyLevel === "low" ? "plain" : "detailed"} (literacy level ${literacyLevel}).` : undefined}
       />
     );
   }
   const boxes = (
     <>
-      {content.includes("feature") && <FeatureBox result={result} />}
+      {content.includes("feature") && <FeatureBox result={result} modality={modality} />}
       {content.includes("counterfactual") && <CounterfactualBox result={result} />}
       {content.includes("confidence") && <ConfidenceBox result={result} />}
     </>

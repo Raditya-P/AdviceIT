@@ -12,12 +12,14 @@ import { neon } from "@neondatabase/serverless";
 
 const ALLOWED_KEYS = new Set([
   "rowType", "timestamp", "participantId", "condition", "explanationContent", "explanationForm",
-  "assignedBy", "advisorModel", "advisorAssignedBy", "language", "scenario", "trialIndex", "trialProfileId",
+  "explanationModality", "assignedBy", "advisorModel", "advisorAssignedBy", "language", "scenario", "trialIndex", "trialProfileId",
   "age", "horizon", "tolerance", "toleranceInconsistent", "emergencyFund", "incomeStable",
   "debtObligations", "nearTermNeed", "knowledge", "suitabilityTolerance", "suitabilityCapacity",
   "suitabilityLiquidity", "recommendedPortfolio", "soundPortfolio", "score", "margin", "confidence",
   "trustRating", "decision", "adjustedTo", "adjustSteps", "understanding", "decisionConfidence",
-  "mentalDemand", "reason", "literacyScore", "literacyAnswers", "literacyLevel", "whatIfMoves",
+  "mentalDemand", "reason", "literacyScore", "literacyAnswers", "literacyLevel", "nfcScore", "nfcAnswers",
+  "easeOfSatisfaction", "easeAnswers", "percTrust", "percTransparency", "percPersuasiveness",
+  "percUsefulness", "percSatisfaction", "whatIfMoves",
   "whyNotAsked", "adaptiveVariant", "attentionCheck", "decisionTimeMs", "llmModel", "llmExplanation",
   "llmTurns", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile", "caseReadMs",
   "profileSource", "tryIndex",

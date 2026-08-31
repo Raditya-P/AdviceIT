@@ -7,9 +7,20 @@ export type ContentPart = (typeof CONTENT_PARTS)[number];
 export const FORMS = ["static", "interactive", "adaptive", "llm"] as const;
 export type Form = (typeof FORMS)[number];
 
+/* Modality applies to the "why" content only, which is the one content that
+   exists in both a visual and a textual form. Counterfactual content is
+   inherently textual and confidence content is inherently both, so a
+   modality manipulation on those would not be a manipulation. Replicates
+   Szymanski, Millecamp and Verbert (IUI 2021) and Szymanski et al. (TIIS
+   2025). Default is "visual", which is what every version before 2.5.0
+   showed, so existing rows stay comparable. */
+export const MODALITIES = ["visual", "textual", "hybrid"] as const;
+export type Modality = (typeof MODALITIES)[number];
+
 export interface ConditionSpec {
   content: ContentPart[];
   form: Form;
+  modality?: Modality;
 }
 
 /* The nine cells of the pilot's fractional design. Five vary content at
@@ -18,7 +29,9 @@ export interface ConditionSpec {
    clean comparator is "none" rather than "hybrid". */
 export const PRESETS: Record<string, ConditionSpec> = {
   none: { content: [], form: "static" },
-  feature: { content: ["feature"], form: "static" },
+  feature: { content: ["feature"], form: "static", modality: "visual" },
+  "feature-textual": { content: ["feature"], form: "static", modality: "textual" },
+  "feature-hybrid": { content: ["feature"], form: "static", modality: "hybrid" },
   counterfactual: { content: ["counterfactual"], form: "static" },
   confidence: { content: ["confidence"], form: "static" },
   hybrid: { content: ["feature", "counterfactual", "confidence"], form: "static" },
@@ -30,7 +43,9 @@ export const PRESETS: Record<string, ConditionSpec> = {
 
 export const PRESET_LABELS: Record<string, string> = {
   none: "No explanation",
-  feature: "Why (feature-based)",
+  feature: "Why (visual)",
+  "feature-textual": "Why (textual)",
+  "feature-hybrid": "Why (hybrid)",
   counterfactual: "What would change it (counterfactual)",
   confidence: "How sure (confidence)",
   hybrid: "All three (hybrid)",
@@ -43,7 +58,9 @@ export const PRESET_LABELS: Record<string, string> = {
 
 const PRESET_LABELS_ID: Record<string, string> = {
   none: "Tanpa penjelasan",
-  feature: "Mengapa (berbasis fitur)",
+  feature: "Mengapa (visual)",
+  "feature-textual": "Mengapa (tekstual)",
+  "feature-hybrid": "Mengapa (hibrida)",
   counterfactual: "Apa yang mengubahnya (kontrafaktual)",
   confidence: "Seberapa yakin (keyakinan)",
   hybrid: "Ketiganya (hibrida)",
@@ -59,13 +76,17 @@ export function presetLabel(name: string, locale: "en" | "id") {
   return PRESET_LABELS[name] ?? name;
 }
 
-export function presetFor(content: ContentPart[], form: Form): string {
-  const key = [...content].sort().join("+") + "|" + form;
+export function presetFor(content: ContentPart[], form: Form, modality: Modality = "visual"): string {
+  const key = [...content].sort().join("+") + "|" + form + "|" + modality;
   for (const name of Object.keys(PRESETS)) {
     const p = PRESETS[name];
-    if ([...p.content].sort().join("+") + "|" + p.form === key) return name;
+    if ([...p.content].sort().join("+") + "|" + p.form + "|" + (p.modality ?? "visual") === key) return name;
   }
   return "custom";
+}
+
+export function modalityOf(spec: ConditionSpec): Modality {
+  return spec.modality ?? "visual";
 }
 
 export function specFor(preset: string): ConditionSpec {

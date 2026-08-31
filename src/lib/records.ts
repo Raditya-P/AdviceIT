@@ -9,6 +9,7 @@ export interface StudyRow {
   condition: string;
   explanationContent: string;
   explanationForm: string;
+  explanationModality?: "visual" | "textual" | "hybrid";
   assignedBy: "random" | "chosen";
   advisorModel: "ml" | "logit";
   advisorAssignedBy: "random" | "chosen";
@@ -44,6 +45,19 @@ export interface StudyRow {
   literacyScore?: number | "";
   literacyAnswers?: string;
   literacyLevel?: string;
+  /* Personal characteristics, collected once before the trials.
+     nfcScore: six-item need for cognition, 1 to 5, reverse items flipped.
+     easeOfSatisfaction: three-item scale, same range. */
+  nfcScore?: number | "";
+  nfcAnswers?: string;
+  easeOfSatisfaction?: number | "";
+  easeAnswers?: string;
+  /* Explanation perception, collected once at the exit questionnaire. */
+  percTrust?: number | "";
+  percTransparency?: number | "";
+  percPersuasiveness?: number | "";
+  percUsefulness?: number | "";
+  percSatisfaction?: number | "";
   whatIfMoves?: number | "";
   whyNotAsked?: number | "";
   adaptiveVariant?: string;
