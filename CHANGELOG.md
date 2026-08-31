@@ -3,6 +3,14 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.3.2 (2026-08-27)
+
+### Changed
+
+- Dropped the "by Radit" byline from the header, the footer, the README and the citation file. The project
+  is a collaboration now, and author credit belongs in the citation file and the paper rather than in the
+  product name. The archived v1 instrument keeps its original byline, since it is a released version.
+
 ## 2.3.1 (2026-08-27)
 
 ### Fixed

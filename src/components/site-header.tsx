@@ -30,7 +30,6 @@ export function SiteHeader() {
           className="text-[17px] font-semibold tracking-tight transition-opacity hover:opacity-80"
         >
           AdviceIT
-          <span className="ml-1.5 hidden text-sm font-normal text-muted-foreground sm:inline">by Radit</span>
         </Link>
         <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((item) => {

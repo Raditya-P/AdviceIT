@@ -32,7 +32,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 md:grid-cols-[minmax(0,2fr)_1fr_1fr_auto]">
           <div className="space-y-3">
-            <p className="text-base font-semibold tracking-tight">AdviceIT by Radit</p>
+            <p className="text-base font-semibold tracking-tight">AdviceIT</p>
             <p className="max-w-xs text-sm text-muted-foreground">
               {t(
                 "A research instrument for explainable AI in financial advice. Nothing here is real financial advice.",

@@ -1,13 +1,13 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 type: software
-title: "AdviceIT by Radit: an instrument for studying explainable AI investment advice"
+title: "AdviceIT: an instrument for studying explainable AI investment advice"
 abstract: "An interactive research instrument for studying how explanation styles (none, feature-based, counterfactual, confidence, conversational LLM) and advisor model type (glass-box rules or neural network) calibrate trust and appropriate reliance on AI investment advice."
 authors:
   - family-names: "Pratama"
     given-names: "Raditya"
     email: "radityapratama2077@gmail.com"
-version: "2.3.1"
+version: "2.3.2"
 date-released: "2026-08-25"
 year: 2026
 license: MIT
