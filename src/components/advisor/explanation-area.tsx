@@ -35,7 +35,7 @@ export function ExplanationArea({
   studyMode?: boolean;
   onInteract?: (kind: "move" | "whynot") => void;
   onLlmOpening?: (text: string, modelId: string) => void;
-  onLlmTurn?: () => void;
+  onLlmTurn?: (info: { routed: boolean; intent?: string }) => void;
 }) {
   if (form === "llm") {
     return (

@@ -32,6 +32,7 @@ import { presetLabel, type ContentPart, type Form, type Modality } from "@/lib/c
 import { ArrowRight, UserRound } from "lucide-react";
 import { tr, useLang } from "@/lib/i18n";
 import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
+import * as llm from "@/lib/llm";
 import {
   EOS_ITEMS,
   LITERACY_CORRECT,
@@ -448,7 +449,13 @@ function TrialStage({
   const [busy, setBusy] = useState(false);
   const [whatIfMoves, setWhatIfMoves] = useState(0);
   const [whyNotAsked, setWhyNotAsked] = useState(0);
-  const llmData = useRef<{ opening: string; model: string; turns: number }>({ opening: "", model: "", turns: 0 });
+  const llmData = useRef<{ opening: string; model: string; turns: number; routed: number; intents: string[] }>({
+    opening: "",
+    model: "",
+    turns: 0,
+    routed: 0,
+    intents: [],
+  });
 
   /* TrialStage is keyed by trial index, so a new trial remounts it and every
      ref and phase starts fresh. Clocks are read in effects, never in render. */
@@ -519,6 +526,9 @@ function TrialStage({
       llmModel: assignment.form === "llm" ? llmData.current.model : "",
       llmExplanation: assignment.form === "llm" ? llmData.current.opening.slice(0, 4000) : "",
       llmTurns: assignment.form === "llm" ? llmData.current.turns : "",
+      llmRoutedTurns: assignment.form === "llm" ? llmData.current.routed : "",
+      llmIntents: assignment.form === "llm" ? llmData.current.intents.join("|").slice(0, 500) : "",
+      llmModelAvailable: assignment.form === "llm" ? (llm.supported() ? "yes" : "no") : "",
     });
     setBusy(false);
   };
@@ -632,7 +642,11 @@ function TrialStage({
           llmData.current.model = model;
           displayedAt.current = Date.now();
         }}
-        onLlmTurn={() => (llmData.current.turns += 1)}
+        onLlmTurn={(info) => {
+          llmData.current.turns += 1;
+          if (info.routed) llmData.current.routed += 1;
+          if (info.intent) llmData.current.intents.push(info.intent);
+        }}
       />
 
       <section className="panel overflow-hidden">

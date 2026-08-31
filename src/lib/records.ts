@@ -66,6 +66,12 @@ export interface StudyRow {
   llmModel?: string;
   llmExplanation?: string;
   llmTurns?: number | "";
+  /* Conversational condition: how many turns were answered from the
+     computation rather than by the model, which intents matched, and whether
+     the model was available on this device at all. */
+  llmRoutedTurns?: number | "";
+  llmIntents?: string;
+  llmModelAvailable?: string;
   exitDistrustMoment?: string;
   exitMissingExplanation?: string;
   userAgentMobile?: boolean;

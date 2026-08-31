@@ -1,10 +1,19 @@
 "use client";
 
-/* Conversational delivery: an open-weight language model runs in the
-   browser through WebLLM, grounded ONLY on the ticked content facts. The
-   opening explanation and the number of follow-up turns are reported to
-   the parent so the study can log them verbatim. In Bahasa Indonesia mode
-   the model is instructed to reply in Indonesian. */
+/* Conversational delivery.
+
+   Two answer paths. Questions that match the supported intent set are
+   answered from the advisor's own computations by src/lib/advisor/intents.ts,
+   so no number in those answers can be invented. Everything else goes to an
+   open-weight language model running in the browser through WebLLM, grounded
+   only on the ticked content facts. This is the hybrid prompt handling of
+   Samimi et al. (CUI 2025), with a lexical matcher in place of their
+   fine-tuned one, and the supported set taken from the XAI question bank of
+   Liao, Gruen and Miller (CHI 2020).
+
+   The routed path needs no GPU, so the suggested questions work on any
+   device. The opening explanation, the turn counts and the matched intents
+   are reported to the parent for the study log. */
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,11 +22,12 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import * as llm from "@/lib/llm";
 import type { AdvisorResult } from "@/lib/advisor/types";
+import { answerFor, matchIntent, suggestedQuestions } from "@/lib/advisor/intents";
 import { tr, useLang } from "@/lib/i18n";
-import { MessageSquareText } from "lucide-react";
+import { Calculator, MessageSquareText } from "lucide-react";
 import { ExplanationCard } from "./explanation-boxes";
 
-type Bubble = { role: "user" | "assistant"; text: string };
+type Bubble = { role: "user" | "assistant"; text: string; computed?: boolean };
 
 export function LlmChat({
   result,
@@ -32,7 +42,7 @@ export function LlmChat({
   showModelPicker?: boolean;
   autoStart?: boolean;
   onOpening?: (text: string, modelId: string) => void;
-  onTurn?: () => void;
+  onTurn?: (info: { routed: boolean; intent?: string }) => void;
 }) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
@@ -98,12 +108,40 @@ export function LlmChat({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart, gpuOk]);
 
-  const ask = async () => {
-    const q = input.trim();
-    if (!q || !ready || busy) return;
+  const ask = async (preset?: string) => {
+    const q = (preset ?? input).trim();
+    if (!q || busy) return;
     setInput("");
+
+    /* Route first. A matched question is answered from the computation, which
+       is both faster and impossible to hallucinate. */
+    const match = matchIntent(q, locale, result.escalated);
+    const routed = match ? answerFor(match, result, locale) : null;
+    if (routed) {
+      onTurn?.({ routed: true, intent: match!.intent });
+      setBubbles((b) => [...b, { role: "user", text: q }, { role: "assistant", text: routed, computed: true }]);
+      /* Give the model the exchange too, so a later free-form question has it. */
+      messagesRef.current.push({ role: "user", content: q }, { role: "assistant", content: routed });
+      return;
+    }
+
+    if (!ready) {
+      setBubbles((b) => [
+        ...b,
+        { role: "user", text: q },
+        {
+          role: "assistant",
+          text: t(
+            "I can answer that only with the language model, which is not loaded on this device. The suggested questions above are answered from the advisor's own numbers and work anywhere.",
+            "Pertanyaan itu hanya bisa saya jawab dengan model bahasa, yang tidak termuat di perangkat ini. Pertanyaan yang disarankan di atas dijawab dari angka milik penasihat sendiri dan berfungsi di mana saja.",
+          ),
+        },
+      ]);
+      return;
+    }
+
     setBusy(true);
-    onTurn?.();
+    onTurn?.({ routed: false });
     messagesRef.current.push({ role: "user", content: q });
     setBubbles((b) => [...b, { role: "user", text: q }, { role: "assistant", text: "" }]);
     try {
@@ -126,18 +164,6 @@ export function LlmChat({
     }
   };
 
-  if (!gpuOk) {
-    return (
-      <ExplanationCard icon={MessageSquareText} title={t("Ask the advisor", "Tanya penasihat")}>
-        <p className="text-muted-foreground">
-          {t(
-            "This browser does not expose WebGPU, which the in-browser language model needs. Use a recent Chrome or Edge on a laptop with a GPU. All other explanation styles work everywhere.",
-            "Browser ini tidak menyediakan WebGPU, yang dibutuhkan model bahasa dalam browser. Gunakan Chrome atau Edge terbaru di laptop dengan GPU. Semua gaya penjelasan lain berfungsi di mana saja.",
-          )}
-        </p>
-      </ExplanationCard>
-    );
-  }
 
   return (
     <ExplanationCard icon={MessageSquareText} title={t("Ask the advisor", "Tanya penasihat")}>
@@ -177,12 +203,32 @@ export function LlmChat({
               }`}
             >
               {b.text || <span className="italic text-muted-foreground">{t("Thinking", "Berpikir")}</span>}
+              {b.computed && (
+                <span className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary">
+                  <Calculator className="size-3" aria-hidden />
+                  {t("Computed by the advisor, not written by the model", "Dihitung oleh penasihat, bukan ditulis model")}
+                </span>
+              )}
             </div>
           ))}
         </div>
       )}
 
-      {ready && (
+      <div className="flex flex-wrap gap-2">
+        {suggestedQuestions(result, locale).map((q) => (
+          <button
+            key={q}
+            type="button"
+            onClick={() => void ask(q)}
+            disabled={busy}
+            className="rounded-full border border-border/80 px-3 py-1.5 text-xs transition-colors hover:border-primary/50 hover:bg-muted disabled:opacity-50"
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+
+      {(
         <div className="flex gap-2">
           <Input
             value={input}
@@ -196,15 +242,15 @@ export function LlmChat({
             placeholder={t("Ask a follow-up question", "Ajukan pertanyaan lanjutan")}
             aria-label={t("Your question", "Pertanyaan Anda")}
           />
-          <Button onClick={ask} disabled={busy || !input.trim()}>
+          <Button onClick={() => void ask()} disabled={busy || !input.trim()}>
             {t("Ask", "Tanya")}
           </Button>
         </div>
       )}
       <p className="text-xs text-muted-foreground">
         {t(
-          "The language model only sees the facts computed by the advisor and is instructed to explain those. Its text is recorded in the study log. The model downloads once (about 1 GB) and is cached by your browser, then runs on your device's GPU. Nothing you type here leaves your device.",
-          "Model bahasa hanya melihat fakta yang dihitung penasihat dan diinstruksikan menjelaskannya. Teksnya direkam dalam log studi. Model diunduh sekali (sekitar 1 GB) dan disimpan cache oleh browser Anda, lalu berjalan di GPU perangkat Anda. Tidak ada yang Anda ketik di sini yang meninggalkan perangkat Anda.",
+          "The suggested questions are answered from the advisor's own computations, so those answers cannot be invented and they work on any device. Other questions go to a language model that only sees the computed facts. It downloads once (about 1 GB), is cached by your browser, needs WebGPU, and runs on your device. Nothing you type here leaves your device, and the text is recorded in the study log.",
+          "Pertanyaan yang disarankan dijawab dari hasil perhitungan penasihat sendiri, sehingga jawabannya tidak mungkin dikarang dan berfungsi di perangkat apa pun. Pertanyaan lain diteruskan ke model bahasa yang hanya melihat fakta yang telah dihitung. Model itu diunduh sekali (sekitar 1 GB), disimpan cache oleh browser Anda, membutuhkan WebGPU, dan berjalan di perangkat Anda. Tidak ada yang Anda ketik di sini yang meninggalkan perangkat Anda, dan teksnya direkam dalam log studi.",
         )}
       </p>
     </ExplanationCard>

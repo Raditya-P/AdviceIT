@@ -21,7 +21,7 @@ const ALLOWED_KEYS = new Set([
   "easeOfSatisfaction", "easeAnswers", "percTrust", "percTransparency", "percPersuasiveness",
   "percUsefulness", "percSatisfaction", "whatIfMoves",
   "whyNotAsked", "adaptiveVariant", "attentionCheck", "decisionTimeMs", "llmModel", "llmExplanation",
-  "llmTurns", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile", "caseReadMs",
+  "llmTurns", "llmRoutedTurns", "llmIntents", "llmModelAvailable", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile", "caseReadMs",
   "profileSource", "tryIndex",
 ]);
 

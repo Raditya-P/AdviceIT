@@ -18,7 +18,7 @@ export function stringsLocale() {
 const pick = <T,>(en: T, id: T): T => (L === "id" ? id : en);
 
 /* ---------------- Display names ---------------- */
-const OUTCOME_ID: Record<string, string> = {
+export const OUTCOME_ID: Record<string, string> = {
   "Capital preservation": "Preservasi modal",
   Conservative: "Konservatif",
   Balanced: "Seimbang",
@@ -43,7 +43,7 @@ export function outcomeSummary(id: string, enSummary: string) {
   return L === "id" ? (SUMMARY_ID[id] ?? enSummary) : enSummary;
 }
 
-const ASSET_ID: Record<string, string> = {
+export const ASSET_ID: Record<string, string> = {
   "Global equities": "Saham global",
   Bonds: "Obligasi",
   "Cash and money market": "Kas dan pasar uang",
