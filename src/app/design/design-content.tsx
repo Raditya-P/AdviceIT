@@ -163,6 +163,12 @@ export function DesignContent() {
             </div>
             <p className="text-sm text-muted-foreground">
               {t(
+                "A modality factor sits inside the why content, which is the one content that exists both as bars and as sentences: visual, textual, or both together. It is held at visual in every cell of the design below, and varied only in a separate within-subject study, so that it does not multiply the cells here.",
+                "Sebuah faktor modalitas berada di dalam konten mengapa, satu-satunya konten yang hadir baik sebagai batang maupun sebagai kalimat: visual, tekstual, atau keduanya sekaligus. Faktor ini dijaga pada visual di setiap sel rancangan di bawah, dan hanya divariasikan dalam studi within-subject terpisah, agar tidak melipatgandakan jumlah sel di sini.",
+              )}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t(
                 "A third factor runs alongside them: the advisor itself, a neural network whose explanations are computed after the decision, or an interpretable scorecard whose explanations are exact. It is assigned at random and logged, which turns explanation faithfulness into a measured variable rather than an assumption.",
                 "Ada faktor ketiga yang berjalan bersamanya: penasihatnya sendiri, sebuah neural network yang penjelasannya dihitung setelah keputusan, atau scorecard interpretable yang penjelasannya eksak. Faktor ini ditetapkan secara acak dan dicatat, sehingga kesetiaan penjelasan menjadi variabel yang diukur, bukan asumsi.",
               )}

@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.4.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.5.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -73,6 +73,7 @@ Verification, all three should pass before a deploy:
 ```bash
 npx tsx scripts/verify.ts       # 22 checks: training accuracies, Shapley efficiency, counterfactual truth, seeding
 npx tsx scripts/i18n-smoke.ts   # EN output byte-identical, ID translations complete
+npx tsx scripts/intent-smoke.ts # conversational routing accuracy, both languages
 npx tsc --noEmit                # types
 ```
 

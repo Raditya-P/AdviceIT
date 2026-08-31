@@ -181,6 +181,33 @@ set goes to the language model with context. The model never originates a number
 | Clarke and Braun (2017). Thematic analysis. Journal of Positive Psychology 12(3) | The analysis method | REF (CUI ref 12) |
 | Fereday and Muir-Cochrane (2006). Demonstrating rigor using thematic analysis: a hybrid approach of inductive and deductive coding and theme development. IJQM 5(1) | The hybrid deductive and inductive coding procedure, with D, I and D-I tagging | REF (CUI refs) |
 
+## 16b. Why a learned advisor, given the lookup baseline
+
+`v1/ml/lookup_baseline_test.py` measures what the 88.7 percent lookup baseline can and cannot do,
+cross-validated over 3 repeats of 5 folds on the 400 cases.
+
+| Measure | Result |
+| --- | --- |
+| Distinct label combinations | 37 |
+| Held-out cases covered by the table | 98.6 percent |
+| Accuracy when covered | 89.2 percent |
+| Ties in the table | 2.2 percent of covered cases |
+| Unseen combinations | 1.4 percent, 64.7 percent accurate by falling back to the majority class |
+| Overall | 88.8 percent |
+
+**Report this straight.** The generalisation argument does not hold: the table covers almost everything
+and matches the network's accuracy. What the table cannot do is structural rather than statistical, and
+it is what the study design needs:
+
+- **A calibrated probability for every outcome.** The confidence condition does not exist without it.
+- **A feature attribution.** The why condition does not exist without it, in either modality.
+- **Any sensitivity to age**, which the label combination does not encode but both models use.
+- **A stable answer on tied combinations**, 2.2 percent of covered cases, where the table's output
+  depends on tie-breaking rather than on evidence.
+
+The apparatus argument in the paper should therefore be that the models are required by the
+manipulations, not that they predict better. Claiming an accuracy advantage would be false.
+
 ## 17. Deliberately unsupported, and gaps to close
 
 These are decisions we have not yet grounded. Either find a source or mark them as design choices

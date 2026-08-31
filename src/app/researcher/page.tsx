@@ -24,6 +24,7 @@ import {
   quality,
   relianceTable,
   toCSV,
+  toQualitativeCSV,
   trials,
   type Row,
 } from "@/lib/analytics";
@@ -59,15 +60,25 @@ export default function ResearcherPage() {
     }
   };
 
-  const downloadCSV = () => {
-    if (!rows) return;
-    const blob = new Blob([toCSV(rows)], { type: "text/csv;charset=utf-8" });
+  const download = (name: string, text: string) => {
+    const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "adviceit-responses.csv";
+    a.download = name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const downloadCSV = () => {
+    if (!rows) return;
+    download("adviceit-responses.csv", toCSV(rows));
+  };
+
+  /* One utterance per row, for thematic coding. */
+  const downloadQualitative = () => {
+    if (!rows) return;
+    download("adviceit-qualitative.csv", toQualitativeCSV(rows));
   };
 
   const ov = rows ? overview(rows) : null;
@@ -124,9 +135,14 @@ export default function ResearcherPage() {
                 Fetch responses
               </Button>
               {rows && (
-                <Button variant="outline" onClick={downloadCSV}>
-                  Download CSV
-                </Button>
+                <>
+                  <Button variant="outline" onClick={downloadCSV}>
+                    Download CSV
+                  </Button>
+                  <Button variant="outline" onClick={downloadQualitative}>
+                    Download free text for coding
+                  </Button>
+                </>
               )}
               {status && <p className="text-sm text-muted-foreground">{status}</p>}
             </CardContent>

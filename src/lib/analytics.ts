@@ -143,3 +143,52 @@ export function toCSV(rows: Row[]): string {
   };
   return [keys.join(","), ...rows.map((r) => keys.map((k) => cell(r[k])).join(","))].join("\r\n") + "\r\n";
 }
+
+/* One row per free-text answer, ready for import into a coding tool.
+   Long-form fields are separated so that a coder sees a single utterance at a
+   time with the condition it came from, rather than a wide row of numbers. */
+export interface QualRow {
+  participantId: string;
+  language: string;
+  rowType: string;
+  condition: string;
+  content: string;
+  form: string;
+  modality: string;
+  advisor: string;
+  scenario: string;
+  trialIndex: string;
+  source: "trial reason" | "exit: distrust moment" | "exit: missing explanation" | "llm opening";
+  text: string;
+}
+
+export function qualitativeRows(rows: Row[]): QualRow[] {
+  const out: QualRow[] = [];
+  const base = (r: Row) => ({
+    participantId: String(r.participantId ?? ""),
+    language: String(r.language ?? "en"),
+    rowType: String(r.rowType ?? ""),
+    condition: String(r.condition ?? ""),
+    content: String(r.explanationContent ?? ""),
+    form: String(r.explanationForm ?? ""),
+    modality: String(r.explanationModality ?? ""),
+    advisor: String(r.advisorModel ?? ""),
+    scenario: String(r.scenario ?? ""),
+    trialIndex: String(r.trialIndex ?? ""),
+  });
+  const add = (r: Row, source: QualRow["source"], value: unknown) => {
+    const text = String(value ?? "").trim();
+    if (text) out.push({ ...base(r), source, text });
+  };
+  for (const r of rows) {
+    add(r, "trial reason", r.reason);
+    add(r, "exit: distrust moment", r.exitDistrustMoment);
+    add(r, "exit: missing explanation", r.exitMissingExplanation);
+    add(r, "llm opening", r.llmExplanation);
+  }
+  return out;
+}
+
+export function toQualitativeCSV(rows: Row[]): string {
+  return toCSV(qualitativeRows(rows) as unknown as Row[]);
+}

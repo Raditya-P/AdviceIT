@@ -3,6 +3,43 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.5.0 (2026-08-27)
+
+### Added
+
+- **Modality factor** on the why content: visual (bars), textual (the generated sentences, which the
+  instrument had been computing and discarding since 1.0.0), or hybrid. Two new cells, `feature-textual`
+  and `feature-hybrid`, reachable by link and from the advisor picker but held out of the random pool,
+  because modality is a separate within-subject study. Every row logs `explanationModality`.
+- **Intent router** in front of the conversational explainer. Why, what would change it, how sure, why
+  not X, how the advisor works, what an input means, and why a case was escalated are answered from the
+  computations and labelled as computed rather than written. Everything else goes to the language model
+  as before. The routed path needs no GPU, so the suggested questions work on any device. Rows log
+  `llmRoutedTurns`, `llmIntents` and `llmModelAvailable`.
+- **Comparison measures.** Six-item need for cognition and three-item ease-of-satisfaction before the
+  trials, five explanation perception items at the exit. The need for cognition and ease items are
+  transcribed from Table 2 of Szymanski et al. so the scores are directly comparable to theirs. The five
+  perception wordings are ours and are marked in the source as needing a check against Tsai and
+  Brusilovsky and Van Der Laan before data collection.
+- **Free-text export** in the researcher dashboard: one utterance per row with its condition, ready for
+  a coding tool.
+- `scripts/intent-smoke.ts`: routing accuracy over a labelled bilingual set including out-of-scope
+  questions that must fall through. Currently 29 of 29.
+- `v1/ml/lookup_baseline_test.py`: what the lookup baseline can and cannot do.
+
+### Changed
+
+- The conversational condition no longer dead-ends without WebGPU. The routed answers work, and only the
+  free-form path is unavailable, which is stated on the card and logged per row.
+
+### Note for the paper
+
+The lookup baseline test came back against the easy argument. The table covers 98.6 percent of held-out
+cases and scores 88.8 percent, the same as the network. The reason to train models is not accuracy or
+generalisation, it is that the table cannot produce a calibrated probability, a feature attribution, or
+any sensitivity to age, and the study's conditions need all three. `docs/design-justification.md`
+records this in full.
+
 ## 2.4.0 (2026-08-27)
 
 ### Added
