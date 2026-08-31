@@ -65,7 +65,7 @@ export function SiteFooter() {
         </div>
         <div className="mt-10 flex flex-col gap-2 border-t border-border/70 pt-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
-            Raditya Pratama · {t("MIT licence", "Lisensi MIT")} · v{VERSION}
+            {t("Pratama, Wicaksono and Ramadhan", "Pratama, Wicaksono, dan Ramadhan")} · {t("MIT licence", "Lisensi MIT")} · v{VERSION}
           </p>
           <a
             className="transition-colors hover:text-foreground"

@@ -3,6 +3,21 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.4.0 (2026-08-27)
+
+### Added
+
+- `docs/design-justification.md`: every interface and study decision mapped to the published work that
+  supports it, with a verification status per source (read in full, taken from a read paper's reference
+  list, or confirmed against the publisher). Seventeen sections, ten of them citing the Augment group at
+  KU Leuven. The last section lists the decisions that are still ungrounded, so the gaps are visible
+  rather than hidden.
+
+### Changed
+
+- Authors recorded as Raditya Pratama, Muhammad Wahyudi Wicaksono and Fausta Irsyad Ramadhan in
+  `CITATION.cff`, the README and the site footer.
+
 ## 2.3.2 (2026-08-27)
 
 ### Changed

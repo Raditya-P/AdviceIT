@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.3.2-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.4.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -247,6 +247,8 @@ If you use AdviceIT, please cite it (GitHub shows a "Cite this repository" butto
 
 ## Author
 
-**Raditya Pratama** · radityapratama2077@gmail.com
+**Raditya Pratama**, **Muhammad Wahyudi Wicaksono** and **Fausta Irsyad Ramadhan**
+
+Department of Information Systems, Institut Teknologi Sepuluh Nopember. Contact: radityapratama2077@gmail.com
 
 Built as an extension of my SSRAAI 2026 systematic literature review on trust and algorithm aversion. Released under the MIT licence.
