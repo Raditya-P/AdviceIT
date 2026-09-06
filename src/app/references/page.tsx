@@ -74,6 +74,79 @@ const SECTIONS: { title: L; refs: { text: string; use: L; href?: string }[] }[] 
     ],
   },
   {
+    title: {
+      en: "The design of the explanations and the study",
+      id: "Rancangan penjelasan dan studi",
+    },
+    refs: [
+      {
+        text: "Szymanski, M., Keyaerts, S., Conati, C., De Croon, R., Vanden Abeele, V., Verbert, K. (2025). Designing and Personalising Hybrid Health Explanations for Lay Users. ACM Transactions on Interactive Intelligent Systems.",
+        use: {
+          en: "The visual, textual and hybrid modality factor, the need for cognition and ease-of-satisfaction scales, and the three-phase study structure.",
+          id: "Faktor modalitas visual, tekstual, dan hibrida, skala need for cognition dan ease-of-satisfaction, serta struktur studi tiga fase.",
+        },
+      },
+      {
+        text: "Szymanski, M., Millecamp, M., Verbert, K. (2021). Visual, Textual or Hybrid: The Effect of User Expertise on Different Explanations. IUI '21.",
+        use: { en: "The original modality comparison.", id: "Perbandingan modalitas yang asli." },
+      },
+      {
+        text: "Samimi, R., Bhattacharya, A., Gosak, L., Stiglic, G., Verbert, K. (2025). Visual-Conversational Interface for Evidence-Based Explanation of Diabetes Risk Prediction. CUI '25.",
+        use: {
+          en: "The two-path conversational explainer: analytical questions answered from computation, the rest by a language model.",
+          id: "Penjelas percakapan dua jalur: pertanyaan analitis dijawab dari perhitungan, sisanya oleh model bahasa.",
+        },
+        href: "https://doi.org/10.1145/3719160.3736616",
+      },
+      {
+        text: "Millecamp, M., Htun, N. N., Conati, C., Verbert, K. (2019). To Explain or Not to Explain: The Effects of Personal Characteristics When Explaining Music Recommendations. IUI '19.",
+        use: { en: "Personal characteristics as moderators of whether an explanation helps.", id: "Karakteristik pribadi sebagai moderator apakah sebuah penjelasan membantu." },
+      },
+      {
+        text: "Millecamp, M., Htun, N. N., Conati, C., Verbert, K. (2020). What's in a User? Towards Personalising Transparency for Music Recommender Interfaces. UMAP '20.",
+        use: { en: "Interactive control over explanations.", id: "Kendali interaktif atas penjelasan." },
+      },
+      {
+        text: "Bhattacharya, A., Ooge, J., Stiglic, G., Verbert, K. (2023). Directive Explanations for Monitoring the Risk of Diabetes Onset. IUI '23.",
+        use: { en: "Explanations that say what to do, the basis for the actionable steps.", id: "Penjelasan yang menyatakan apa yang harus dilakukan, dasar bagi langkah yang dapat ditindaklanjuti." },
+      },
+      {
+        text: "Liao, Q. V., Gruen, D., Miller, S. (2020). Questioning the AI: Informing Design Practices for Explainable AI User Experiences. CHI '20.",
+        use: { en: "The question bank the conversational explainer's supported questions come from.", id: "Bank pertanyaan yang menjadi sumber pertanyaan yang didukung penjelas percakapan." },
+      },
+      {
+        text: "Buçinca, Z., Malaya, M. B., Gajos, K. Z. (2021). To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on AI in AI-assisted Decision-making. Proceedings of the ACM on Human-Computer Interaction 5 (CSCW1).",
+        use: { en: "Reading the case before the advice is shown, and the analysis pause.", id: "Membaca kasus sebelum saran ditampilkan, dan jeda analisis." },
+        href: "https://doi.org/10.1145/3449287",
+      },
+      {
+        text: "Zhang, Y., Liao, Q. V., Bellamy, R. K. E. (2020). Effect of Confidence and Explanation on Accuracy and Trust Calibration in AI-Assisted Decision Making. FAT* '20.",
+        use: { en: "The confidence condition, and why its effect is not assumed to be positive.", id: "Kondisi keyakinan, dan mengapa efeknya tidak diasumsikan positif." },
+        href: "https://doi.org/10.1145/3351095.3372852",
+      },
+      {
+        text: "Schemmer, M., Kühl, N., Benz, C., Bartos, A., Satzger, G. (2023). Appropriate Reliance on AI Advice: Conceptualization and the Effect of Explanations. IUI '23.",
+        use: { en: "How appropriate reliance is defined and measured.", id: "Bagaimana reliance yang tepat didefinisikan dan diukur." },
+        href: "https://doi.org/10.1145/3581641.3584066",
+      },
+      {
+        text: "Springer, A., Whittaker, S. (2020). Progressive Disclosure: When, Why, and How Do Users Want Algorithmic Transparency Information? ACM Transactions on Interactive Intelligent Systems 10 (4).",
+        use: { en: "Detail on demand across the site.", id: "Rincian sesuai permintaan di seluruh situs." },
+        href: "https://doi.org/10.1145/3374218",
+      },
+      {
+        text: "Lins de Holanda Coelho, G., Hanel, P. H. P., Wolf, L. J. (2020). The Very Efficient Assessment of Need for Cognition: Developing a Six-Item Version. Assessment 27 (8).",
+        use: { en: "The six need for cognition items asked before the cases.", id: "Enam butir need for cognition yang ditanyakan sebelum kasus." },
+        href: "https://doi.org/10.1177/1073191118793208",
+      },
+      {
+        text: "Buell, R. W., Norton, M. I. (2011). The Labor Illusion: How Operational Transparency Increases Perceived Value. Management Science 57 (9).",
+        use: { en: "The analysis screen, and why it is held constant across conditions.", id: "Layar analisis, dan mengapa ia dijaga sama di semua kondisi." },
+        href: "https://doi.org/10.1287/mnsc.1110.1376",
+      },
+    ],
+  },
+  {
     title: { en: "Explainable AI methods", id: "Metode explainable AI" },
     refs: [
       {

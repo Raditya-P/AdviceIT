@@ -3,6 +3,32 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.9.0 (2026-09-06)
+
+Gap audit of the site and the code.
+
+### Fixed
+
+- The privacy page said the advisor pages record nothing at all. Since 2.2.0 the optional response panel
+  there stores an anonymous tryout row, and the page now says so.
+- The consent text said 10 to 15 minutes. With the two scales before the cases and the perception items
+  after, the honest figure is about 15 minutes, and the consent, the participate page and the site
+  description now agree on it.
+- The participate page said "that is the whole session" before the questions before and after existed.
+- The references page listed none of the works the explanation design and the study design rest on.
+  Thirteen entries added under their own heading, each with the part of the site it supports.
+- The README promised a confusion matrix on the training data page and there was none, although the
+  data has always been in the exported weights. It is rendered now, cross-validated, with per-class
+  recall.
+- The design page's moderator list lacked need for cognition and ease-of-satisfaction.
+- The researcher dashboard ignored the perception items and the personal characteristics. A table per
+  condition now shows the five perception means, need for cognition and ease-of-satisfaction.
+
+### Added
+
+- A mobile menu. On small screens the navigation was hidden entirely, leaving only the language toggle
+  and the participate button.
+
 ## 2.8.3 (2026-09-06)
 
 ### Changed

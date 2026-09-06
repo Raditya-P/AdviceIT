@@ -331,8 +331,8 @@ export function DesignContent() {
               <p className="mt-4 font-medium">{t("Moderators", "Moderator")}</p>
               <p className="mt-2 leading-relaxed text-muted-foreground">
                 {t(
-                  "Financial literacy measured with the Big Three questions, self-rated financial knowledge, and the language the session ran in.",
-                  "Literasi keuangan yang diukur dengan tiga pertanyaan Big Three, penilaian sendiri atas pengetahuan keuangan, dan bahasa yang dipakai selama sesi.",
+                  "Financial literacy measured with the Big Three questions, need for cognition (six items), ease-of-satisfaction (three items), self-rated financial knowledge, and the language the session ran in.",
+                  "Literasi keuangan yang diukur dengan tiga pertanyaan Big Three, need for cognition (enam butir), ease-of-satisfaction (tiga butir), penilaian sendiri atas pengetahuan keuangan, dan bahasa yang dipakai selama sesi.",
                 )}
               </p>
             </div>

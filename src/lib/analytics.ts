@@ -116,6 +116,49 @@ export function measuresTable(rows: Row[]) {
   return out;
 }
 
+/* Explanation perception (asked once at the exit) and the personal
+   characteristics (asked once before the trials), per condition. Means on
+   the 1 to 5 scales, one row per condition, so they can be set beside the
+   Szymanski et al. figures. Exit rows carry the perception items, and every
+   row carries the characteristics, so they are read from different rows. */
+export function perceptionTable(rows: Row[]) {
+  const ex = exits(rows);
+  const tr = trials(rows);
+  const out: {
+    label: string;
+    n: number;
+    trust: string;
+    transparency: string;
+    persuasiveness: string;
+    usefulness: string;
+    satisfaction: string;
+    nfc: string;
+    ease: string;
+  }[] = [];
+  for (const c of CONDITION_ORDER) {
+    const e = ex.filter((r) => r.condition === c);
+    const firstTrialPerParticipant = new Map<string, Row>();
+    for (const r of tr.filter((r) => r.condition === c)) {
+      const pid = String(r.participantId);
+      if (!firstTrialPerParticipant.has(pid)) firstTrialPerParticipant.set(pid, r);
+    }
+    const pc = Array.from(firstTrialPerParticipant.values());
+    if (!e.length && !pc.length) continue;
+    out.push({
+      label: CONDITION_LABELS[c],
+      n: e.length,
+      trust: fmt(mean(e.map((r) => num(r.percTrust))), 2),
+      transparency: fmt(mean(e.map((r) => num(r.percTransparency))), 2),
+      persuasiveness: fmt(mean(e.map((r) => num(r.percPersuasiveness))), 2),
+      usefulness: fmt(mean(e.map((r) => num(r.percUsefulness))), 2),
+      satisfaction: fmt(mean(e.map((r) => num(r.percSatisfaction))), 2),
+      nfc: fmt(mean(pc.map((r) => num(r.nfcScore))), 2),
+      ease: fmt(mean(pc.map((r) => num(r.easeOfSatisfaction))), 2),
+    });
+  }
+  return out;
+}
+
 export function quality(rows: Row[]) {
   const t = trials(rows);
   const att = t.filter((r) => r.attentionCheck);

@@ -167,7 +167,7 @@ export function completionCode(participantId: string) {
 export const TEXTS = {
   consentTitle: "Before you start",
   consent: [
-    "This is a research study about how people use investment advice from an automated advisor. It takes about 10 to 15 minutes.",
+    "This is a research study about how people use investment advice from an automated advisor. It takes about 15 minutes, including a few short questions before and after the cases.",
     "You will read a few short descriptions of hypothetical investors, see the advisor's recommendation for each of them, and tell us whether you would follow it and how much you trust it. Three questions about financial knowledge come first, and two open questions come at the end.",
     "Nothing here is real financial advice, and no real money is involved. Please answer as the person described in each case.",
     "Your answers are stored under an anonymous participant ID together with the recommendation you saw and your responses. No name, email or account information is collected, and nothing can identify you. You can stop at any time by closing this page, and you can ask for your data to be deleted by quoting your participant ID.",
@@ -235,7 +235,7 @@ export function caseDisplay(trial: { profileId: string; label: string; text: str
 const TEXTS_ID: typeof TEXTS = {
   consentTitle: "Sebelum Anda mulai",
   consent: [
-    "Ini adalah studi penelitian tentang bagaimana orang menggunakan saran investasi dari penasihat otomatis. Waktunya sekitar 10 sampai 15 menit.",
+    "Ini adalah studi penelitian tentang bagaimana orang menggunakan saran investasi dari penasihat otomatis. Waktunya sekitar 15 menit, termasuk beberapa pertanyaan singkat sebelum dan sesudah kasus.",
     "Anda akan membaca beberapa deskripsi singkat investor hipotetis, melihat rekomendasi penasihat untuk masing-masing, dan memberi tahu kami apakah Anda akan mengikutinya serta seberapa besar Anda memercayainya. Tiga pertanyaan tentang pengetahuan keuangan datang lebih dulu, dan dua pertanyaan terbuka ada di bagian akhir.",
     "Tidak ada saran keuangan sungguhan di sini, dan tidak ada uang sungguhan yang terlibat. Mohon jawab sebagai orang yang digambarkan dalam setiap kasus.",
     "Jawaban Anda disimpan di bawah ID partisipan anonim bersama rekomendasi yang Anda lihat dan respons Anda. Tidak ada nama, email, atau informasi akun yang dikumpulkan, dan tidak ada yang dapat mengidentifikasi Anda. Anda dapat berhenti kapan saja dengan menutup halaman ini, dan Anda dapat meminta data Anda dihapus dengan menyebutkan ID partisipan Anda.",

@@ -53,6 +53,9 @@ export default async function TrainingDataPage() {
   const hr = cases.filter((c) => c.portfolio === "Human review").length;
   const combos = new Set(cases.map((c) => `${c.tolerance}|${c.capacity}|${c.liquidity}`)).size;
   const authorAgree = cases.filter((c) => c.authorPortfolio === c.portfolio).length;
+  const cvMeta = mlMeta as unknown as { confusion: number[][]; perClassRecall: Record<string, number> };
+  const confusion = cvMeta.confusion ?? [];
+  const recall = cvMeta.perClassRecall ?? {};
   const pct = (x: number, d = 1) => `${Math.round(x * 100 * 10 ** d) / 10 ** d} ${t("percent", "persen")}`;
 
   return (
@@ -183,6 +186,48 @@ export default async function TrainingDataPage() {
                       </TableRow>
                     </TableBody>
                   </Table>
+                </div>
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    {t("AI advisor, cross-validated confusion matrix", "Penasihat AI, confusion matrix validasi silang")}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {t(
+                      "Rows are the expert consensus, columns are what the advisor answered on held-out cases. The diagonal is agreement.",
+                      "Baris adalah konsensus ahli, kolom adalah jawaban penasihat pada kasus yang ditahan. Diagonalnya adalah kesepakatan.",
+                    )}
+                  </p>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs">{t("Experts \\ advisor", "Ahli \\ penasihat")}</TableHead>
+                          {classes.map((c) => (
+                            <TableHead key={c} className="text-right text-xs">
+                              {keyLabel(c)}
+                            </TableHead>
+                          ))}
+                          <TableHead className="text-right text-xs">{t("Recall", "Recall")}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {confusion.map((row, i) => (
+                          <TableRow key={classes[i]}>
+                            <TableCell className="whitespace-nowrap text-xs font-medium">{keyLabel(classes[i])}</TableCell>
+                            {row.map((v, j) => (
+                              <TableCell
+                                key={j}
+                                className={`text-right tabular-nums text-xs ${i === j ? "font-semibold text-primary" : v === 0 ? "text-muted-foreground/50" : ""}`}
+                              >
+                                {v}
+                              </TableCell>
+                            ))}
+                            <TableCell className="text-right tabular-nums text-xs">{pct(recall[classes[i]] ?? 0)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
                 </details>
                 <p className="text-xs text-muted-foreground">

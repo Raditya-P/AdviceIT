@@ -34,8 +34,8 @@ export function PrivacyContent() {
           <h2 className="text-xl font-semibold">{t("What is not collected", "Apa yang tidak dikumpulkan")}</h2>
           <p className="text-muted-foreground">
             {t(
-              "No name, no email, no account data, no IP-based profile, no advertising or analytics trackers. The conversational explainer runs entirely in your browser, so what you type to it never reaches a server. The try-mode advisor pages do not record anything at all.",
-              "Tidak ada nama, tidak ada email, tidak ada data akun, tidak ada profil berbasis IP, tidak ada pelacak iklan atau analitik. Penjelas percakapan berjalan sepenuhnya di browser Anda, jadi apa yang Anda ketik kepadanya tidak pernah mencapai server. Halaman penasihat mode coba tidak merekam apa pun sama sekali.",
+              "No name, no email, no account data, no IP-based profile, no advertising or analytics trackers. The conversational explainer runs entirely in your browser, so what you type to it never reaches a server. The advisor pages record nothing while you try them. If you choose to fill in the optional response panel there, that answer is stored anonymously as a tryout, marked separately from the study.",
+              "Tidak ada nama, tidak ada email, tidak ada data akun, tidak ada profil berbasis IP, tidak ada pelacak iklan atau analitik. Penjelas percakapan berjalan sepenuhnya di browser Anda, jadi apa yang Anda ketik kepadanya tidak pernah mencapai server. Halaman penasihat tidak merekam apa pun saat Anda mencobanya. Jika Anda memilih mengisi panel respons opsional di sana, jawaban itu disimpan secara anonim sebagai uji coba, ditandai terpisah dari studi.",
             )}
           </p>
           <h2 className="text-xl font-semibold">{t("Your rights", "Hak Anda")}</h2>

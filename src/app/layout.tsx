@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s · AdviceIT",
   },
   description:
-    "An open research study on which explanations help people trust AI investment advice the right amount. Try two advisors trained on expert-validated data, then contribute a 10-minute session.",
+    "An open research study on which explanations help people trust AI investment advice the right amount. Try two advisors trained on expert-validated data, then contribute a 15-minute session.",
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

@@ -22,6 +22,7 @@ import {
   mean,
   measuresTable,
   overview,
+  perceptionTable,
   quality,
   relianceTable,
   toCSV,
@@ -86,6 +87,7 @@ export default function ResearcherPage() {
   const ov = rows ? overview(rows) : null;
   const rel = rows ? relianceTable(rows) : [];
   const meas = rows ? measuresTable(rows) : [];
+  const perc = rows ? perceptionTable(rows) : [];
   const qual = rows ? quality(rows) : null;
   const exitRows = rows ? exits(rows) : [];
   /* Visitor tryouts from the advisor pages. Self-chosen condition and
@@ -217,6 +219,44 @@ export default function ResearcherPage() {
                         <TableCell>{r.overReliance}</TableCell>
                         <TableCell>{r.underReliance}</TableCell>
                         <TableCell>{r.askedHuman}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
+
+          {perc.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Explanation perception and personal characteristics, per condition</CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Perception items are asked once at the exit (1 to 5, n is exit rows). Need for cognition and
+                  ease-of-satisfaction are asked once before the trials (1 to 5, one value per participant).
+                </p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      {["Condition", "n", "trust", "transparency", "persuasiveness", "usefulness", "satisfaction", "need for cognition", "ease-of-satisfaction"].map((h) => (
+                        <TableHead key={h}>{h}</TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {perc.map((r) => (
+                      <TableRow key={r.label}>
+                        <TableCell className="font-medium">{r.label}</TableCell>
+                        <TableCell>{r.n}</TableCell>
+                        <TableCell>{r.trust}</TableCell>
+                        <TableCell>{r.transparency}</TableCell>
+                        <TableCell>{r.persuasiveness}</TableCell>
+                        <TableCell>{r.usefulness}</TableCell>
+                        <TableCell>{r.satisfaction}</TableCell>
+                        <TableCell>{r.nfc}</TableCell>
+                        <TableCell>{r.ease}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

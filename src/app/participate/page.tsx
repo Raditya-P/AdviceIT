@@ -107,8 +107,8 @@ export default function ParticipatePage() {
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {t(
-                "You read six short cases about made-up people. For each one, the advisor recommends something and explains why. You tell us what you would do. That is the whole session.",
-                "Anda membaca enam kasus singkat tentang orang rekaan. Untuk tiap kasus, penasihat merekomendasikan sesuatu dan menjelaskan mengapa. Anda memberi tahu kami apa yang akan Anda lakukan. Itu saja sesinya.",
+                "You read six short cases about made-up people. For each one, the advisor recommends something and explains why, and you tell us what you would do. A few short questions before and after, and that is the session.",
+                "Anda membaca enam kasus singkat tentang orang rekaan. Untuk tiap kasus, penasihat merekomendasikan sesuatu dan menjelaskan mengapa, dan Anda memberi tahu kami apa yang akan Anda lakukan. Beberapa pertanyaan singkat sebelum dan sesudahnya, dan selesailah sesinya.",
               )}
             </p>
             <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">

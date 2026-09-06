@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Languages } from "lucide-react";
+import { Languages, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand";
 import { tr, useLang } from "@/lib/i18n";
@@ -45,6 +45,25 @@ export function SiteHeader() {
           })}
         </nav>
         <div className="flex items-center gap-1.5">
+          <details className="relative md:hidden">
+            <summary
+              className="flex size-9 cursor-pointer list-none items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label={t("Menu", "Menu")}
+            >
+              <Menu className="size-5" aria-hidden />
+            </summary>
+            <nav className="absolute right-0 top-11 z-50 w-56 rounded-2xl border border-border/80 bg-background p-2 shadow-lg">
+              {NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="block rounded-xl px-3 py-2.5 text-sm text-foreground hover:bg-muted"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </details>
           <Button
             variant="ghost"
             size="sm"
