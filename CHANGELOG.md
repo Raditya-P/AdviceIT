@@ -3,6 +3,20 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.8.0 (2026-09-06)
+
+### Changed
+
+- **Home page redesigned around the two advisors.** After the hero, which keeps its headline and loses one
+  paragraph, the page is: the two advisors side by side, each with a visual computed from the real model
+  (the AI advisor's contribution bars for an example investor, three rows of the interpretable advisor's
+  actual scorecard), the four explanation styles, the five outcomes as real allocation bands plus the
+  human-review option, a two-sentence "why this matters", and the study last. Every number and bar on
+  the page comes from the advisors at render time, nothing is drawn.
+- The interpretable advisor is back in the header navigation.
+- The About page no longer shows the logo and its explanation in the hero. The mark stays in the header,
+  the footer and the browser tab.
+
 ## 2.7.0 (2026-09-06)
 
 ### Changed

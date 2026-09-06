@@ -13,7 +13,8 @@ export function SiteHeader() {
   const pathname = usePathname();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const NAV = [
-    { href: "/advisor/ml", label: t("Try the advisor", "Coba penasihatnya") },
+    { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
+    { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat interpretable") },
     { href: "/about", label: t("About", "Tentang") },
     { href: "/about#researchers", label: t("For researchers", "Untuk peneliti") },
   ];
