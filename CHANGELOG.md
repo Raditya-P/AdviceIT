@@ -3,6 +3,14 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.8.1 (2026-09-06)
+
+### Changed
+
+- The three-step "What the advisor does" section is back on the home page, directly after the hero.
+- "Why this matters" carries its two explanatory paragraphs again, beside the heading in the two-column
+  layout, with the two-sentence summary as the lead. Section backgrounds re-alternated to suit.
+
 ## 2.8.0 (2026-09-06)
 
 ### Changed

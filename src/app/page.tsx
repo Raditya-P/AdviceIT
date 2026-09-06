@@ -64,6 +64,30 @@ export default function HomePage() {
     { icon: Clock3, text: t("About two minutes to try", "Sekitar dua menit untuk mencoba") },
   ];
 
+  const STEPS = [
+    {
+      title: t("Describe an investor", "Gambarkan seorang investor"),
+      text: t(
+        "Age, how long the money can stay invested, how much risk they can live with, and a few facts about their finances. Made up is fine.",
+        "Usia, berapa lama uangnya bisa tetap diinvestasikan, seberapa besar risiko yang sanggup dijalani, dan beberapa fakta tentang keuangannya. Rekaan pun tidak apa-apa.",
+      ),
+    },
+    {
+      title: t("Get a recommendation", "Dapatkan rekomendasi"),
+      text: t(
+        "One of five investment mixes, from capital preservation to aggressive growth. Or, when the case calls for it, a referral to a human adviser.",
+        "Satu dari lima campuran investasi, dari pelestarian modal sampai pertumbuhan agresif. Atau, bila kasusnya menuntut, rujukan ke penasihat manusia.",
+      ),
+    },
+    {
+      title: t("See why, in the style you choose", "Lihat mengapa, dengan gaya pilihan Anda"),
+      text: t(
+        "Which of your answers mattered, what would change the advice, how sure the advisor is, or a conversation about it. Then decide whether you would trust it.",
+        "Jawaban Anda yang mana yang berpengaruh, apa yang akan mengubah sarannya, seberapa yakin penasihatnya, atau percakapan tentangnya. Lalu putuskan apakah Anda akan memercayainya.",
+      ),
+    },
+  ];
+
   const STYLES = [
     {
       icon: BarChart3,
@@ -142,8 +166,33 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Two advisors */}
+        {/* What the advisor does */}
         <section className="border-y border-border/70 bg-muted/40">
+          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+            <div className="max-w-2xl space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("What the advisor does", "Apa yang dilakukan penasihat")}
+              </p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                {t("Three steps from a person to a recommendation", "Tiga langkah dari seseorang ke sebuah rekomendasi")}
+              </h2>
+            </div>
+            <ol className="mt-10 grid gap-5 md:grid-cols-3">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="panel lift p-6">
+                  <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    {i + 1}
+                  </span>
+                  <h3 className="mt-4 text-lg font-semibold tracking-tight">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* Two advisors */}
+        <section>
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
@@ -248,7 +297,7 @@ export default function HomePage() {
         </section>
 
         {/* How it explains itself */}
-        <section>
+        <section className="border-y border-border/70 bg-muted/40">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
@@ -276,7 +325,7 @@ export default function HomePage() {
         </section>
 
         {/* What it can recommend */}
-        <section className="border-y border-border/70 bg-muted/40">
+        <section>
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
@@ -314,21 +363,37 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Why this matters, briefly */}
-        <section>
-          <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-              {t("Why this matters", "Mengapa ini penting")}
-            </p>
-            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              {t("An explanation can help you judge advice, or just make it sound convincing", "Sebuah penjelasan bisa membantu Anda menilai saran, atau sekadar membuatnya terdengar meyakinkan")}
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl leading-relaxed text-muted-foreground">
-              {t(
-                "Nobody yet knows which kinds do which. That is the question this advisor was built to answer.",
-                "Belum ada yang tahu jenis mana yang berbuat apa. Itulah pertanyaan yang menjadi alasan penasihat ini dibangun.",
-              )}
-            </p>
+        {/* Why this matters */}
+        <section className="border-y border-border/70 bg-muted/40">
+          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+            <div className="space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                {t("Why this matters", "Mengapa ini penting")}
+              </p>
+              <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                {t("An explanation can help you judge advice, or just make it sound convincing", "Sebuah penjelasan bisa membantu Anda menilai saran, atau sekadar membuatnya terdengar meyakinkan")}
+              </h2>
+              <p className="text-muted-foreground">
+                {t(
+                  "Nobody yet knows which kinds do which. That is the question this advisor was built to answer.",
+                  "Belum ada yang tahu jenis mana yang berbuat apa. Itulah pertanyaan yang menjadi alasan penasihat ini dibangun.",
+                )}
+              </p>
+            </div>
+            <div className="space-y-5 leading-relaxed text-muted-foreground lg:pt-9">
+              <p>
+                {t(
+                  "Investment apps increasingly recommend what to do with your money, and the recommendation comes from a model. When it is right, following it helps. When it is wrong, following it costs real money. Most people cannot tell which is which from the recommendation alone.",
+                  "Aplikasi investasi makin sering merekomendasikan apa yang harus dilakukan dengan uang Anda, dan rekomendasi itu berasal dari sebuah model. Saat benar, mengikutinya membantu. Saat keliru, mengikutinya merugikan uang sungguhan. Kebanyakan orang tidak bisa membedakan keduanya dari rekomendasi saja.",
+                )}
+              </p>
+              <p>
+                {t(
+                  "Explanations are meant to close that gap. Yet an explanation can also make wrong advice sound convincing. Which kinds of explanation help people judge, rather than simply persuade, is still an open question.",
+                  "Penjelasan dimaksudkan untuk menutup celah itu. Namun penjelasan juga bisa membuat saran yang keliru terdengar meyakinkan. Jenis penjelasan mana yang membantu orang menilai, bukan sekadar membujuk, masih menjadi pertanyaan terbuka.",
+                )}
+              </p>
+            </div>
           </div>
         </section>
 
