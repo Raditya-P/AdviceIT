@@ -20,6 +20,7 @@ import {
   MessageSquareText,
   Shuffle,
   SlidersHorizontal,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -85,9 +86,10 @@ export default function ParticipatePage() {
   };
 
   const FACTS = [
-    { icon: Clock3, text: t("10 to 15 minutes", "10 sampai 15 menit") },
+    { icon: Clock3, text: t("About 15 minutes", "Sekitar 15 menit") },
     { icon: Lock, text: t("Anonymous, no account", "Anonim, tanpa akun") },
-    { icon: Layers, text: t("Six hypothetical cases", "Enam kasus hipotetis") },
+    { icon: Layers, text: t("Six made-up cases", "Enam kasus rekaan") },
+    { icon: Wallet, text: t("No real money involved", "Tanpa uang sungguhan") },
   ];
 
   return (
@@ -105,8 +107,8 @@ export default function ParticipatePage() {
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {t(
-                "You will read six short investor cases, each with a recommendation from the advisor and one style of explanation. Tell us what you would do with that advice, and the session is done.",
-                "Anda akan membaca enam kasus investor singkat, masing-masing dengan rekomendasi dari penasihat dan satu gaya penjelasan. Beri tahu kami apa yang akan Anda lakukan dengan saran itu, dan sesi pun selesai.",
+                "You read six short cases about made-up people. For each one, the advisor recommends something and explains why. You tell us what you would do. That is the whole session.",
+                "Anda membaca enam kasus singkat tentang orang rekaan. Untuk tiap kasus, penasihat merekomendasikan sesuatu dan menjelaskan mengapa. Anda memberi tahu kami apa yang akan Anda lakukan. Itu saja sesinya.",
               )}
             </p>
             <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
@@ -125,30 +127,35 @@ export default function ParticipatePage() {
                 onClick={() => go(randomCondition(), "random")}
               >
                 <Dices data-icon="inline-start" />
-                {t("Start with a random style", "Mulai dengan gaya acak")}
+                {t("Start the study", "Mulai studinya")}
               </Button>
               <p className="max-w-md text-sm text-muted-foreground">
                 {t(
-                  "Random assignment is what makes the results comparable, so this is the option we recommend. It can also give you a control session with no explanation at all.",
-                  "Penetapan acak itulah yang membuat hasilnya dapat dibandingkan, jadi inilah opsi yang kami sarankan. Opsi ini juga bisa memberi Anda sesi kontrol tanpa penjelasan sama sekali.",
+                  "We pick the kind of explanation you will see. You do not need to choose anything. Some people get a session with no explanation at all, and that is a normal part of the study.",
+                  "Kami yang memilih jenis penjelasan yang akan Anda lihat. Anda tidak perlu memilih apa pun. Sebagian orang mendapat sesi tanpa penjelasan sama sekali, dan itu bagian normal dari studi.",
                 )}
               </p>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-          <div className="max-w-2xl space-y-3">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              {t("Or choose an explanation style yourself", "Atau pilih sendiri gaya penjelasannya")}
-            </h2>
-            <p className="text-muted-foreground">
-              {t(
-                "Every style below is one way of answering the same question: why this recommendation, and how much should you rely on it. Your choice is recorded as a choice, so it stays separable from the randomly assigned sessions.",
-                "Setiap gaya di bawah ini adalah satu cara menjawab pertanyaan yang sama: mengapa rekomendasi ini, dan seberapa besar Anda sebaiknya mengandalkannya. Pilihan Anda dicatat sebagai pilihan, sehingga tetap terpisah dari sesi yang ditetapkan secara acak.",
-              )}
-            </p>
-          </div>
+        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <details className="group rounded-[1.5rem] border border-border/70 bg-muted/30 p-5 sm:p-6">
+            <summary className="cursor-pointer list-none">
+              <span className="flex flex-wrap items-baseline justify-between gap-2">
+                <span className="text-lg font-semibold tracking-tight">
+                  {t("Prefer to choose the explanation style yourself?", "Ingin memilih sendiri gaya penjelasannya?")}
+                </span>
+                <span className="text-sm text-primary group-open:hidden">{t("Show the options", "Tampilkan pilihannya")}</span>
+              </span>
+              <span className="mt-1 block max-w-2xl text-sm text-muted-foreground">
+                {t(
+                  "Optional. The button above is the normal way in. If you choose a style here, we record that it was your choice and keep those sessions separate.",
+                  "Opsional. Tombol di atas adalah jalan masuk yang biasa. Jika Anda memilih gaya di sini, kami mencatat bahwa itu pilihan Anda dan memisahkan sesi tersebut.",
+                )}
+              </span>
+            </summary>
+          <div className="mt-2">
 
           {GROUPS.map((group) => (
             <div key={group.key} className="mt-9 space-y-4">
@@ -209,13 +216,15 @@ export default function ParticipatePage() {
             </div>
           ))}
 
-          <p className="mt-10 text-center text-sm text-muted-foreground">
+          </div>
+          </details>
+          <p className="mt-8 text-center text-sm text-muted-foreground">
             {t(
-              "The advisor itself, the neural network or the interpretable scorecard, is assigned at random either way. The session ends with a debrief that tells you which recommendations were deliberately flawed.",
-              "Penasihatnya sendiri, neural network atau scorecard interpretable, tetap ditetapkan secara acak. Sesi berakhir dengan debrief yang memberi tahu Anda rekomendasi mana yang sengaja dibuat keliru.",
+              "Either way, the session ends with a debrief that tells you which recommendations were deliberately wrong.",
+              "Bagaimanapun caranya, sesi berakhir dengan debrief yang memberi tahu Anda rekomendasi mana yang sengaja dibuat keliru.",
             )}{" "}
-            <Link href="/design" className="font-medium text-primary underline underline-offset-4">
-              {t("How the study is designed", "Bagaimana studi ini dirancang")}
+            <Link href="/about#researchers" className="font-medium text-primary underline underline-offset-4">
+              {t("Researchers: how the study is designed", "Peneliti: bagaimana studi ini dirancang")}
             </Link>
             .
           </p>

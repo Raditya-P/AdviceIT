@@ -24,7 +24,7 @@ import * as llm from "@/lib/llm";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import { answerFor, matchIntent, suggestedQuestions } from "@/lib/advisor/intents";
 import { tr, useLang } from "@/lib/i18n";
-import { Calculator, MessageSquareText } from "lucide-react";
+import { Calculator, MessageSquareText, TriangleAlert } from "lucide-react";
 import { ExplanationCard } from "./explanation-boxes";
 
 type Bubble = { role: "user" | "assistant"; text: string; computed?: boolean };
@@ -207,6 +207,12 @@ export function LlmChat({
                 <span className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary">
                   <Calculator className="size-3" aria-hidden />
                   {t("Computed by the advisor, not written by the model", "Dihitung oleh penasihat, bukan ditulis model")}
+                </span>
+              )}
+              {b.role === "assistant" && !b.computed && b.text && (
+                <span className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-amber-700">
+                  <TriangleAlert className="size-3" aria-hidden />
+                  {t("Written by a language model. It can be wrong, even when it sounds sure.", "Ditulis model bahasa. Bisa keliru, meski terdengar yakin.")}
                 </span>
               )}
             </div>

@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.5.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -91,7 +91,8 @@ The conversational delivery and the free-text reading run an open-weight languag
 
 | Route | What it is |
 | --- | --- |
-| `/` | Home: try the two advisors, why the research exists, the participate call to action. |
+| `/` | Home, written for participants: what this is, what it is not, how long it takes, two buttons. |
+| `/about` | Plain summary, the team and roles, and the doorway for researchers and reviewers. |
 | `/advisor/ml`, `/advisor/logit` | The advisor flow in three steps (explanation style, investor profile, recommendation), plus an optional response panel logged as `explore`. `?researcher=1` unlocks the flawed-advice scenario toggle, the suitability labels and the advisor comparison line. |
 | `/participate` | The seven explanation-style cards. The primary button assigns at random (logged as `random`), choosing a card is allowed (logged as `chosen`). |
 | `/study` | The full flow: consent, literacy questions, six trials (each one read the case, watch the analysis, judge the advice), attention check, exit questionnaire, debrief, completion code. Researcher links: `/study?cond=<preset>&pid=P07` or `/study?content=feature,confidence&form=interactive`. |
@@ -226,6 +227,22 @@ AdviceIT/
 **3. Smoke-test.** Open the home page, try both advisors, run a full session from `/participate`, then check the row count on `/researcher` with the key.
 
 Locally, put the same two variables in `.env.local`, which is gitignored and must never be committed.
+
+## Security model
+
+What each gate does, so nobody mistakes a convenience for a control.
+
+| Surface | What it exposes | How it is protected |
+| --- | --- | --- |
+| `POST /api/responses` | Accepts anonymous study rows | Key whitelist on every field, strings capped, participant ids pattern-checked, 50 rows and 256 KB per request, 60 requests per 10 minutes per IP (best effort, per instance), no data returned |
+| `GET /api/responses` | Every collected row | `RESEARCHER_KEY`, compared in constant time. Responses are `no-store` |
+| `?researcher=1` on the advisor pages | The flawed-advice toggle, suitability labels and advisor comparison. No data | Unlocks only after the dashboard has validated the key in the same browser session. The parameter alone does nothing |
+| `/researcher` | The dashboard | Needs the key for every fetch |
+
+Two honest limits. The rate limiter lives in memory, so it resets per serverless instance and is a brake,
+not a wall: the payload and row caps are what bound the cost. And the key is only as strong as the
+string you choose. Use a long random one in Vercel, and rotate it if it has ever been typed into a
+chat or a screenshot.
 
 ## Data
 

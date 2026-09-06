@@ -3,6 +3,44 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.6.0 (2026-09-06)
+
+Fifteen points of feedback from the team's QA review, applied.
+
+### Changed
+
+- **Participants first.** The home page now speaks to a participant: the headline is followed at once by
+  "this is a research simulation, not a financial service", the facts strip (about 15 minutes, anonymous,
+  no account, no real money) sits under it, and the two paths are one button each. The accuracy numbers,
+  the feature cards and the Shapley, calibration and WebLLM vocabulary are gone from the front page.
+- **Researchers one click deeper.** New `/about` page: what the site is in plain words, the team and each
+  person's role, where the work comes from, and a "for researchers and reviewers" doorway to the design,
+  the data, the references, the dashboard and the code. The header now reads Try the advisor, About, For
+  researchers. The footer separates participant links from researcher links. `/design` opens with a note
+  saying who it is for.
+- **Taking part is one path.** The participate page's button is "Start the study" with "we pick the kind of
+  explanation you will see". Choosing a style yourself is inside a collapsed panel marked optional.
+- **Accuracy figures carry their context** everywhere, in one format: "88.8% cross-validated accuracy on
+  400 expert-reviewed synthetic cases", never a rounded 89. The training-accuracy row on the data page is
+  labelled as training accuracy and says why it is higher. The confidence figure in the home preview is
+  labelled as the advisor's confidence, not a return.
+- **Training data page opens with a summary.** The distributions and headline figures show first. The
+  full results table and the 400-case browser sit behind disclosures.
+- **Model-written chat answers are labelled** as written by a language model that can be wrong, the mirror
+  of the "computed by the advisor" label on routed answers.
+- **Team credit.** The About page states the roles: Raditya Pratama, lead developer and research design.
+  Fausta Irsyad Ramadhan, AI ecosystem and core resources. Muhammad Wahyudi Wicaksono, quality assurance
+  and research validation.
+
+### Security
+
+- `?researcher=1` no longer unlocks anything on its own. The researcher controls on the advisor pages
+  open only after the dashboard has validated the key in the same browser session.
+- The collector rate-limits by IP (best effort, per instance), caps the payload at 256 KB, pattern-checks
+  participant ids, compares the researcher key in constant time, and marks every response `no-store`.
+  `GET ?check=1` validates the key without returning data. The README documents the security model and
+  its limits.
+
 ## 2.5.0 (2026-08-27)
 
 ### Added

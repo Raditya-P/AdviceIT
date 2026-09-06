@@ -10,20 +10,21 @@ export function SiteFooter() {
   const t = (en: string, id: string) => tr(locale, { en, id });
   const COLUMNS = [
     {
-      title: t("Try the advisors", "Coba penasihatnya"),
+      title: t("For participants", "Untuk peserta"),
       links: [
-        { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
-        { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat interpretable") },
-        { href: "/training-data", label: t("Training data", "Data pelatihan") },
+        { href: "/participate", label: t("Take part", "Ikut serta") },
+        { href: "/advisor/ml", label: t("Try the AI advisor", "Coba penasihat AI") },
+        { href: "/advisor/logit", label: t("Try the interpretable advisor", "Coba penasihat interpretable") },
+        { href: "/privacy", label: t("Privacy and consent", "Privasi dan persetujuan") },
       ],
     },
     {
-      title: t("The research", "Penelitiannya"),
+      title: t("For researchers", "Untuk peneliti"),
       links: [
-        { href: "/participate", label: t("Take part", "Ikut serta") },
+        { href: "/about", label: t("About and team", "Tentang dan tim") },
         { href: "/design", label: t("Study design", "Rancangan studi") },
+        { href: "/training-data", label: t("Training data and models", "Data pelatihan dan model") },
         { href: "/references", label: t("References", "Referensi") },
-        { href: "/privacy", label: t("Privacy and consent", "Privasi dan persetujuan") },
       ],
     },
   ];
@@ -35,8 +36,8 @@ export function SiteFooter() {
             <p className="text-base font-semibold tracking-tight">AdviceIT</p>
             <p className="max-w-xs text-sm text-muted-foreground">
               {t(
-                "A research instrument for explainable AI in financial advice. Nothing here is real financial advice.",
-                "Instrumen penelitian untuk AI yang dapat dijelaskan dalam saran keuangan. Tidak ada saran keuangan sungguhan di sini.",
+                "A research simulation about explaining AI investment advice, built by a team of three. Nothing here is real financial advice.",
+                "Simulasi penelitian tentang menjelaskan saran investasi AI, dibangun tim beranggotakan tiga orang. Tidak ada saran keuangan sungguhan di sini.",
               )}
             </p>
           </div>
@@ -56,10 +57,10 @@ export function SiteFooter() {
           ))}
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              {t("For researchers", "Untuk peneliti")}
+              {t("Data access", "Akses data")}
             </p>
             <Button asChild variant="outline" size="sm" className="rounded-full">
-              <Link href="/researcher">{t("Researcher mode", "Mode peneliti")}</Link>
+              <Link href="/researcher">{t("Researcher dashboard", "Dasbor peneliti")}</Link>
             </Button>
           </div>
         </div>

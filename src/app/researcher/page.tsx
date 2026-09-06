@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SiteFooter } from "@/components/site-footer";
 import { PageHero } from "@/components/page-hero";
+import { grantResearcherAccess } from "@/lib/researcher";
 import { SiteHeader } from "@/components/site-header";
 import {
   CONDITION_LABELS,
@@ -52,7 +53,8 @@ export default function ResearcherPage() {
       }
       const data = await res.json();
       setRows(data.rows || []);
-      setStatus(`${data.count} rows fetched.`);
+      grantResearcherAccess();
+      setStatus(`${data.count} rows fetched. Researcher controls on the advisor pages are unlocked for this browser session.`);
     } catch {
       setStatus("Could not reach the API.");
     } finally {

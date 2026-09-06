@@ -6,7 +6,7 @@
    unlocks the scenario toggle, the labels and comparison line, the ILS-Bench
    case loader and the example dropdown. */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, GraduationCap, Pencil, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { labelValue } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import { modalityOf, presetFor, presetLabel, specFor, type ContentPart, type Form, type Modality } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
+import { accuracyPhrase } from "@/lib/format";
+import { hasResearcherAccess } from "@/lib/researcher";
 import { Analyzing } from "./analyzing";
 import { ExplanationArea } from "./explanation-area";
 import { OutcomeGuide } from "./outcome-guide";
@@ -30,15 +32,28 @@ type Step = "style" | "profile" | "analyzing" | "result";
 function advisorDescription(advisorId: "ml" | "logit", locale: "en" | "id") {
   if (locale === "en") return ADVISORS[advisorId].description;
   if (advisorId === "ml") {
-    return `Neural network yang dilatih pada ILS-Bench, ${mlMeta.cases} kasus tervalidasi ahli, akurasi validasi silang ${Math.round(mlMeta.cvAccuracy * 100)} persen pada enam hasil termasuk Tinjauan manusia. Bobotnya tidak terbaca, sehingga penjelasan dihitung setelah keputusan.`;
+    return `Neural network yang dilatih pada ILS-Bench: ${accuracyPhrase(mlMeta.cvAccuracy, mlMeta.cases, "id")}, pada enam hasil termasuk Tinjauan manusia. Bobotnya tidak terbaca, sehingga penjelasan dihitung setelah keputusan.`;
   }
-  return `Scorecard yang dipaskan pada data yang sama dengan regresi logistik multinomial, akurasi validasi silang ${Math.round((logitMeta.cvAccuracy as number) * 100)} persen. Satu bobot per input dan hasil, semua bobot terbaca, penjelasan eksak.`;
+  return `Scorecard yang dipaskan pada data yang sama dengan regresi logistik multinomial: ${accuracyPhrase(logitMeta.cvAccuracy as number, mlMeta.cases, "id")}. Satu bobot per input dan hasil, semua bobot terbaca, penjelasan eksak.`;
 }
 
-export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit"; researcher: boolean }) {
+export function Playground({
+  advisorId,
+  researcher: researcherRequested,
+}: {
+  advisorId: "ml" | "logit";
+  researcher: boolean;
+}) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const advisor = ADVISORS[advisorId];
+  /* ?researcher=1 only asks. The controls unlock when the dashboard has
+     validated the key in this browser session. Read in an effect, because
+     sessionStorage does not exist during server rendering. */
+  const [researcher, setResearcher] = useState(false);
+  useEffect(() => {
+    setResearcher(researcherRequested && hasResearcherAccess());
+  }, [researcherRequested]);
   const [step, setStep] = useState<Step>("style");
   const [profile, setProfile] = useState<FormProfile>(DEFAULT_PROFILE);
   const [preset, setPreset] = useState<string>("feature");
@@ -103,6 +118,17 @@ export function Playground({ advisorId, researcher }: { advisorId: "ml" | "logit
           </Link>
         </div>
         <p className="max-w-3xl leading-relaxed text-muted-foreground">{advisorDescription(advisorId, locale)}</p>
+        {researcherRequested && !researcher && (
+          <p className="rounded-xl border border-border/70 bg-muted/40 px-4 py-2.5 text-sm text-muted-foreground">
+            {t(
+              "Researcher controls are locked. Open the researcher dashboard, enter the key once, then return to this page.",
+              "Kontrol peneliti terkunci. Buka dasbor peneliti, masukkan kuncinya sekali, lalu kembali ke halaman ini.",
+            )}{" "}
+            <Link href="/researcher" className="font-medium text-primary underline underline-offset-4">
+              {t("Researcher dashboard", "Dasbor peneliti")}
+            </Link>
+          </p>
+        )}
         {advisorId === "logit" && (
           <div className="pt-2">
             <ScorecardTable />

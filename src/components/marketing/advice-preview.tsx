@@ -47,9 +47,15 @@ export function AdvicePreview() {
             </p>
             <p className="mt-1 text-3xl font-semibold tracking-tight">{outcomeName(result.portfolio.name)}</p>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground">
+          <div
+            className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground"
+            title={t(
+              "The advisor's calibrated confidence in this outcome. Not an expected return.",
+              "Keyakinan terkalibrasi penasihat pada hasil ini. Bukan imbal hasil yang diharapkan.",
+            )}
+          >
             <ShieldCheck className="size-4" aria-hidden />
-            {pct}%
+            <span className="text-xs font-normal text-muted-foreground">{t("confidence", "keyakinan")}</span> {pct}%
           </div>
         </div>
 

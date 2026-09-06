@@ -12,11 +12,9 @@ export function SiteHeader() {
   const pathname = usePathname();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const NAV = [
-    { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
-    { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat interpretable") },
-    { href: "/training-data", label: t("Training data", "Data pelatihan") },
-    { href: "/design", label: t("Study design", "Rancangan studi") },
-    { href: "/references", label: t("References", "Referensi") },
+    { href: "/advisor/ml", label: t("Try the advisor", "Coba penasihatnya") },
+    { href: "/about", label: t("About", "Tentang") },
+    { href: "/about#researchers", label: t("For researchers", "Untuk peneliti") },
   ];
   const toggle = () => {
     setLocale(locale === "en" ? "id" : "en");
@@ -33,7 +31,7 @@ export function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((item) => {
-            const active = pathname === item.href;
+            const active = pathname === item.href.split("#")[0] && !item.href.includes("#");
             return (
               <Link
                 key={item.href}

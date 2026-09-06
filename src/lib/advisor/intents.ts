@@ -28,6 +28,7 @@ import {
 } from "./explanations";
 import type { AdvisorResult } from "./types";
 import { ADVISORS, mlMeta, logitMeta } from "./advisors";
+import { accuracyPhrase } from "@/lib/format";
 
 export type Intent = "why" | "change" | "confidence" | "whyNot" | "how" | "input" | "escalation" | "asset";
 
@@ -193,12 +194,11 @@ export function answerFor(
     }
     case "how": {
       const meta = result.advisor === "ml" ? mlMeta : logitMeta;
-      const cv = Math.round((meta.cvAccuracy as number) * 100);
       const name = result.advisor === "ml" ? ADVISORS.ml.name : ADVISORS.logit.name;
       return pick(
         locale,
-        `I am the ${name.toLowerCase()}. I was trained on ILS-Bench, ${mlMeta.cases} investor cases whose labels were agreed by a panel of four financial experts, and I score ${cv} percent in cross-validation on six outcomes including Human review. The Training data page shows the dataset, the results and every case.`,
-        `Saya adalah ${name.toLowerCase()}. Saya dilatih pada ILS-Bench, ${mlMeta.cases} kasus investor yang labelnya disepakati panel empat ahli keuangan, dan akurasi validasi silang saya ${cv} persen pada enam hasil termasuk Tinjauan manusia. Halaman Data pelatihan menampilkan datasetnya, hasilnya, dan setiap kasus.`,
+        `I am the ${name.toLowerCase()}. I was trained on ILS-Bench, ${mlMeta.cases} investor cases whose labels were agreed by a panel of four financial experts, and I reach ${accuracyPhrase(meta.cvAccuracy as number, mlMeta.cases)} across six outcomes including Human review. That is a benchmark figure, not a real-world one. The Training data page shows the dataset, the results and every case.`,
+        `Saya adalah ${name.toLowerCase()}. Saya dilatih pada ILS-Bench, ${mlMeta.cases} kasus investor yang labelnya disepakati panel empat ahli keuangan, dan saya mencapai ${accuracyPhrase(meta.cvAccuracy as number, mlMeta.cases, "id")} pada enam hasil termasuk Tinjauan manusia. Itu angka benchmark, bukan angka dunia nyata. Halaman Data pelatihan menampilkan datasetnya, hasilnya, dan setiap kasus.`,
       );
     }
     case "input": {

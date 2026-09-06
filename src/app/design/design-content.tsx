@@ -122,6 +122,15 @@ export function DesignContent() {
         />
 
         <div className="mx-auto max-w-5xl space-y-12 px-4 py-14 sm:px-6">
+          <p className="rounded-2xl border border-border/70 bg-muted/40 px-5 py-4 text-sm text-muted-foreground">
+            {t(
+              "This page is written for researchers and reviewers. If you are taking part in the study, you do not need any of it: the participate page tells you everything you need.",
+              "Halaman ini ditulis untuk peneliti dan reviewer. Jika Anda ikut serta dalam studi, Anda tidak membutuhkan semua ini: halaman ikut serta sudah memberi tahu semua yang Anda perlukan.",
+            )}{" "}
+            <Link href="/participate" className="font-medium text-primary underline underline-offset-4">
+              {t("Take part", "Ikut serta")}
+            </Link>
+          </p>
           {/* 1. Two factors */}
           <section className="space-y-5">
             <h2 className="text-2xl font-semibold tracking-tight">

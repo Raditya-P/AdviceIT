@@ -337,13 +337,13 @@ export const ADVISORS: Record<"ml" | "logit", Advisor> = {
   ml: {
     id: "ml",
     name: "AI advisor",
-    description: `A neural network trained on ILS-Bench, ${(W.meta as { cases?: number }).cases} expert-validated cases, ${Math.round((W.meta as { cvAccuracy: number }).cvAccuracy * 100)} percent cross-validated accuracy over six outcomes including Human review. Its weights are not readable, so explanations are computed post hoc.`,
+    description: `A neural network trained on ILS-Bench: ${((W.meta as { cvAccuracy: number }).cvAccuracy * 100).toFixed(1)}% cross-validated accuracy on ${(W.meta as { cases?: number }).cases} expert-reviewed synthetic cases, over six outcomes including Human review. Its weights are not readable, so explanations are computed post hoc.`,
     recommend: mlRecommend,
   },
   logit: {
     id: "logit",
     name: "Interpretable rule-based advisor",
-    description: `A scorecard fitted on the same data by multinomial logistic regression, ${Math.round(W.logit.meta.cvAccuracy * 100)} percent cross-validated accuracy. One weight per input and outcome, every weight readable, explanations exact.`,
+    description: `A scorecard fitted on the same data by multinomial logistic regression: ${(W.logit.meta.cvAccuracy * 100).toFixed(1)}% cross-validated accuracy on the same ${(W.meta as { cases?: number }).cases} cases. One weight per input and outcome, every weight readable, explanations exact.`,
     recommend: logitRecommend,
   },
 };

@@ -122,7 +122,16 @@ export default async function TrainingDataPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <div className="overflow-x-auto">
+                <p>
+                  {locale === "id"
+                    ? `Penasihat AI: akurasi validasi silang ${pct(mlMeta.cvAccuracy)} pada ${total} kasus sintetis yang ditinjau ahli. Penasihat interpretable: ${pct(logitMeta.cvAccuracy)} pada kasus yang sama. Itu angka benchmark pada satu dataset kecil, bukan akurasi dunia nyata.`
+                    : `AI advisor: ${pct(mlMeta.cvAccuracy)} cross-validated accuracy on ${total} expert-reviewed synthetic cases. Interpretable advisor: ${pct(logitMeta.cvAccuracy)} on the same cases. These are benchmark figures on one small dataset, not real-world accuracy.`}
+                </p>
+                <details className="rounded-xl border border-border/70 px-3 py-2">
+                <summary className="cursor-pointer text-sm font-medium text-primary">
+                  {t("Full results table", "Tabel hasil lengkap")}
+                </summary>
+                <div className="mt-2 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -154,7 +163,10 @@ export default async function TrainingDataPage() {
                       </TableRow>
                       <TableRow>
                         <TableCell className="font-medium">
-                          {t("Training accuracy, reproduced in the browser", "Akurasi pelatihan, direproduksi di browser")}
+                          {t(
+                            "Model training accuracy (on the cases it was trained on, so higher than cross-validation)",
+                            "Akurasi pelatihan model (pada kasus yang dipakai melatihnya, sehingga lebih tinggi dari validasi silang)",
+                          )}
                         </TableCell>
                         <TableCell>{pct(mlMeta.trainAccuracy)}</TableCell>
                         <TableCell>{pct(logitMeta.trainAccuracy)}</TableCell>
@@ -172,6 +184,7 @@ export default async function TrainingDataPage() {
                     </TableBody>
                   </Table>
                 </div>
+                </details>
                 <p className="text-xs text-muted-foreground">
                   {t(
                     `Reference points from the same file (context, not advisors): always guessing the most common outcome ${pct(mlMeta.majorityBaselineAccuracy)}, memorising the most common outcome per label combination (a lookup table, not the interpretable advisor: the advisor is a fitted scorecard with readable weights and calibrated probabilities) ${pct(mlMeta.lookupBaselineAccuracy)}, the author's draft labels ${pct(mlMeta.authorAgreementWithConsensus)}. Both advisors are trained by the seeded numpy script in the repository, and the browser inference reproduces the Python training accuracy exactly.`,
@@ -188,7 +201,17 @@ export default async function TrainingDataPage() {
             </Card>
           </div>
 
-          <CasesBrowser />
+          <details className="group rounded-[1.5rem] border border-border/70 bg-muted/30 p-5 sm:p-6">
+            <summary className="flex cursor-pointer list-none flex-wrap items-baseline justify-between gap-2">
+              <span className="text-lg font-semibold tracking-tight">
+                {t("Browse all 400 cases", "Jelajahi seluruh 400 kasus")}
+              </span>
+              <span className="text-sm text-primary group-open:hidden">{t("Open the browser", "Buka penjelajahnya")}</span>
+            </summary>
+            <div className="mt-4">
+              <CasesBrowser />
+            </div>
+          </details>
         </div>
       </main>
       <SiteFooter />
