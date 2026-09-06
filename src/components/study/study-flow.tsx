@@ -22,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { ADVISORS } from "@/lib/advisor/advisors";
 import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
@@ -53,7 +52,7 @@ import { ExplanationArea } from "@/components/advisor/explanation-area";
 import { RecommendationCard, advisorDisplayName } from "@/components/advisor/recommendation-card";
 import { Analyzing } from "@/components/advisor/analyzing";
 import { Seg } from "@/components/advisor/profile-form";
-import { RatingSlider } from "@/components/rating-slider";
+import { RatingScale } from "@/components/rating-scale";
 import { LikertRow } from "./likert";
 
 type Stage = "consent" | "literacy" | "characteristics" | "trial" | "exit" | "debrief" | "done";
@@ -438,12 +437,14 @@ function TrialStage({
   const caseShownAt = useRef(0);
   const caseReadMs = useRef(0);
   const displayedAt = useRef(0);
-  const [trust, setTrust] = useState(4);
+  const [trust, setTrust] = useState<number | null>(null);
   const [decision, setDecision] = useState("");
   const [adjustedTo, setAdjustedTo] = useState("");
-  const [understanding, setUnderstanding] = useState(4);
-  const [decisionConfidence, setDecisionConfidence] = useState(4);
-  const [mentalDemand, setMentalDemand] = useState(4);
+  const [understanding, setUnderstanding] = useState<number | null>(null);
+  const [decisionConfidence, setDecisionConfidence] = useState<number | null>(null);
+  const [mentalDemand, setMentalDemand] = useState<number | null>(null);
+  /* Set after a failed submit, so unanswered ratings light up. */
+  const [missing, setMissing] = useState(false);
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -482,6 +483,12 @@ function TrialStage({
       setError(t("Please choose which portfolio you would adjust to.", "Silakan pilih portofolio tujuan penyesuaian Anda."));
       return;
     }
+    if (trust === null || understanding === null || decisionConfidence === null || mentalDemand === null) {
+      setMissing(true);
+      setError(t("Please answer all four rating questions.", "Mohon jawab keempat pertanyaan penilaian."));
+      return;
+    }
+    setMissing(false);
     setError("");
     setBusy(true);
     const p = result.profile;
@@ -509,13 +516,13 @@ function TrialStage({
       score: result.score,
       margin: result.margin,
       confidence: result.confidence,
-      trustRating: trust,
+      trustRating: trust as number,
       decision,
       adjustedTo,
       adjustSteps: adjustedTo && shownIdx >= 0 && adjIdx >= 0 ? adjIdx - shownIdx : "",
-      understanding,
-      decisionConfidence,
-      mentalDemand,
+      understanding: understanding as number,
+      decisionConfidence: decisionConfidence as number,
+      mentalDemand: mentalDemand as number,
       reason: reason.trim().slice(0, 2000),
       whatIfMoves: assignment.form === "interactive" ? whatIfMoves : "",
       whyNotAsked: assignment.form === "interactive" ? whyNotAsked : "",
@@ -665,16 +672,15 @@ function TrialStage({
               </AlertDescription>
             </Alert>
           )}
-          <div className="space-y-1.5">
-            <Label>
-              {t("How much do you trust this recommendation?", "Seberapa besar Anda memercayai rekomendasi ini?")}{" "}
-              <span className="tabular-nums text-primary">{trust}</span> {t("of", "dari")} 7
-            </Label>
-            <Slider min={1} max={7} step={1} value={[trust]} onValueChange={(v: number[]) => setTrust(v[0])} aria-label={t("Trust rating", "Penilaian kepercayaan")} />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{t("1, not at all", "1, tidak sama sekali")}</span>
-              <span>{t("7, completely", "7, sepenuhnya")}</span>
-            </div>
+          <div className="space-y-5">
+            <RatingScale
+              label={t("How much do you trust this recommendation?", "Seberapa besar Anda memercayai rekomendasi ini?")}
+              value={trust}
+              onChange={setTrust}
+              low={t("1, not at all", "1, tidak sama sekali")}
+              high={t("7, completely", "7, sepenuhnya")}
+              invalid={missing && trust === null}
+            />
           </div>
           <div className="space-y-1.5">
             <Label>{t("Would you follow this advice?", "Apakah Anda akan mengikuti saran ini?")}</Label>
@@ -708,38 +714,39 @@ function TrialStage({
             )}
           </div>
 
-          <details className="rounded-lg border px-3 py-2 text-sm">
-            <summary className="cursor-pointer font-medium text-primary">
-              {t("A few more questions about this decision", "Beberapa pertanyaan lagi tentang keputusan ini")}
-            </summary>
-            <div className="mt-3 space-y-4">
-              <RatingSlider
-                label={t("How well do you understand why this advice was given?", "Seberapa baik Anda memahami mengapa saran ini diberikan?")}
-                value={understanding}
-                onChange={setUnderstanding}
-                low={t("1, not at all", "1, tidak sama sekali")}
-                high={t("7, completely", "7, sepenuhnya")}
-              />
-              <RatingSlider
-                label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan Anda?")}
-                value={decisionConfidence}
-                onChange={setDecisionConfidence}
-                low={t("1, not at all", "1, tidak sama sekali")}
-                high={t("7, completely", "7, sepenuhnya")}
-              />
-              <RatingSlider
-                label={t("How mentally demanding was this decision?", "Seberapa menuntut secara mental keputusan ini?")}
-                value={mentalDemand}
-                onChange={setMentalDemand}
-                low={t("1, very low", "1, sangat rendah")}
-                high={t("7, very high", "7, sangat tinggi")}
-              />
-              <div className="space-y-1.5">
-                <Label htmlFor="reason">{t("Why did you decide this? (optional)", "Mengapa Anda memutuskan demikian? (opsional)")}</Label>
-                <Textarea id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("In your own words", "Dengan kata-kata Anda sendiri")} />
-              </div>
+          <div className="space-y-5 border-t border-border/70 pt-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              {t("About this decision", "Tentang keputusan ini")}
+            </p>
+            <RatingScale
+              label={t("How well do you understand why this advice was given?", "Seberapa baik Anda memahami mengapa saran ini diberikan?")}
+              value={understanding}
+              onChange={setUnderstanding}
+              low={t("1, not at all", "1, tidak sama sekali")}
+              high={t("7, completely", "7, sepenuhnya")}
+              invalid={missing && understanding === null}
+            />
+            <RatingScale
+              label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan Anda?")}
+              value={decisionConfidence}
+              onChange={setDecisionConfidence}
+              low={t("1, not at all", "1, tidak sama sekali")}
+              high={t("7, completely", "7, sepenuhnya")}
+              invalid={missing && decisionConfidence === null}
+            />
+            <RatingScale
+              label={t("How mentally demanding was this decision?", "Seberapa menuntut secara mental keputusan ini?")}
+              value={mentalDemand}
+              onChange={setMentalDemand}
+              low={t("1, very low", "1, sangat rendah")}
+              high={t("7, very high", "7, sangat tinggi")}
+              invalid={missing && mentalDemand === null}
+            />
+            <div className="space-y-1.5">
+              <Label htmlFor="reason">{t("Why did you decide this? (optional)", "Mengapa Anda memutuskan demikian? (opsional)")}</Label>
+              <Textarea id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("In your own words", "Dengan kata-kata Anda sendiri")} />
             </div>
-          </details>
+          </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button onClick={submit} disabled={busy} size="lg" className="h-11 rounded-full px-6">

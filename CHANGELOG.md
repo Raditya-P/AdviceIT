@@ -3,6 +3,24 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.8.2 (2026-09-06)
+
+### Changed
+
+- **The four response ratings are required, and they are buttons now.** Trust, understanding, decision
+  confidence and mental demand are a row of seven large buttons each, always visible, and a submit with
+  any of them unanswered is refused with the missing ones highlighted. The collapsed "a few more
+  questions" panel is gone. A slider always shows a value, so a required slider would have logged untouched
+  4s as answers; a button row can be genuinely blank until the person chooses. The free-text reason stays
+  optional. Applies to study trials and to the try-out response panel alike.
+- The sliders that remain (investment horizon, the what-if controls) have a thumb twice the size, a thicker
+  track and a larger hit area.
+
+### Note for the analysis
+
+Rows collected before 2.8.2 have ratings that default to 4 when untouched. Rows from 2.8.2 on have no
+default. Treat the two as separate batches if the pilot straddles the change.
+
 ## 2.8.1 (2026-09-06)
 
 ### Changed
