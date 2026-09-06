@@ -3,6 +3,14 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.9.1 (2026-09-06)
+
+### Changed
+
+- The home page's explanations section is back to the four-card "Four ways to ask why" version from
+  2.8.1. The split into content and delivery introduced in 2.8.3 is undone on the home page. The colour
+  key on the outcomes section stays.
+
 ## 2.9.0 (2026-09-06)
 
 Gap audit of the site and the code.

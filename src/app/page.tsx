@@ -12,13 +12,10 @@ import {
   BarChart3,
   Clock3,
   Cpu,
-  FileText,
   Gauge,
-  GraduationCap,
   Lock,
   MessageSquareText,
   Shuffle,
-  SlidersHorizontal,
   UserRound,
   Wallet,
 } from "lucide-react";
@@ -91,7 +88,7 @@ export default function HomePage() {
     },
   ];
 
-  const CONTENTS = [
+  const STYLES = [
     {
       icon: BarChart3,
       title: t("Why", "Mengapa"),
@@ -107,28 +104,10 @@ export default function HomePage() {
       title: t("How sure", "Seberapa yakin"),
       text: t("The advisor's confidence, with every other outcome shown beside it.", "Keyakinan penasihat, dengan setiap hasil lain ditampilkan di sampingnya."),
     },
-  ];
-
-  const DELIVERIES = [
-    {
-      icon: FileText,
-      title: t("Static", "Statis"),
-      text: t("A panel you read as it is.", "Sebuah panel yang Anda baca apa adanya."),
-    },
-    {
-      icon: SlidersHorizontal,
-      title: t("Interactive", "Interaktif"),
-      text: t("Move the inputs yourself and watch the advice react.", "Geser sendiri inputnya dan lihat sarannya bereaksi."),
-    },
-    {
-      icon: GraduationCap,
-      title: t("Adaptive", "Adaptif"),
-      text: t("Plain sentences or the detailed version, matched to your financial literacy.", "Kalimat sederhana atau versi rinci, disesuaikan dengan literasi keuangan Anda."),
-    },
     {
       icon: MessageSquareText,
-      title: t("Conversational", "Percakapan"),
-      text: t("Ask questions and get answers grounded in the same numbers.", "Ajukan pertanyaan dan dapatkan jawaban yang berpijak pada angka yang sama."),
+      title: t("Ask it", "Tanyakan"),
+      text: t("A conversation about the recommendation, grounded in the same numbers.", "Percakapan tentang rekomendasi, berpijak pada angka yang sama."),
     },
   ];
 
@@ -325,50 +304,22 @@ export default function HomePage() {
                 {t("Explanations", "Penjelasan")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("What it explains, and how", "Apa yang dijelaskannya, dan bagaimana")}
+                {t("Four ways to ask why", "Empat cara bertanya mengapa")}
               </h2>
               <p className="text-muted-foreground">
-                {t(
-                  "An explanation has two parts: what is being explained, and the way it reaches you. Pick either on the advisor page. Every version is computed from the advisor's own numbers.",
-                  "Sebuah penjelasan punya dua bagian: apa yang dijelaskan, dan cara penjelasan itu sampai kepada Anda. Pilih keduanya di halaman penasihat. Setiap versi dihitung dari angka penasihat sendiri.",
-                )}
+                {t("Pick any of them on the advisor page. Each is computed from the advisor's own numbers.", "Pilih salah satunya di halaman penasihat. Masing-masing dihitung dari angka penasihat sendiri.")}
               </p>
             </div>
-
-            <div className="mt-10 space-y-10">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  {t("What it explains", "Apa yang dijelaskan")}
-                </p>
-                <div className="mt-4 grid gap-5 sm:grid-cols-3">
-                  {CONTENTS.map((c) => (
-                    <article key={c.title} className="panel lift p-6">
-                      <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <c.icon className="size-5" aria-hidden />
-                      </span>
-                      <h3 className="mt-4 font-semibold tracking-tight">{c.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.text}</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  {t("How it reaches you", "Bagaimana sampainya kepada Anda")}
-                </p>
-                <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                  {DELIVERIES.map((d) => (
-                    <article key={d.title} className="panel lift p-6">
-                      <span className="flex size-10 items-center justify-center rounded-xl bg-bonds/15 text-bonds">
-                        <d.icon className="size-5" aria-hidden />
-                      </span>
-                      <h3 className="mt-4 font-semibold tracking-tight">{d.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.text}</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {STYLES.map((s) => (
+                <article key={s.title} className="panel lift p-6">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <s.icon className="size-5" aria-hidden />
+                  </span>
+                  <h3 className="mt-4 font-semibold tracking-tight">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
