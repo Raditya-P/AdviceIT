@@ -78,10 +78,11 @@ export function AdvicePreview() {
                   {d.label}: <span className="text-foreground">{d.valueText}</span>
                 </span>
                 <span
-                  className={`shrink-0 tabular-nums font-medium ${d.points >= 0 ? "text-primary" : "text-muted-foreground"}`}
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                    d.points >= 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                  }`}
                 >
-                  {d.points >= 0 ? "+" : ""}
-                  {d.points}
+                  {d.points >= 0 ? t("supports it", "mendukungnya") : t("weighs against it", "melawannya")}
                 </span>
               </li>
             ))}

@@ -114,7 +114,7 @@ export function AboutContent() {
 
         <div className="mx-auto max-w-4xl space-y-14 px-4 py-14 sm:px-6">
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">{t("In plain words", "Dengan kata sederhana")}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("What AdviceIT is", "Apa itu AdviceIT")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
                 "The site has a working AI advisor that recommends an investment mix for a made-up person. It also has several ways of explaining that recommendation. People who take part read six short cases, see the advisor's recommendation with one kind of explanation, and say what they would do. Half of the recommendations are deliberately wrong, and the study measures whether the explanation helped people notice.",
@@ -160,12 +160,12 @@ export function AboutContent() {
                 {t("For researchers and reviewers", "Untuk peneliti dan reviewer")}
               </p>
               <h2 className="text-2xl font-semibold tracking-tight">
-                {t("Everything technical lives here", "Semua yang teknis ada di sini")}
+                {t("Design, data and methods", "Rancangan, data, dan metode")}
               </h2>
               <p className="leading-relaxed text-muted-foreground">
                 {t(
-                  "The participant-facing pages are kept deliberately plain. The design rationale, the dataset, the model results, the references and the collected data are all published, one page each.",
-                  "Halaman yang menghadap peserta sengaja dibuat sederhana. Rasional rancangan, dataset, hasil model, referensi, dan data yang terkumpul semuanya dipublikasikan, masing-masing satu halaman.",
+                  "The study design, the training data, the model results, the references and the collected responses are each published on their own page.",
+                  "Rancangan studi, data pelatihan, hasil model, referensi, dan respons yang terkumpul masing-masing dipublikasikan di halamannya sendiri.",
                 )}
               </p>
             </div>
@@ -194,9 +194,9 @@ export function AboutContent() {
           </section>
 
           <section className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">{t("Taking part is the point", "Ikut serta adalah intinya")}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("Take part in the study", "Ikut serta dalam studi")}</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              {t("About fifteen minutes, anonymous, no real money.", "Sekitar lima belas menit, anonim, tanpa uang sungguhan.")}
+              {t("About fifteen minutes, anonymous, and no real money involved.", "Sekitar lima belas menit, anonim, dan tanpa uang sungguhan.")}
             </p>
             <Button asChild className="mt-5 h-11 rounded-full px-6">
               <Link href="/participate">

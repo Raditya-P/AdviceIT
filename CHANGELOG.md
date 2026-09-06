@@ -3,6 +3,16 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.6.2 (2026-09-06)
+
+### Changed
+
+- Copy pass for tone. The "Why this matters" section on the home page is rewritten as a two-column
+  argument in three short paragraphs, with a heading that states the point rather than a slogan. Section
+  headings across the home and About pages are plainer: "What a session looks like", "Design, data and
+  methods", "Take part in the study". The home preview no longer prints raw attribution points beside the
+  drivers, it says whether each one supports the recommendation or weighs against it.
+
 ## 2.6.1 (2026-09-06)
 
 ### Added
