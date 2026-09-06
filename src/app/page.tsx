@@ -12,22 +12,25 @@ import {
   BarChart3,
   Clock3,
   Cpu,
+  FileText,
   Gauge,
+  GraduationCap,
   Lock,
   MessageSquareText,
   Shuffle,
+  SlidersHorizontal,
   UserRound,
   Wallet,
 } from "lucide-react";
-import { AllocationBar } from "@/components/allocation-bar";
+import { ASSET_COLOR, AllocationBar } from "@/components/allocation-bar";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { AdvicePreview } from "@/components/marketing/advice-preview";
 import { mlRecommend, scorecard } from "@/lib/advisor/advisors";
 import { featureExplanation } from "@/lib/advisor/explanations";
-import { PORTFOLIOS } from "@/lib/advisor/model";
-import { labelValue, outcomeName, outcomeSummary } from "@/lib/advisor/strings";
+import { ASSET_CLASSES, PORTFOLIOS } from "@/lib/advisor/model";
+import { assetLabel, labelValue, outcomeName, outcomeSummary } from "@/lib/advisor/strings";
 import { tr, useLang } from "@/lib/i18n";
 
 const EXAMPLE = {
@@ -88,7 +91,7 @@ export default function HomePage() {
     },
   ];
 
-  const STYLES = [
+  const CONTENTS = [
     {
       icon: BarChart3,
       title: t("Why", "Mengapa"),
@@ -104,10 +107,28 @@ export default function HomePage() {
       title: t("How sure", "Seberapa yakin"),
       text: t("The advisor's confidence, with every other outcome shown beside it.", "Keyakinan penasihat, dengan setiap hasil lain ditampilkan di sampingnya."),
     },
+  ];
+
+  const DELIVERIES = [
+    {
+      icon: FileText,
+      title: t("Static", "Statis"),
+      text: t("A panel you read as it is.", "Sebuah panel yang Anda baca apa adanya."),
+    },
+    {
+      icon: SlidersHorizontal,
+      title: t("Interactive", "Interaktif"),
+      text: t("Move the inputs yourself and watch the advice react.", "Geser sendiri inputnya dan lihat sarannya bereaksi."),
+    },
+    {
+      icon: GraduationCap,
+      title: t("Adaptive", "Adaptif"),
+      text: t("Plain sentences or the detailed version, matched to your financial literacy.", "Kalimat sederhana atau versi rinci, disesuaikan dengan literasi keuangan Anda."),
+    },
     {
       icon: MessageSquareText,
-      title: t("Ask it", "Tanyakan"),
-      text: t("A conversation about the recommendation, grounded in the same numbers.", "Percakapan tentang rekomendasi, berpijak pada angka yang sama."),
+      title: t("Conversational", "Percakapan"),
+      text: t("Ask questions and get answers grounded in the same numbers.", "Ajukan pertanyaan dan dapatkan jawaban yang berpijak pada angka yang sama."),
     },
   ];
 
@@ -304,22 +325,50 @@ export default function HomePage() {
                 {t("Explanations", "Penjelasan")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("Four ways to ask why", "Empat cara bertanya mengapa")}
+                {t("What it explains, and how", "Apa yang dijelaskannya, dan bagaimana")}
               </h2>
               <p className="text-muted-foreground">
-                {t("Pick any of them on the advisor page. Each is computed from the advisor's own numbers.", "Pilih salah satunya di halaman penasihat. Masing-masing dihitung dari angka penasihat sendiri.")}
+                {t(
+                  "An explanation has two parts: what is being explained, and the way it reaches you. Pick either on the advisor page. Every version is computed from the advisor's own numbers.",
+                  "Sebuah penjelasan punya dua bagian: apa yang dijelaskan, dan cara penjelasan itu sampai kepada Anda. Pilih keduanya di halaman penasihat. Setiap versi dihitung dari angka penasihat sendiri.",
+                )}
               </p>
             </div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {STYLES.map((s) => (
-                <article key={s.title} className="panel lift p-6">
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <s.icon className="size-5" aria-hidden />
-                  </span>
-                  <h3 className="mt-4 font-semibold tracking-tight">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-                </article>
-              ))}
+
+            <div className="mt-10 space-y-10">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("What it explains", "Apa yang dijelaskan")}
+                </p>
+                <div className="mt-4 grid gap-5 sm:grid-cols-3">
+                  {CONTENTS.map((c) => (
+                    <article key={c.title} className="panel lift p-6">
+                      <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        <c.icon className="size-5" aria-hidden />
+                      </span>
+                      <h3 className="mt-4 font-semibold tracking-tight">{c.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.text}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  {t("How it reaches you", "Bagaimana sampainya kepada Anda")}
+                </p>
+                <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  {DELIVERIES.map((d) => (
+                    <article key={d.title} className="panel lift p-6">
+                      <span className="flex size-10 items-center justify-center rounded-xl bg-bonds/15 text-bonds">
+                        <d.icon className="size-5" aria-hidden />
+                      </span>
+                      <h3 className="mt-4 font-semibold tracking-tight">{d.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.text}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -334,8 +383,22 @@ export default function HomePage() {
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                 {t("Five mixes, and the option to say no", "Lima campuran, dan pilihan untuk berkata tidak")}
               </h2>
+              <p className="text-muted-foreground">
+                {t(
+                  "Each bar shows how a mix splits the money across four kinds of asset.",
+                  "Setiap batang menunjukkan bagaimana sebuah campuran membagi uang ke empat jenis aset.",
+                )}
+              </p>
             </div>
-            <div className="mt-10 grid gap-3">
+            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {ASSET_CLASSES.map((ac) => (
+                <li key={ac.key} className="flex items-center gap-2">
+                  <span aria-hidden className="inline-block size-3 rounded-full" style={{ background: ASSET_COLOR[ac.key] }} />
+                  <span className="font-medium">{assetLabel(ac.label)}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 grid gap-3">
               {PORTFOLIOS.map((pf) => (
                 <div key={pf.id} className="panel grid items-center gap-3 p-4 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-6 sm:p-5">
                   <div>

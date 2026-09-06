@@ -3,6 +3,17 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.8.3 (2026-09-06)
+
+### Changed
+
+- The outcomes section on the home page now says what the bars are and carries a colour key for the four
+  asset classes (global equities, bonds, cash and money market, real assets).
+- The explanations section is split into the two parts an explanation actually has: what it explains
+  (why, what would change it, how sure) and how it reaches you (static, interactive, adaptive,
+  conversational). "Ask it" was a delivery type sitting in the content list, and the delivery types had no
+  section at all.
+
 ## 2.8.2 (2026-09-06)
 
 ### Changed
