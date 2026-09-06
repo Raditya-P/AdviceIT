@@ -1,12 +1,11 @@
 "use client";
 
-/* The home page speaks to a participant first. Everything a researcher or
-   reviewer needs lives one click away under /about, so that nobody arriving
-   here has to read about Shapley values before they find out what they are
-   being asked to do. */
+/* The home page introduces the advisor first. A visitor should understand
+   what the thing is by trying it, and only then be asked to help with the
+   study. Everything a researcher or reviewer needs lives under /about. */
 
 import Link from "next/link";
-import { ArrowRight, BookOpen, Clock3, Eye, Lock, ShieldOff, Wallet } from "lucide-react";
+import { ArrowRight, Clock3, Cpu, Lock, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -18,59 +17,32 @@ export default function HomePage() {
   const t = (en: string, id: string) => tr(locale, { en, id });
 
   const FACTS = [
-    { icon: Clock3, text: t("About 15 minutes", "Sekitar 15 menit") },
-    { icon: Lock, text: t("Anonymous", "Anonim") },
-    { icon: ShieldOff, text: t("No account needed", "Tanpa akun") },
+    { icon: Cpu, text: t("Runs entirely in your browser", "Berjalan sepenuhnya di browser Anda") },
+    { icon: Lock, text: t("Nothing about you is stored", "Tidak ada data tentang Anda yang disimpan") },
     { icon: Wallet, text: t("No real money involved", "Tanpa uang sungguhan") },
+    { icon: Clock3, text: t("About two minutes to try", "Sekitar dua menit untuk mencoba") },
   ];
 
   const STEPS = [
     {
-      title: t("Read a short case", "Baca sebuah kasus singkat"),
+      title: t("Describe an investor", "Gambarkan seorang investor"),
       text: t(
-        "A few sentences about a made-up person and their savings.",
-        "Beberapa kalimat tentang seseorang rekaan dan tabungannya.",
+        "Age, how long the money can stay invested, how much risk they can live with, and a few facts about their finances. Made up is fine.",
+        "Usia, berapa lama uangnya bisa tetap diinvestasikan, seberapa besar risiko yang sanggup dijalani, dan beberapa fakta tentang keuangannya. Rekaan pun tidak apa-apa.",
       ),
     },
     {
-      title: t("See what the AI advisor recommends", "Lihat apa yang direkomendasikan penasihat AI"),
+      title: t("Get a recommendation", "Dapatkan rekomendasi"),
       text: t(
-        "With an explanation of why. Some recommendations are deliberately wrong.",
-        "Disertai penjelasan mengapa. Sebagian rekomendasi sengaja dibuat keliru.",
+        "One of five investment mixes, from capital preservation to aggressive growth. Or, when the case calls for it, a referral to a human adviser.",
+        "Satu dari lima campuran investasi, dari pelestarian modal sampai pertumbuhan agresif. Atau, bila kasusnya menuntut, rujukan ke penasihat manusia.",
       ),
     },
     {
-      title: t("Say what you would do, and why", "Katakan apa yang akan Anda lakukan, dan mengapa"),
+      title: t("See why, in the style you choose", "Lihat mengapa, dengan gaya pilihan Anda"),
       text: t(
-        "Follow it, adjust it, reject it, or ask a human. Six cases, then a debrief.",
-        "Ikuti, sesuaikan, tolak, atau tanya manusia. Enam kasus, lalu debrief.",
-      ),
-    },
-  ];
-
-  const REASSURANCE = [
-    {
-      icon: Eye,
-      title: t("You will be told which ones were wrong", "Anda akan diberi tahu mana yang keliru"),
-      text: t(
-        "At the end, the debrief names every recommendation that was deliberately flawed.",
-        "Di akhir, debrief menyebutkan setiap rekomendasi yang sengaja dibuat keliru.",
-      ),
-    },
-    {
-      icon: Lock,
-      title: t("Nothing about you is collected", "Tidak ada data tentang Anda yang dikumpulkan"),
-      text: t(
-        "No name, no email, no account. Only your answers about the made-up cases.",
-        "Tanpa nama, tanpa email, tanpa akun. Hanya jawaban Anda tentang kasus rekaan.",
-      ),
-    },
-    {
-      icon: BookOpen,
-      title: t("Everything is open", "Semuanya terbuka"),
-      text: t(
-        "The data the advisor learned from, how it was built, and how the study works are all published on this site.",
-        "Data yang dipelajari penasihat, cara membangunnya, dan cara studi ini bekerja semuanya dipublikasikan di situs ini.",
+        "Which of your answers mattered, what would change the advice, how sure the advisor is, or a conversation about it. Then decide whether you would trust it.",
+        "Jawaban Anda yang mana yang berpengaruh, apa yang akan mengubah sarannya, seberapa yakin penasihatnya, atau percakapan tentangnya. Lalu putuskan apakah Anda akan memercayainya.",
       ),
     },
   ];
@@ -83,11 +55,11 @@ export default function HomePage() {
         <section className="relative overflow-hidden">
           <div aria-hidden className="surface-glow" />
           <div aria-hidden className="surface-grid" />
-          <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:py-28">
-            <div className="space-y-7">
+          <div className="relative mx-auto grid max-w-6xl items-start gap-10 px-4 pb-16 pt-10 sm:px-6 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14 lg:pb-20 lg:pt-16">
+            <div className="space-y-5">
               <span className="rise inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-3.5 py-1.5 text-sm text-muted-foreground backdrop-blur">
                 <span className="inline-block size-1.5 rounded-full bg-primary" />
-                {t("A research study, open to anyone", "Sebuah studi penelitian, terbuka untuk siapa saja")}
+                {t("A research simulation, not a financial service", "Simulasi penelitian, bukan layanan keuangan")}
               </span>
               <h1 className="rise rise-1 text-balance text-4xl font-semibold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
                 {t("Know when to trust", "Tahu kapan harus memercayai")}{" "}
@@ -95,14 +67,14 @@ export default function HomePage() {
               </h1>
               <p className="rise rise-2 max-w-xl text-lg leading-relaxed text-foreground">
                 {t(
-                  "This is a research simulation, not a financial service. The advisor here is real, the cases are made up, and nothing on this site is advice for your own money.",
-                  "Ini simulasi penelitian, bukan layanan keuangan. Penasihatnya sungguhan, kasusnya rekaan, dan tidak ada apa pun di situs ini yang merupakan saran untuk uang Anda sendiri.",
+                  "Meet an AI investment advisor that explains itself. Describe an investor, get a recommended mix, and see exactly why it was chosen.",
+                  "Kenali penasihat investasi AI yang menjelaskan dirinya sendiri. Gambarkan seorang investor, dapatkan campuran yang direkomendasikan, dan lihat persis mengapa itu dipilih.",
                 )}
               </p>
               <p className="rise rise-2 max-w-xl leading-relaxed text-muted-foreground">
                 {t(
-                  "We are studying which kinds of explanation help people follow good advice and catch bad advice. You can help by spending a few minutes judging what the advisor says.",
-                  "Kami meneliti jenis penjelasan mana yang membantu orang mengikuti saran yang baik dan menangkap saran yang buruk. Anda bisa membantu dengan meluangkan beberapa menit menilai apa yang dikatakan penasihat.",
+                  "The advisor is real. It learned from cases reviewed by a panel of financial experts. The investors are made up, and nothing here is advice for your own money.",
+                  "Penasihatnya sungguhan. Ia belajar dari kasus yang ditinjau panel ahli keuangan. Investornya rekaan, dan tidak ada apa pun di sini yang merupakan saran untuk uang Anda sendiri.",
                 )}
               </p>
               <ul className="rise rise-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -113,14 +85,14 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <div className="rise rise-4 flex flex-col gap-3 sm:flex-row">
+              <div className="rise rise-4 flex flex-col gap-3 pt-1 sm:flex-row">
                 <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
-                  <Link href="/participate">
-                    {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                  <Link href="/advisor/ml">
+                    {t("Try the advisor", "Coba penasihatnya")} <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-7 text-base">
-                  <Link href="/advisor/ml">{t("Just try the advisor", "Coba dulu penasihatnya")}</Link>
+                  <Link href="/participate">{t("Take part in the study", "Ikut serta dalam studi")}</Link>
                 </Button>
               </div>
               <p className="rise rise-4 text-sm text-muted-foreground">
@@ -130,19 +102,21 @@ export default function HomePage() {
                 </Link>
               </p>
             </div>
-            <AdvicePreview />
+            <div className="lg:pt-4">
+              <AdvicePreview />
+            </div>
           </div>
         </section>
 
-        {/* What happens */}
+        {/* What the advisor does */}
         <section className="border-y border-border/70 bg-muted/40">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                {t("What happens", "Apa yang terjadi")}
+                {t("What the advisor does", "Apa yang dilakukan penasihat")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("What a session looks like", "Seperti apa satu sesi")}
+                {t("Three steps from a person to a recommendation", "Tiga langkah dari seseorang ke sebuah rekomendasi")}
               </h2>
             </div>
             <ol className="mt-10 grid gap-5 md:grid-cols-3">
@@ -156,6 +130,14 @@ export default function HomePage() {
                 </li>
               ))}
             </ol>
+            <div className="mt-8">
+              <Button asChild variant="outline" className="rounded-full">
+                <Link href="/advisor/logit">
+                  {t("There is also a fully transparent advisor to compare", "Ada juga penasihat yang sepenuhnya transparan untuk dibandingkan")}{" "}
+                  <ArrowRight data-icon="inline-end" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -185,50 +167,43 @@ export default function HomePage() {
               </p>
               <p>
                 {t(
-                  "This study answers it the only way it can be answered: by watching how people decide. The advisor was trained on cases reviewed by a panel of financial experts, and the study is run by a small university research team.",
-                  "Studi ini menjawabnya dengan satu-satunya cara yang mungkin: dengan mengamati bagaimana orang memutuskan. Penasihatnya dilatih pada kasus yang ditinjau panel ahli keuangan, dan studi ini dijalankan tim peneliti kecil dari universitas.",
+                  "This advisor exists to study that question the only way it can be studied: by watching how people decide. It was trained on cases reviewed by a panel of financial experts, and it is run by a small university research team.",
+                  "Penasihat ini ada untuk meneliti pertanyaan itu dengan satu-satunya cara yang mungkin: dengan mengamati bagaimana orang memutuskan. Ia dilatih pada kasus yang ditinjau panel ahli keuangan, dan dijalankan tim peneliti kecil dari universitas.",
                 )}
               </p>
             </div>
           </div>
         </section>
 
-        {/* Reassurance */}
-        <section className="border-y border-border/70 bg-muted/40">
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-            <div className="grid gap-5 md:grid-cols-3">
-              {REASSURANCE.map((f) => (
-                <article key={f.title} className="panel p-6">
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <f.icon className="size-5" aria-hidden />
-                  </span>
-                  <h3 className="mt-4 font-semibold tracking-tight">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA */}
-        <section className="px-4 py-20 sm:px-6">
-          <div className="cta-panel relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-16 text-center">
+        {/* The study, once the advisor is understood */}
+        <section className="px-4 pb-24 pt-4 sm:px-6">
+          <div className="cta-panel relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-14 sm:px-10">
             <div aria-hidden className="surface-grid opacity-60" />
-            <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-5">
-              <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("Take part in the study", "Ikut serta dalam studi")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t(
-                  "About fifteen minutes. Six short cases, then a debrief that shows you which recommendations were wrong.",
-                  "Sekitar lima belas menit. Enam kasus singkat, lalu debrief yang menunjukkan rekomendasi mana yang keliru.",
-                )}
-              </p>
-              <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
-                <Link href="/participate">
-                  {t("Start", "Mulai")} <ArrowRight data-icon="inline-end" />
-                </Link>
-              </Button>
+            <div className="relative grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center">
+              <div className="space-y-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+                  {t("Then help the research", "Lalu bantu penelitiannya")}
+                </p>
+                <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
+                  {t("Judge the advisor on six short cases", "Nilai penasihatnya pada enam kasus singkat")}
+                </h2>
+                <p className="max-w-xl leading-relaxed text-muted-foreground">
+                  {t(
+                    "You read a case, see the advisor's recommendation with one kind of explanation, and say what you would do. Some recommendations are deliberately wrong, and the debrief at the end tells you which. About fifteen minutes, anonymous, no account.",
+                    "Anda membaca sebuah kasus, melihat rekomendasi penasihat dengan satu jenis penjelasan, dan mengatakan apa yang akan Anda lakukan. Sebagian rekomendasi sengaja dibuat keliru, dan debrief di akhir memberi tahu yang mana. Sekitar lima belas menit, anonim, tanpa akun.",
+                  )}
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
+                <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
+                  <Link href="/participate">
+                    {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-7 text-base">
+                  <Link href="/privacy">{t("What is recorded", "Apa yang direkam")}</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

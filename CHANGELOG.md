@@ -3,6 +3,25 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.7.0 (2026-09-06)
+
+### Changed
+
+- **The home page introduces the advisor first.** The primary button is "Try the advisor", the study is
+  the secondary button and gets its own section at the end, after the visitor knows what the advisor is.
+  The three steps now describe the advisor (describe an investor, get a recommendation, see why in the
+  style you choose) rather than the study. The facts strip describes the site (runs in your browser,
+  nothing stored, no real money, two minutes to try). A link to the fully transparent advisor sits under
+  the steps.
+- **Tighter hero.** Top padding roughly halved and the grid aligned to the top, so the headline starts
+  where it did before the participant-facing copy was added.
+- **No trust cues in the conversational condition during study sessions.** The "written by a language
+  model, it can be wrong" label added in 2.6.0 is removed everywhere: a warning that exists only in one
+  condition would confound the delivery contrast and suppress exactly the reliance the study measures.
+  For the same reason the "computed by the advisor" badge on routed answers now shows only on the
+  try-out pages, never in a study session. Consent and debrief remain the places that tell participants
+  some advice is deliberately wrong.
+
 ## 2.6.2 (2026-09-06)
 
 ### Changed

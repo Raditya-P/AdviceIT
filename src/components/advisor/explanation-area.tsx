@@ -46,6 +46,7 @@ export function ExplanationArea({
         autoStart={autoStartLlm}
         onOpening={onLlmOpening}
         onTurn={onLlmTurn}
+        showSourceLabels={!studyMode}
       />
     );
   }
