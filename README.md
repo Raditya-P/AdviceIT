@@ -6,7 +6,7 @@
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.6.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.1-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
@@ -206,7 +206,8 @@ AdviceIT/
 │   ├── analytics.ts         reliance, trust and time per condition
 │   └── version.ts           the version shown in the footer
 ├── src/data/                trained weights and the 400 cases (generated)
-├── scripts/                 verify.ts, i18n-smoke.ts
+├── public/brand/            logo mark and wordmark as SVG, light and dark
+├── scripts/                 verify.ts, i18n-smoke.ts, intent-smoke.ts
 ├── db/schema.sql            one table, two indexes
 ├── v1/                      the original single-page instrument, still runnable
 │   ├── index.html ...       the five pages, plain HTML, CSS and JavaScript

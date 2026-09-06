@@ -3,6 +3,16 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.6.1 (2026-09-06)
+
+### Added
+
+- A logo. The mark is an A whose crossbar is a slider with a knob: advice you can adjust, and trust you
+  can calibrate. Brand blue square, white strokes, teal knob. The wordmark sets "Advice" in the foreground
+  colour and "IT" in the brand blue, in the heading face. Both are inline SVG and text in
+  `src/components/brand.tsx`, so they follow the theme. Static copies for slides and papers are in
+  `public/brand` (mark, light logo, dark logo), and the mark is the site icon.
+
 ## 2.6.0 (2026-09-06)
 
 Fifteen points of feedback from the team's QA review, applied.

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="160" viewBox="0 0 720 160" fill="none">
+  <g transform="translate(16 16) scale(4)">
+    <rect x="1" y="1" width="30" height="30" rx="8" fill="#61a5e8"/>
+    <path d="M8.5 24.5 16 8l7.5 16.5" stroke="#06101d" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10.6 19h10.8" stroke="#06101d" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
+    <circle cx="18.6" cy="19" r="2.6" fill="#4cc4ba" stroke="#06101d" stroke-width="1.6"/>
+  </g>
+  <text x="168" y="108" font-family="Instrument Sans, Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="88" font-weight="600" letter-spacing="-2.6" fill="#eaf0f8">Advice<tspan fill="#61a5e8">IT</tspan></text>
+</svg>

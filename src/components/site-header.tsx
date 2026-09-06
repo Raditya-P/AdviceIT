@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/brand";
 import { tr, useLang } from "@/lib/i18n";
 
 export function SiteHeader() {
@@ -23,12 +24,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
-        <Link
-          href="/"
-          className="text-[17px] font-semibold tracking-tight transition-opacity hover:opacity-80"
-        >
-          AdviceIT
-        </Link>
+        <Logo size={28} wordmarkClass="text-[19px]" />
         <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((item) => {
             const active = pathname === item.href.split("#")[0] && !item.href.includes("#");

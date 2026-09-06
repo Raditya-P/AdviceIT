@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Code2, Database, FlaskConical, Scale, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LogoMark, Wordmark } from "@/components/brand";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -96,7 +97,20 @@ export function AboutContent() {
             "Simulasi penelitian tentang menjelaskan saran investasi AI, dibangun tim beranggotakan tiga orang. Situs ini ada untuk mencari tahu jenis penjelasan mana yang membantu orang mengikuti saran yang baik dan menangkap saran yang buruk. Tidak ada apa pun di situs ini yang merupakan saran keuangan sungguhan.",
           )}
           width="max-w-4xl"
-        />
+        >
+          <div className="mt-7 flex items-center gap-4">
+            <LogoMark size={56} />
+            <div>
+              <Wordmark className="text-3xl" />
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t(
+                  "The mark is an A whose crossbar is a slider: advice you can adjust, and trust you can calibrate.",
+                  "Tandanya adalah huruf A yang palangnya berupa penggeser: saran yang bisa Anda sesuaikan, dan kepercayaan yang bisa Anda kalibrasi.",
+                )}
+              </p>
+            </div>
+          </div>
+        </PageHero>
 
         <div className="mx-auto max-w-4xl space-y-14 px-4 py-14 sm:px-6">
           <section className="space-y-4">
