@@ -3,6 +3,16 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.9.2 (2026-09-07)
+
+### Fixed
+
+- The age field could not be typed into. It clamped to 18 to 80 on every keystroke, so typing "4" on
+  the way to "45" snapped to 18 and the next digit made "185", which snapped to 80. The what-if panel's
+  age field had the mirror image of the problem and silently rejected any keystroke that left the number
+  out of range. Both now use a shared number field that keeps the typed text, applies the value as soon
+  as it is in range, and clamps once when the field loses focus.
+
 ## 2.9.1 (2026-09-06)
 
 ### Changed

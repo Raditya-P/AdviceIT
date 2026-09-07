@@ -8,7 +8,7 @@
 
 import { useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/number-field";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -119,16 +119,12 @@ export function WhatIfPanel({
             <Label>
               {t("Age", "Usia")} <IgnoreToggle k="age" />
             </Label>
-            <Input
-              type="number"
+            <NumberField
               min={18}
               max={80}
               value={whatIf.age}
+              onCommit={(age) => bump({ age })}
               className="max-w-28"
-              onChange={(e) => {
-                const v = Number(e.target.value);
-                if (v >= 18 && v <= 80) bump({ age: Math.round(v) });
-              }}
               aria-label={t("What-if age", "Usia what-if")}
             />
           </div>

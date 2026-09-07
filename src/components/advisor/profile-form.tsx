@@ -8,7 +8,7 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/number-field";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -242,18 +242,7 @@ export function ProfileForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="age">{t("Age", "Usia")}</Label>
-        <Input
-          id="age"
-          type="number"
-          min={18}
-          max={80}
-          value={profile.age}
-          className="max-w-28"
-          onChange={(e) => {
-            const v = Number(e.target.value);
-            if (!isNaN(v)) set({ age: Math.min(80, Math.max(18, Math.round(v))) });
-          }}
-        />
+        <NumberField id="age" min={18} max={80} value={profile.age} onCommit={(age) => set({ age })} className="max-w-28" />
         <p className="text-xs text-muted-foreground">{t("18 to 80.", "18 sampai 80.")}</p>
       </div>
 
