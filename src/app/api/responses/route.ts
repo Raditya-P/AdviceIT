@@ -60,7 +60,7 @@ const ALLOWED_KEYS = new Set([
   "percUsefulness", "percSatisfaction", "whatIfMoves",
   "whyNotAsked", "adaptiveVariant", "attentionCheck", "decisionTimeMs", "llmModel", "llmExplanation",
   "llmTurns", "llmRoutedTurns", "llmIntents", "llmModelAvailable", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile", "caseReadMs",
-  "profileSource", "tryIndex",
+  "profileSource", "tryIndex", "sessionResumes", "sessionElapsedMs",
 ]);
 
 function sanitize(row: Record<string, unknown>): Record<string, unknown> | null {

@@ -3,6 +3,36 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.10.0 (2026-09-09)
+
+### Added
+
+- **A study session survives leaving the page.** Someone who has answered four cases and closes the
+  tab comes back to case five, in the same condition, with the same participant ID and advisor, and
+  with the literacy and personal characteristics answers they already gave. A short notice at the top
+  says where they left off and offers to start a new session instead. The exit questionnaire's free
+  text is kept too, so a session abandoned on the last screen is not lost.
+- Two fields per row, `sessionResumes` and `sessionElapsedMs`. A session run in one sitting has zero
+  resumes and a short elapsed time. A session picked up three days later says so, which lets the
+  analysis treat it separately rather than discover it by accident.
+- `scripts/session-smoke.ts`, twenty-three checks over the session store: the round trip, the deadline,
+  rejection of corrupt or foreign records, snapshot stability, and cleanup.
+
+### Notes on the design
+
+- **A session is resumed at the start of a case, never inside one.** Someone returning to case five
+  reads its description again from the beginning. Resuming mid-case would either lose the reading time
+  or record a judgement made from memory of a case read hours earlier, and case reading time is a
+  measure in this study.
+- **The condition travels with the session, not with the link.** A restored session carries its own
+  condition, advisor and participant ID, so returning through a different link, or refreshing to see
+  what else is on offer, cannot move anyone into another cell.
+- **Nothing is written before consent.** The store is created when the person agrees to take part and
+  deleted the moment the exit questionnaire is submitted. It expires on its own after a week, because a
+  session spread over more than that is not the session the design assumes. The consent text and the
+  privacy page both say this now, with a new section on the privacy page listing everything this site
+  keeps in the browser.
+
 ## 2.9.2 (2026-09-07)
 
 ### Fixed

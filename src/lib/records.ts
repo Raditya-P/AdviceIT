@@ -76,6 +76,11 @@ export interface StudyRow {
   exitMissingExplanation?: string;
   userAgentMobile?: boolean;
   caseReadMs?: number;
+  /* Session continuity: how many times the participant left the page and
+     came back, and the wall clock time from consent to this row. Both are
+     zero and short for an uninterrupted session. */
+  sessionResumes?: number | "";
+  sessionElapsedMs?: number | "";
   /* explore rows only: where the profile came from, and how many tries this
      visitor has submitted in this browser session */
   profileSource?: "form" | "example" | "ils-bench" | "narrative";

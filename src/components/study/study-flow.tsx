@@ -15,8 +15,9 @@
    English canonical whatever the display language, and the language is
    logged per row. */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,6 +32,15 @@ import { presetLabel, type ContentPart, type Form, type Modality } from "@/lib/c
 import { ArrowRight, UserRound } from "lucide-react";
 import { tr, useLang } from "@/lib/i18n";
 import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
+import {
+  clearSession,
+  noSession,
+  saveSession,
+  sessionSnapshot,
+  subscribeToSession,
+  type ResumableStage,
+  type SavedSession,
+} from "@/lib/session";
 import * as llm from "@/lib/llm";
 import {
   EOS_ITEMS,
@@ -66,26 +76,72 @@ export interface Assignment {
   pid?: string;
 }
 
+/* Storage cannot be read while the server renders, and reading it during
+   the first client render would make the two disagree. useSyncExternalStore
+   is the sanctioned way out: it hands back the server value during
+   hydration and the real one immediately after, so the session is resolved
+   before any study state is created and nothing has to be corrected later. */
 export function StudyFlow({ assignment }: { assignment: Assignment }) {
+  const { locale } = useLang();
+  const mounted = useSyncExternalStore(
+    subscribeToSession,
+    () => true,
+    () => false,
+  );
+  const stored = useSyncExternalStore(subscribeToSession, sessionSnapshot, noSession);
+  if (!mounted) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12 text-muted-foreground sm:px-6">
+        {tr(locale, { en: "Preparing your session", id: "Menyiapkan sesi Anda" })}
+      </div>
+    );
+  }
+  /* A researcher link that names a participant always starts that session
+     fresh, whatever is sitting in this browser. */
+  const restored = stored && (!assignment.pid || assignment.pid === stored.pid) ? stored : null;
+  return <StudySession assignment={assignment} restored={restored} />;
+}
+
+function StudySession({ assignment, restored }: { assignment: Assignment; restored: SavedSession | null }) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const TX = textsFor(locale);
   const LQ = literacyFor(locale);
 
-  const [pid] = useState(() => assignment.pid || randomParticipantId());
-  const [advisorId] = useState<"ml" | "logit">(() => randomAdvisor());
-  const [stage, setStage] = useState<Stage>("consent");
-  const [consented, setConsented] = useState(false);
-  const [litAnswers, setLitAnswers] = useState<Record<string, string>>({});
+  const [pid] = useState(() => restored?.pid || assignment.pid || randomParticipantId());
+  const [advisorId] = useState<"ml" | "logit">(() => restored?.advisorId ?? randomAdvisor());
+  /* The condition in force. A restored session carries its own, so coming
+     back through a different link cannot move anyone into another one. */
+  const [live] = useState<Assignment>(() =>
+    restored
+      ? {
+          condition: restored.condition,
+          content: restored.content,
+          form: restored.form,
+          modality: restored.modality,
+          assignedBy: restored.assignedBy,
+          pid: restored.pid,
+        }
+      : assignment,
+  );
+  const [stage, setStage] = useState<Stage>(restored ? restored.stage : "consent");
+  const [consented, setConsented] = useState(restored !== null);
+  const [litAnswers, setLitAnswers] = useState<Record<string, string>>(() => restored?.litAnswers ?? {});
   const [litError, setLitError] = useState("");
-  const [trialIdx, setTrialIdx] = useState(0);
+  const [trialIdx, setTrialIdx] = useState(restored?.trialIdx ?? 0);
   const [saved, setSaved] = useState<"server" | "local" | null>(null);
-  const [pcAnswers, setPcAnswers] = useState<Record<string, number>>({});
+  const [pcAnswers, setPcAnswers] = useState<Record<string, number>>(() => restored?.pcAnswers ?? {});
   const [pcError, setPcError] = useState("");
-  const [perception, setPerception] = useState<Record<string, number>>({});
-  const [exit1, setExit1] = useState("");
-  const [exit2, setExit2] = useState("");
+  const [perception, setPerception] = useState<Record<string, number>>(() => restored?.perception ?? {});
+  const [exit1, setExit1] = useState(restored?.exit1 ?? "");
+  const [exit2, setExit2] = useState(restored?.exit2 ?? "");
   const prior = useMemo(() => (typeof window === "undefined" ? null : priorParticipation()), []);
+  const router = useRouter();
+  const [resumed, setResumed] = useState<{ stage: ResumableStage; trialIdx: number } | null>(() =>
+    restored ? { stage: restored.stage, trialIdx: restored.trialIdx } : null,
+  );
+  const startedAt = useRef(restored?.startedAt ?? "");
+  const resumes = useRef(restored ? restored.resumes + 1 : 0);
 
   const plan = useMemo(() => buildPlan(pid, 6), [pid]);
   const advisor = ADVISORS[advisorId];
@@ -104,13 +160,78 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   }, [litAnswers, LQ]);
   const literacyLevel: "low" | "high" = literacyScore.score >= 2 ? "high" : "low";
 
+  /* Write the session after every step. Nothing is stored before consent,
+     and finishExit clears it, so a completed session leaves no trace here. */
+  useEffect(() => {
+    if (stage === "consent" || stage === "debrief" || stage === "done") return;
+    const now = new Date().toISOString();
+    if (!startedAt.current) startedAt.current = now;
+    saveSession({
+      v: 1,
+      pid,
+      advisorId,
+      condition: live.condition,
+      content: live.content,
+      form: live.form,
+      modality: live.modality ?? "visual",
+      assignedBy: live.assignedBy,
+      stage: stage as ResumableStage,
+      litAnswers,
+      pcAnswers,
+      trialIdx,
+      perception,
+      exit1,
+      exit2,
+      startedAt: startedAt.current,
+      updatedAt: now,
+      resumes: resumes.current,
+    });
+  }, [stage, pid, advisorId, live, litAnswers, pcAnswers, trialIdx, perception, exit1, exit2]);
+
+  const startOver = () => {
+    clearSession();
+    router.push("/participate");
+  };
+
+  /* The notice belongs to the exact point the session was picked up at, so
+     it disappears by itself as soon as the participant moves on. */
+  const atResumePoint =
+    resumed !== null && stage === resumed.stage && (stage !== "trial" || trialIdx === resumed.trialIdx);
+  const resumeNotice =
+    resumed && atResumePoint ? (
+      <Alert>
+        <AlertTitle>{t("Welcome back, we kept your place", "Selamat datang kembali, tempat Anda kami simpan")}</AlertTitle>
+        <AlertDescription className="space-y-2">
+          <p>
+            {resumed.stage === "trial"
+              ? t(
+                  `You had finished ${resumed.trialIdx} of ${plan.length} cases. You are in the same condition as before, and case ${resumed.trialIdx + 1} starts from its description again so you can read it fresh.`,
+                  `Anda telah menyelesaikan ${resumed.trialIdx} dari ${plan.length} kasus. Kondisi Anda tetap sama seperti sebelumnya, dan kasus ${resumed.trialIdx + 1} dimulai lagi dari deskripsinya agar Anda dapat membacanya kembali.`,
+                )
+              : t(
+                  "Your answers so far are still here and you can carry on where you left off.",
+                  "Jawaban Anda sejauh ini masih tersimpan dan Anda dapat melanjutkan dari tempat Anda berhenti.",
+                )}
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setResumed(null)}>
+              {t("Got it", "Mengerti")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={startOver}>
+              {t("Start a new session instead", "Mulai sesi baru saja")}
+            </Button>
+          </div>
+        </AlertDescription>
+      </Alert>
+    ) : null;
+
   const baseRow = (): Omit<StudyRow, "rowType" | "timestamp"> => ({
     participantId: pid,
-    condition: assignment.condition,
-    explanationContent: assignment.content.join("+"),
-    explanationForm: assignment.form,
-    explanationModality: assignment.modality ?? "visual",
-    assignedBy: assignment.assignedBy,
+    condition: live.condition,
+    explanationContent: live.content.join("+"),
+    explanationForm: live.form,
+    explanationModality: live.modality ?? "visual",
+    assignedBy: live.assignedBy,
     advisorModel: advisorId,
     advisorAssignedBy: "random",
     language: locale,
@@ -122,6 +243,12 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
     easeOfSatisfaction: scaleScore(EOS_ITEMS, pcAnswers),
     easeAnswers: EOS_ITEMS.map((it) => pcAnswers[it.name] ?? "").join("|"),
     userAgentMobile: typeof navigator !== "undefined" && /Mobi|Android/i.test(navigator.userAgent),
+    /* How many times this session was picked up again after leaving the
+       page, and how long it ran from first consent to this row. A session
+       stretched over days is still valid data, but the analysis should be
+       able to see that it was. */
+    sessionResumes: resumes.current,
+    sessionElapsedMs: startedAt.current ? Date.now() - Date.parse(startedAt.current) : "",
   });
 
   const submitTrial = async (row: Partial<StudyRow>) => {
@@ -143,6 +270,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
       exitMissingExplanation: exit2.trim().slice(0, 2000),
     } as StudyRow);
     markParticipated(pid);
+    clearSession();
     setStage("debrief");
   };
 
@@ -187,7 +315,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
 
   if (stage === "literacy") {
     return (
-      <StageShell title={TX.literacyTitle}>
+      <StageShell title={TX.literacyTitle} notice={resumeNotice}>
         <p className="text-muted-foreground">{TX.literacyIntro}</p>
         {LQ.map((q, i) => (
           <div key={q.name} className="space-y-2">
@@ -228,7 +356,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
     const eos = itemsFor(EOS_ITEMS, locale);
     const answered = [...NFC_ITEMS, ...EOS_ITEMS].filter((it) => pcAnswers[it.name]).length;
     return (
-      <StageShell title={t("A little about how you think", "Sedikit tentang cara Anda berpikir")}>
+      <StageShell title={t("A little about how you think", "Sedikit tentang cara Anda berpikir")} notice={resumeNotice}>
         <p className="text-muted-foreground">
           {t(
             "These nine statements are not a test and have no right answers. They measure two traits that are known to change how people respond to explanations, so that we can account for them.",
@@ -285,6 +413,8 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   if (stage === "trial") {
     const trial = plan[trialIdx];
     return (
+      <>
+        {resumeNotice && <div className="mx-auto max-w-3xl px-4 pt-8 sm:px-6">{resumeNotice}</div>}
       <TrialStage
         key={trial.index}
         trial={trial}
@@ -293,7 +423,7 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
           const r = advisor.recommend(p);
           return trial.scenario === "flawed" ? applyFlawedScenario(r) : r;
         }}
-        assignment={assignment}
+        assignment={live}
         literacyLevel={literacyLevel}
         saved={saved}
         onSubmit={async (row) => {
@@ -302,12 +432,13 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
           else setStage("exit");
         }}
       />
+      </>
     );
   }
 
   if (stage === "exit") {
     return (
-      <StageShell title={TX.exitTitle}>
+      <StageShell title={TX.exitTitle} notice={resumeNotice}>
         <p className="text-muted-foreground">
           {t(
             "First, how did you find the explanations you were shown?",
@@ -396,9 +527,18 @@ export function StudyFlow({ assignment }: { assignment: Assignment }) {
   );
 }
 
-function StageShell({ title, children }: { title: string; children: React.ReactNode }) {
+function StageShell({
+  title,
+  notice,
+  children,
+}: {
+  title: string;
+  notice?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-2xl space-y-5 px-4 py-12 sm:px-6">
+      {notice}
       <section className="panel rise p-6 sm:p-8">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
         <div className="mt-5 space-y-4">{children}</div>

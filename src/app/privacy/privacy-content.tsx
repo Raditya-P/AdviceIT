@@ -38,6 +38,13 @@ export function PrivacyContent() {
               "Tidak ada nama, tidak ada email, tidak ada data akun, tidak ada profil berbasis IP, tidak ada pelacak iklan atau analitik. Penjelas percakapan berjalan sepenuhnya di browser Anda, jadi apa yang Anda ketik kepadanya tidak pernah mencapai server. Halaman penasihat tidak merekam apa pun saat Anda mencobanya. Jika Anda memilih mengisi panel respons opsional di sana, jawaban itu disimpan secara anonim sebagai uji coba, ditandai terpisah dari studi.",
             )}
           </p>
+          <h2 className="text-xl font-semibold">{t("What stays in your browser", "Apa yang tetap di browser Anda")}</h2>
+          <p className="text-muted-foreground">
+            {t(
+              "A study session is saved in this browser as you go, so that leaving part way through does not lose your answers. It holds your participant ID, the condition you were assigned, the answers you have given and how many cases you have finished. It never leaves your device, it is deleted the moment you finish the session, and it expires after a week on its own. Starting a new session from the participate page discards it. The site also remembers your language choice, and buffers answers here if the network is down so they can be sent on your next visit.",
+              "Sesi studi disimpan di browser ini sambil Anda mengerjakannya, sehingga keluar di tengah jalan tidak menghilangkan jawaban Anda. Yang disimpan adalah ID partisipan Anda, kondisi yang ditetapkan untuk Anda, jawaban yang sudah Anda berikan, dan berapa kasus yang sudah Anda selesaikan. Data itu tidak pernah meninggalkan perangkat Anda, dihapus begitu Anda menyelesaikan sesi, dan kedaluwarsa sendiri setelah satu minggu. Memulai sesi baru dari halaman ikut serta akan membuangnya. Situs ini juga mengingat pilihan bahasa Anda, dan menyimpan jawaban sementara di sini jika jaringan mati agar dapat dikirim pada kunjungan berikutnya.",
+            )}
+          </p>
           <h2 className="text-xl font-semibold">{t("Your rights", "Hak Anda")}</h2>
           <p className="text-muted-foreground">
             {t(
