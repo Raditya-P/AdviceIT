@@ -1,9 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="160" viewBox="0 0 720 160" fill="none">
   <g transform="translate(16 16) scale(4)">
-    <rect x="1" y="1" width="30" height="30" rx="8" fill="#2f7fd0"/>
-    <path d="M8.5 24.5 16 8l7.5 16.5" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M10.6 19h10.8" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-    <circle cx="18.6" cy="19" r="2.6" fill="#3aa8a0" stroke="#ffffff" stroke-width="1.6"/>
+    <g transform="rotate(-7 16 16.5)">
+      <rect x="1" y="7.5" width="30" height="18" rx="3.96" fill="#2f7fd0"/>
+      <rect x="2.3" y="8.8" width="27.4" height="15.4" rx="2.34" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.9"/>
+      <circle cx="4.4" cy="11.1" r="1.25" fill="#ffffff" fill-opacity="0.85"/>
+      <circle cx="27.6" cy="21.9" r="1.25" fill="#ffffff" fill-opacity="0.85"/>
+    </g>
+    <g transform="translate(16 15) scale(0.72) translate(-16 -15)">
+      <g fill="#ffffff" stroke="#ffffff" stroke-width="2.6" stroke-linejoin="round">
+        <path d="M15.3 5.2 C13.9 4.3 12 4.5 10.8 5.7 C9.1 5.5 7.5 6.7 7.2 8.4 C5.7 9 4.8 10.7 5.2 12.3 C4.1 13.4 4 15.2 5 16.4 C4.5 18 5.3 19.8 6.9 20.6 C7 22.3 8.4 23.7 10.1 23.8 C11.1 25.2 13 25.7 14.5 24.9 L15.3 24.9 Z"/>
+        <path d="M15.3 5.2 C13.9 4.3 12 4.5 10.8 5.7 C9.1 5.5 7.5 6.7 7.2 8.4 C5.7 9 4.8 10.7 5.2 12.3 C4.1 13.4 4 15.2 5 16.4 C4.5 18 5.3 19.8 6.9 20.6 C7 22.3 8.4 23.7 10.1 23.8 C11.1 25.2 13 25.7 14.5 24.9 L15.3 24.9 Z" transform="matrix(-1 0 0 1 32 0)"/>
+      </g>
+      <g fill="#0d1725">
+        <path d="M15.3 5.2 C13.9 4.3 12 4.5 10.8 5.7 C9.1 5.5 7.5 6.7 7.2 8.4 C5.7 9 4.8 10.7 5.2 12.3 C4.1 13.4 4 15.2 5 16.4 C4.5 18 5.3 19.8 6.9 20.6 C7 22.3 8.4 23.7 10.1 23.8 C11.1 25.2 13 25.7 14.5 24.9 L15.3 24.9 Z"/>
+        <path d="M15.3 5.2 C13.9 4.3 12 4.5 10.8 5.7 C9.1 5.5 7.5 6.7 7.2 8.4 C5.7 9 4.8 10.7 5.2 12.3 C4.1 13.4 4 15.2 5 16.4 C4.5 18 5.3 19.8 6.9 20.6 C7 22.3 8.4 23.7 10.1 23.8 C11.1 25.2 13 25.7 14.5 24.9 L15.3 24.9 Z" transform="matrix(-1 0 0 1 32 0)"/>
+      </g>
+      <g stroke="#ffffff" stroke-width="1.35" stroke-linecap="round" fill="none">
+        <path d="M15.3 9.4 C12.4 9.4 10.9 10.7 10.9 12.4 C10.9 13.7 9.8 14.4 8.5 14.3 M15.3 17.4 C12.2 17.4 10.3 18.8 10.3 21"/>
+        <path d="M15.3 9.4 C12.4 9.4 10.9 10.7 10.9 12.4 C10.9 13.7 9.8 14.4 8.5 14.3 M15.3 17.4 C12.2 17.4 10.3 18.8 10.3 21" transform="matrix(-1 0 0 1 32 0)"/>
+      </g>
+    </g>
   </g>
   <text x="168" y="108" font-family="Instrument Sans, Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="88" font-weight="600" letter-spacing="-2.6" fill="#0d1725">Advice<tspan fill="#2f7fd0">IT</tspan></text>
 </svg>

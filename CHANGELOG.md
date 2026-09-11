@@ -3,6 +3,22 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.11.0 (2026-09-11)
+
+### Changed
+
+- **A new logo.** The mark is a brain in front of a banknote. The note is the brand blue, tilted so it
+  sits behind the brain rather than under it, with an inset border and two corner dots to say banknote
+  rather than card. The brain is drawn as one half mirrored down the middle, so the fissure is a real
+  gap in the shape, which is what keeps it reading as a brain at favicon size once the folds fill in.
+  The old mark was an A whose crossbar was a slider, and it said more about the interface than about
+  the question the study asks.
+- The mark takes the foreground colour for the brain and the page colour for its halo, so the same
+  component serves both themes without a second asset.
+- `public/brand/adviceit-mark-dark.svg`, a standalone mark for dark slides. The light mark, both
+  lockups and the app icon are redrawn to match. The app icon is tuned a little bolder than the header
+  mark, since it is read at sixteen pixels.
+
 ## 2.10.0 (2026-09-09)
 
 ### Added
