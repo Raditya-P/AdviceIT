@@ -150,7 +150,7 @@ export function TryResponse({
             <div className="flex flex-wrap gap-3">
               <Button asChild className="rounded-full">
                 <Link href="/participate">
-                  {t("Take part in the real study", "Ikut serta dalam studi sesungguhnya")}{" "}
+                  {t("Take part in the real study", "Ikut serta dalam studi sesungguhnya")}
                   <ArrowRight data-icon="inline-end" />
                 </Link>
               </Button>

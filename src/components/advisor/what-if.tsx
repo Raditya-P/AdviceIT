@@ -117,7 +117,8 @@ export function WhatIfPanel({
         <div className="min-w-0 space-y-4">
           <div className="space-y-1.5">
             <Label>
-              {t("Age", "Usia")} <IgnoreToggle k="age" />
+              {t("Age", "Usia")}
+              <IgnoreToggle k="age" />
             </Label>
             <NumberField
               min={18}
@@ -145,7 +146,8 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Risk tolerance", "Toleransi risiko")} <IgnoreToggle k="tolerance" />
+              {t("Risk tolerance", "Toleransi risiko")}
+              <IgnoreToggle k="tolerance" />
             </Label>
             <Seg
               name={t("What-if tolerance", "Toleransi what-if")}
@@ -160,7 +162,8 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Emergency fund", "Dana darurat")} <IgnoreToggle k="emergencyFund" />
+              {t("Emergency fund", "Dana darurat")}
+              <IgnoreToggle k="emergencyFund" />
             </Label>
             <Seg
               name={t("What-if emergency fund", "Dana darurat what-if")}
@@ -174,7 +177,8 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Income stability", "Stabilitas pendapatan")} <IgnoreToggle k="incomeStable" />
+              {t("Income stability", "Stabilitas pendapatan")}
+              <IgnoreToggle k="incomeStable" />
             </Label>
             <Seg
               name={t("What-if income", "Pendapatan what-if")}
@@ -188,7 +192,8 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Significant debt or obligations", "Utang atau kewajiban besar")} <IgnoreToggle k="debtObligations" />
+              {t("Significant debt or obligations", "Utang atau kewajiban besar")}
+              <IgnoreToggle k="debtObligations" />
             </Label>
             <Seg
               name={t("What-if debt", "Utang what-if")}
@@ -202,7 +207,8 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Money needed in the near term", "Dana dibutuhkan dalam waktu dekat")} <IgnoreToggle k="nearTermNeed" />
+              {t("Money needed in the near term", "Dana dibutuhkan dalam waktu dekat")}
+              <IgnoreToggle k="nearTermNeed" />
             </Label>
             <Seg
               name={t("What-if near-term need", "Kebutuhan jangka pendek what-if")}

@@ -748,13 +748,14 @@ function TrialStage({
           <div className="flex justify-end">
             <Button
               size="lg"
-              className="h-12 rounded-full px-7"
+              className="h-12 rounded-full pl-7 pr-6"
               onClick={() => {
                 caseReadMs.current = Date.now() - caseShownAt.current;
                 setPhase("analyzing");
               }}
             >
-              {t("Ask the advisor", "Tanya penasihatnya")} <ArrowRight data-icon="inline-end" />
+              {t("Ask the advisor", "Tanya penasihatnya")}
+              <ArrowRight />
             </Button>
           </div>
         </div>

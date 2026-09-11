@@ -4,7 +4,18 @@
     <rect x="2.3" y="8.3" width="27.4" height="15.4" rx="2.34" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.9"/>
     <circle cx="4.4" cy="10.6" r="1.25" fill="#ffffff" fill-opacity="0.85"/>
     <circle cx="27.6" cy="21.4" r="1.25" fill="#ffffff" fill-opacity="0.85"/>
-    <path d="M2.5 32 C3.2 27.6 6.6 24.4 11.2 23.6 L11.2 22.6 C8.3 20.4 6.7 16.9 7.1 13.2 C7.5 7.6 11.9 3.4 17.2 3.4 C21.7 3.4 25 6.6 25.1 10.9 C25.15 12.5 24.7 13.7 25.3 14.6 C26.1 15.8 28.1 17.7 27.7 18.7 C27.3 19.7 25.4 19.9 24 19.9 C23.2 19.9 23 20.3 23.2 21 C23.5 22.3 22.8 23.4 21.3 23.9 C20.9 24.1 20.7 24.5 20.5 25.2 C20.2 26.4 19.4 27.2 18.2 27.6 C22.8 28 28.4 29.6 29.5 32 Z" fill="#ffffff" transform="translate(8.336 8.371) scale(0.4790)"/>
+    <g fill="#ffffff" stroke="#2f7fd0" stroke-width="0.9" stroke-linejoin="round">
+      <circle cx="9.4" cy="14.7" r="2.15"/>
+      <path d="M5.7 23.7 L5.7 21.1 A3.7 3.7 0 0 1 13.1 21.1 L13.1 23.7 Z"/>
+    </g>
+    <g fill="#ffffff" stroke="#2f7fd0" stroke-width="0.9" stroke-linejoin="round">
+      <circle cx="22.6" cy="14.7" r="2.15"/>
+      <path d="M18.9 23.7 L18.9 21.1 A3.7 3.7 0 0 1 26.3 21.1 L26.3 23.7 Z"/>
+    </g>
+    <g fill="#ffffff" stroke="#2f7fd0" stroke-width="0.9" stroke-linejoin="round">
+      <circle cx="16" cy="12.5" r="2.6"/>
+      <path d="M11.5 23.7 L11.5 20.2 A4.5 4.5 0 0 1 20.5 20.2 L20.5 23.7 Z"/>
+    </g>
   </g>
   <text x="168" y="108" font-family="Instrument Sans, Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="88" font-weight="600" letter-spacing="-2.6" fill="#0d1725">Advice<tspan fill="#2f7fd0">IT</tspan></text>
 </svg>

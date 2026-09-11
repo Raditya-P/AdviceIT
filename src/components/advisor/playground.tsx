@@ -192,8 +192,9 @@ export function Playground({
               onScenario={setScenario}
             />
             <div className="flex justify-end">
-              <Button size="lg" className="h-12 rounded-full px-7" onClick={() => setStep("profile")}>
-                {t("Continue to your profile", "Lanjut ke profil Anda")} <ArrowRight data-icon="inline-end" />
+              <Button size="lg" className="h-12 rounded-full pl-7 pr-6" onClick={() => setStep("profile")}>
+                {t("Continue to your profile", "Lanjut ke profil Anda")}
+                <ArrowRight />
               </Button>
             </div>
           </div>
@@ -217,10 +218,12 @@ export function Playground({
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <Button variant="ghost" className="rounded-full" onClick={() => setStep("style")}>
-                <ArrowLeft data-icon="inline-start" /> {t("Back to explanation styles", "Kembali ke gaya penjelasan")}
+                <ArrowLeft data-icon="inline-start" />
+                {t("Back to explanation styles", "Kembali ke gaya penjelasan")}
               </Button>
-              <Button size="lg" className="h-12 rounded-full px-7" onClick={() => setStep("analyzing")}>
-                {t("See the recommendation", "Lihat rekomendasinya")} <ArrowRight data-icon="inline-end" />
+              <Button size="lg" className="h-12 rounded-full pl-7 pr-6" onClick={() => setStep("analyzing")}>
+                {t("See the recommendation", "Lihat rekomendasinya")}
+                <ArrowRight />
               </Button>
             </div>
           </div>
@@ -293,7 +296,8 @@ export function Playground({
                   {t("The profile behind this", "Profil di balik ini")}
                 </p>
                 <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setStep("profile")}>
-                  <Pencil data-icon="inline-start" /> {t("Edit", "Ubah")}
+                  <Pencil data-icon="inline-start" />
+                  {t("Edit", "Ubah")}
                 </Button>
               </div>
               <ul className="mt-3 flex flex-wrap gap-2 text-sm">
@@ -313,7 +317,8 @@ export function Playground({
 
             <div className="flex flex-wrap gap-3">
               <Button variant="outline" className="rounded-full" onClick={() => setStep("style")}>
-                <RefreshCw data-icon="inline-start" /> {t("Try another explanation style", "Coba gaya penjelasan lain")}
+                <RefreshCw data-icon="inline-start" />
+                {t("Try another explanation style", "Coba gaya penjelasan lain")}
               </Button>
               <Button variant="ghost" className="rounded-full" onClick={() => setStep("profile")}>
                 {t("Change the profile", "Ubah profilnya")}
@@ -342,9 +347,10 @@ export function Playground({
                   "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Sepuluh menit anonim dengan enam kasus adalah cara kami mencari tahu.",
                 )}
               </p>
-              <Button asChild className="mt-5 h-11 rounded-full px-6">
+              <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">
                 <Link href="/participate">
-                  {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                  {t("Take part in the study", "Ikut serta dalam studi")}
+                  <ArrowRight />
                 </Link>
               </Button>
             </section>

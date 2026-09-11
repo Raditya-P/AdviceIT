@@ -3,6 +3,14 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.11.2 (2026-09-11)
+
+### Fixed
+
+- Minor UI fixes. Buttons that carry a trailing arrow had uneven left and right padding, and an extra
+  space sat between the label and the icon in twenty places. The logo mark is larger, so it reads at
+  the same weight as the wordmark, and the note now carries three figures with the middle one taller.
+
 ## 2.11.1 (2026-09-11)
 
 ### Changed

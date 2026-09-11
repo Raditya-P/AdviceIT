@@ -425,9 +425,10 @@ export function DesignContent() {
               )}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
-              <Button asChild className="h-11 rounded-full px-6">
+              <Button asChild className="h-11 rounded-full pl-6 pr-5">
                 <Link href="/participate">
-                  {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                  {t("Take part in the study", "Ikut serta dalam studi")}
+                  <ArrowRight />
                 </Link>
               </Button>
               <Button asChild variant="outline" className="h-11 rounded-full px-6">

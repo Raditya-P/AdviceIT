@@ -195,7 +195,8 @@ export function StylePicker({
                 </span>
                 {selected && (
                   <span className="flex items-center gap-1 text-xs font-medium text-primary">
-                    <Check className="size-3.5" aria-hidden /> {t("Selected", "Dipilih")}
+                    <Check className="size-3.5" aria-hidden />
+                    {t("Selected", "Dipilih")}
                   </span>
                 )}
               </div>

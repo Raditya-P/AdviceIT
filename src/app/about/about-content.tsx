@@ -184,9 +184,10 @@ export function AboutContent() {
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               {t("About fifteen minutes, anonymous, and no real money involved.", "Sekitar lima belas menit, anonim, dan tanpa uang sungguhan.")}
             </p>
-            <Button asChild className="mt-5 h-11 rounded-full px-6">
+            <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">
               <Link href="/participate">
-                {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                {t("Take part in the study", "Ikut serta dalam studi")}
+                <ArrowRight />
               </Link>
             </Button>
           </section>

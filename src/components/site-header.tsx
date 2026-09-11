@@ -25,7 +25,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
-        <Logo size={28} wordmarkClass="text-[19px]" />
+        <Logo size={34} wordmarkClass="text-[19px]" />
         <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((item) => {
             const active = pathname === item.href.split("#")[0] && !item.href.includes("#");

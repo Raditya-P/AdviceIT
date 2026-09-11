@@ -144,9 +144,10 @@ export default function HomePage() {
                 ))}
               </ul>
               <div className="rise rise-4 flex flex-col gap-3 pt-1 sm:flex-row">
-                <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
+                <Button asChild size="lg" className="h-12 rounded-full pl-7 pr-6 text-base">
                   <Link href="/advisor/ml">
-                    {t("Try the advisor", "Coba penasihatnya")} <ArrowRight data-icon="inline-end" />
+                    {t("Try the advisor", "Coba penasihatnya")}
+                    <ArrowRight />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-7 text-base">
@@ -241,7 +242,8 @@ export default function HomePage() {
                 </div>
                 <Button asChild className="mt-5 self-start rounded-full">
                   <Link href="/advisor/ml">
-                    {t("Try the AI advisor", "Coba penasihat AI")} <ArrowRight data-icon="inline-end" />
+                    {t("Try the AI advisor", "Coba penasihat AI")}
+                    <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
               </article>
@@ -288,7 +290,8 @@ export default function HomePage() {
                 </div>
                 <Button asChild variant="outline" className="mt-5 self-start rounded-full">
                   <Link href="/advisor/logit">
-                    {t("Try the interpretable advisor", "Coba penasihat interpretable")} <ArrowRight data-icon="inline-end" />
+                    {t("Try the interpretable advisor", "Coba penasihat interpretable")}
+                    <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
               </article>
@@ -431,9 +434,10 @@ export default function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
-                <Button asChild size="lg" className="h-12 rounded-full px-7 text-base">
+                <Button asChild size="lg" className="h-12 rounded-full pl-7 pr-6 text-base">
                   <Link href="/participate">
-                    {t("Take part in the study", "Ikut serta dalam studi")} <ArrowRight data-icon="inline-end" />
+                    {t("Take part in the study", "Ikut serta dalam studi")}
+                    <ArrowRight />
                   </Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="h-12 rounded-full px-7 text-base">
