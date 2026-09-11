@@ -3,6 +3,17 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.11.1 (2026-09-11)
+
+### Changed
+
+- **The mark is redrawn.** The banknote sits straight rather than tilted, and the brain is replaced by
+  a white head and shoulders silhouette, cropped by the note's inner border the way a portrait on a
+  real note is. The brain was too large for the note it stood in front of, and at small sizes its
+  folds closed up. A flat white silhouette holds its shape at sixteen pixels, and it needs no halo,
+  so the same drawing serves both themes.
+- The app icon is now the same drawing as the header mark, with no separate bolder cut.
+
 ## 2.11.0 (2026-09-11)
 
 ### Changed
