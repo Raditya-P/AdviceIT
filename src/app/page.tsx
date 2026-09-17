@@ -68,22 +68,22 @@ export default function HomePage() {
     {
       title: t("Describe an investor", "Gambarkan seorang investor"),
       text: t(
-        "Age, how long the money can stay invested, how much risk they can live with, and a few facts about their finances. Made up is fine.",
-        "Usia, berapa lama uangnya bisa tetap diinvestasikan, seberapa besar risiko yang sanggup dijalani, dan beberapa fakta tentang keuangannya. Rekaan pun tidak apa-apa.",
+        "Age, investment horizon, risk tolerance and a few facts about their finances. Made up is fine.",
+        "Usia, horizon investasi, toleransi risiko dan beberapa fakta tentang keuangannya. Rekaan pun tidak apa-apa.",
       ),
     },
     {
       title: t("Get a recommendation", "Dapatkan rekomendasi"),
       text: t(
-        "One of five investment mixes, from capital preservation to aggressive growth. Or, when the case calls for it, a referral to a human adviser.",
-        "Satu dari lima campuran investasi, dari pelestarian modal sampai pertumbuhan agresif. Atau, bila kasusnya menuntut, rujukan ke penasihat manusia.",
+        "One of five investment mixes ranging from capital preservation to aggressive growth. When the case calls for it the advisor refers you to a human adviser instead.",
+        "Satu dari lima campuran investasi mulai dari pelestarian modal sampai pertumbuhan agresif. Penasihat merujuk Anda ke penasihat manusia bila kasusnya menuntut.",
       ),
     },
     {
-      title: t("See why, in the style you choose", "Lihat mengapa, dengan gaya pilihan Anda"),
+      title: t("See why in the style you choose", "Lihat mengapa dengan gaya pilihan Anda"),
       text: t(
-        "Which of your answers mattered, what would change the advice, how sure the advisor is, or a conversation about it. Then decide whether you would trust it.",
-        "Jawaban Anda yang mana yang berpengaruh, apa yang akan mengubah sarannya, seberapa yakin penasihatnya, atau percakapan tentangnya. Lalu putuskan apakah Anda akan memercayainya.",
+        "Pick one of four explanation styles. Then decide whether you would trust what you were told.",
+        "Pilih satu dari empat gaya penjelasan. Lalu putuskan apakah Anda akan memercayai yang disampaikan.",
       ),
     },
   ];
@@ -92,7 +92,7 @@ export default function HomePage() {
     {
       icon: BarChart3,
       title: t("Why", "Mengapa"),
-      text: t("Which of your answers pushed the advice, and by how much.", "Jawaban Anda yang mana yang mendorong saran, dan seberapa besar."),
+      text: t("Which of your answers pushed the advice and by how much.", "Jawaban Anda yang mana yang mendorong saran dan seberapa besar."),
     },
     {
       icon: Shuffle,
@@ -102,12 +102,12 @@ export default function HomePage() {
     {
       icon: Gauge,
       title: t("How sure", "Seberapa yakin"),
-      text: t("The advisor's confidence, with every other outcome shown beside it.", "Keyakinan penasihat, dengan setiap hasil lain ditampilkan di sampingnya."),
+      text: t("The advisor's confidence with every other outcome shown beside it.", "Keyakinan penasihat dengan setiap hasil lain ditampilkan di sampingnya."),
     },
     {
       icon: MessageSquareText,
       title: t("Ask it", "Tanyakan"),
-      text: t("A conversation about the recommendation, grounded in the same numbers.", "Percakapan tentang rekomendasi, berpijak pada angka yang sama."),
+      text: t("A conversation about the recommendation grounded in the same numbers.", "Percakapan tentang rekomendasi yang berpijak pada angka yang sama."),
     },
   ];
 
@@ -123,7 +123,7 @@ export default function HomePage() {
             <div className="space-y-5">
               <span className="rise inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-3.5 py-1.5 text-sm text-muted-foreground backdrop-blur">
                 <span className="inline-block size-1.5 rounded-full bg-primary" />
-                {t("A research simulation, not a financial service", "Simulasi penelitian, bukan layanan keuangan")}
+                {t("A research simulation. Not a financial service", "Simulasi penelitian. Bukan layanan keuangan")}
               </span>
               <h1 className="rise rise-1 text-balance text-4xl font-semibold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
                 {t("Know when to trust", "Tahu kapan harus memercayai")}{" "}
@@ -131,8 +131,8 @@ export default function HomePage() {
               </h1>
               <p className="rise rise-2 max-w-xl text-lg leading-relaxed text-foreground">
                 {t(
-                  "Meet an AI investment advisor that explains itself. Describe an investor, get a recommended mix, and see exactly why it was chosen.",
-                  "Kenali penasihat investasi AI yang menjelaskan dirinya sendiri. Gambarkan seorang investor, dapatkan campuran yang direkomendasikan, dan lihat persis mengapa itu dipilih.",
+                  "Meet an AI investment advisor that explains itself. Describe an investor and get a recommended mix with the reasoning behind it.",
+                  "Kenali penasihat investasi AI yang menjelaskan dirinya sendiri. Gambarkan seorang investor dan dapatkan campuran yang direkomendasikan beserta alasannya.",
                 )}
               </p>
               <ul className="rise rise-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -200,12 +200,12 @@ export default function HomePage() {
                 {t("Two advisors", "Dua penasihat")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("Same data, two ways of thinking", "Data yang sama, dua cara berpikir")}
+                {t("Two ways of thinking about the same data", "Dua cara berpikir tentang data yang sama")}
               </h2>
               <p className="text-muted-foreground">
                 {t(
-                  "Both learned from the same 400 cases reviewed by a panel of financial experts. One reasons like a network, the other like a checklist.",
-                  "Keduanya belajar dari 400 kasus yang sama yang ditinjau panel ahli keuangan. Yang satu bernalar seperti jaringan, yang lain seperti daftar periksa.",
+                  "Both learned from the same 400 cases reviewed by a panel of financial experts. One reasons like a network and the other like a checklist.",
+                  "Keduanya belajar dari 400 kasus yang sama yang ditinjau panel ahli keuangan. Yang satu bernalar seperti jaringan dan yang lain seperti daftar periksa.",
                 )}
               </p>
             </div>
@@ -217,13 +217,13 @@ export default function HomePage() {
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight">{t("The AI advisor", "Penasihat AI")}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {t(
-                    "Learns the pattern in the cases and explains each recommendation afterwards, by working out how much every answer counted.",
-                    "Mempelajari pola dalam kasus dan menjelaskan tiap rekomendasi setelahnya, dengan menghitung seberapa besar setiap jawaban berpengaruh.",
+                    "Learns the pattern in the cases and explains each recommendation afterwards by working out how much every answer counted.",
+                    "Mempelajari pola dalam kasus dan menjelaskan tiap rekomendasi setelahnya dengan menghitung seberapa besar setiap jawaban berpengaruh.",
                   )}
                 </p>
                 <div className="mt-5 flex-1 space-y-2.5 rounded-2xl border border-border/80 bg-background/70 p-4">
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    {t("What counted, for one example investor", "Apa yang berpengaruh, untuk satu investor contoh")}
+                    {t("What counted for one example investor", "Apa yang berpengaruh untuk satu investor contoh")}
                   </p>
                   {bars.map((b) => (
                     <div key={b.key} className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)] items-center gap-3 text-sm">
@@ -254,8 +254,8 @@ export default function HomePage() {
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight">{t("The interpretable advisor", "Penasihat interpretable")}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {t(
-                    "A points table you can read in full. Every answer adds or removes points for each outcome, and the highest total wins. No step is hidden.",
-                    "Tabel poin yang bisa Anda baca seluruhnya. Setiap jawaban menambah atau mengurangi poin untuk tiap hasil, dan total tertinggi menang. Tidak ada langkah yang disembunyikan.",
+                    "A points table you can read in full. Every answer adds or removes points for each outcome and the highest total wins. No step is hidden.",
+                    "Tabel poin yang bisa Anda baca seluruhnya. Setiap jawaban menambah atau mengurangi poin untuk tiap hasil dan total tertinggi menang. Tidak ada langkah yang disembunyikan.",
                   )}
                 </p>
                 <div className="mt-5 flex-1 rounded-2xl border border-border/80 bg-background/70 p-4">
@@ -335,7 +335,7 @@ export default function HomePage() {
                 {t("Outcomes", "Hasil")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("Five mixes, and the option to say no", "Lima campuran, dan pilihan untuk berkata tidak")}
+                {t("Five mixes and the option to say no", "Lima campuran dan pilihan untuk berkata tidak")}
               </h2>
               <p className="text-muted-foreground">
                 {t(
@@ -370,8 +370,8 @@ export default function HomePage() {
                   <p className="font-semibold tracking-tight">{outcomeName("Human review")}</p>
                   <p className="text-sm text-muted-foreground">
                     {t(
-                      "When the case is not one a model should decide, the advisor says so and refers it to a person. The experts did the same with almost half the cases.",
-                      "Ketika kasusnya bukan sesuatu yang seharusnya diputuskan model, penasihat mengatakannya dan merujuk ke seseorang. Para ahli pun berbuat sama pada hampir separuh kasus.",
+                      "The advisor says so and refers the case to a person when a model should not be the one deciding. The experts did the same with almost half the cases.",
+                      "Penasihat mengatakannya dan merujuk kasus ke seseorang ketika model seharusnya tidak memutuskan. Para ahli pun berbuat sama pada hampir separuh kasus.",
                     )}
                   </p>
                 </div>
@@ -388,7 +388,7 @@ export default function HomePage() {
                 {t("Why this matters", "Mengapa ini penting")}
               </p>
               <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("An explanation can help you judge advice, or just make it sound convincing", "Sebuah penjelasan bisa membantu Anda menilai saran, atau sekadar membuatnya terdengar meyakinkan")}
+                {t("An explanation can help you judge advice or just make it sound convincing", "Sebuah penjelasan bisa membantu Anda menilai saran atau sekadar membuatnya terdengar meyakinkan")}
               </h2>
               <p className="text-muted-foreground">
                 {t(
@@ -400,14 +400,14 @@ export default function HomePage() {
             <div className="space-y-5 leading-relaxed text-muted-foreground lg:pt-9">
               <p>
                 {t(
-                  "Investment apps increasingly recommend what to do with your money, and the recommendation comes from a model. When it is right, following it helps. When it is wrong, following it costs real money. Most people cannot tell which is which from the recommendation alone.",
-                  "Aplikasi investasi makin sering merekomendasikan apa yang harus dilakukan dengan uang Anda, dan rekomendasi itu berasal dari sebuah model. Saat benar, mengikutinya membantu. Saat keliru, mengikutinya merugikan uang sungguhan. Kebanyakan orang tidak bisa membedakan keduanya dari rekomendasi saja.",
+                  "Investment apps increasingly recommend what to do with your money and the recommendation comes from a model. Following it helps when the model is right. Following it costs real money when the model is wrong. Most people cannot tell which is which from the recommendation alone.",
+                  "Aplikasi investasi makin sering merekomendasikan apa yang harus dilakukan dengan uang Anda dan rekomendasi itu berasal dari sebuah model. Mengikutinya membantu saat model benar. Mengikutinya merugikan uang sungguhan saat model keliru. Kebanyakan orang tidak bisa membedakan keduanya dari rekomendasi saja.",
                 )}
               </p>
               <p>
                 {t(
-                  "Explanations are meant to close that gap. Yet an explanation can also make wrong advice sound convincing. Which kinds of explanation help people judge, rather than simply persuade, is still an open question.",
-                  "Penjelasan dimaksudkan untuk menutup celah itu. Namun penjelasan juga bisa membuat saran yang keliru terdengar meyakinkan. Jenis penjelasan mana yang membantu orang menilai, bukan sekadar membujuk, masih menjadi pertanyaan terbuka.",
+                  "Explanations are meant to close that gap. Yet an explanation can also make wrong advice sound convincing. Which kinds of explanation help people judge rather than simply persuade is still an open question.",
+                  "Penjelasan dimaksudkan untuk menutup celah itu. Namun penjelasan juga bisa membuat saran yang keliru terdengar meyakinkan. Jenis penjelasan mana yang membantu orang menilai dan bukan sekadar membujuk masih menjadi pertanyaan terbuka.",
                 )}
               </p>
             </div>
@@ -428,8 +428,8 @@ export default function HomePage() {
                 </h2>
                 <p className="max-w-xl leading-relaxed text-muted-foreground">
                   {t(
-                    "Read a case, see the recommendation with one kind of explanation, say what you would do. Some recommendations are deliberately wrong, and the debrief tells you which. About fifteen minutes, anonymous, no account.",
-                    "Baca sebuah kasus, lihat rekomendasinya dengan satu jenis penjelasan, katakan apa yang akan Anda lakukan. Sebagian rekomendasi sengaja dibuat keliru, dan debrief memberi tahu yang mana. Sekitar lima belas menit, anonim, tanpa akun.",
+                    "Read a case. See the recommendation with one kind of explanation. Say what you would do. Some recommendations are deliberately wrong and the debrief tells you which. The study is anonymous and takes about fifteen minutes with no account needed.",
+                    "Baca sebuah kasus. Lihat rekomendasinya dengan satu jenis penjelasan. Katakan apa yang akan Anda lakukan. Sebagian rekomendasi sengaja dibuat keliru dan debrief memberi tahu yang mana. Studi ini anonim dan memakan sekitar lima belas menit tanpa perlu akun.",
                   )}
                 </p>
               </div>

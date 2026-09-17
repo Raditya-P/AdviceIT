@@ -3,6 +3,15 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.11.3 (2026-09-17)
+
+### Changed
+
+- Home page copy is tightened. Comma-heavy sentences are rewritten so a comma is only used where it
+  carries grammatical weight, which suits the research framing better than the looser earlier wording.
+  The count across the page drops from 55 to 4, all of them in one genuine list. Meaning is unchanged
+  and the Indonesian copy is rewritten to match.
+
 ## 2.11.2 (2026-09-11)
 
 ### Fixed

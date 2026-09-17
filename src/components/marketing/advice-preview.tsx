@@ -96,8 +96,8 @@ export function AdvicePreview() {
         </span>
         <p className="text-muted-foreground">
           {t(
-            "Live output of the advisor, computed in your browser.",
-            "Keluaran langsung dari penasihat, dihitung di browser Anda.",
+            "Live output of the advisor computed in your browser.",
+            "Keluaran langsung dari penasihat yang dihitung di browser Anda.",
           )}
         </p>
       </div>
