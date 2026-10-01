@@ -242,8 +242,8 @@ export function DesignContent() {
             </div>
             <p className="text-sm text-muted-foreground">
               {t(
-                "Nine cells. Eight of them are in the random pool. The conversational cell is offered by choice only, because it needs a WebGPU browser and downloads a model, so assigning it at random would fail for part of the sample.",
-                "Sembilan sel. Delapan di antaranya masuk kumpulan acak. Sel percakapan hanya ditawarkan lewat pilihan, karena membutuhkan browser dengan WebGPU dan mengunduh model, sehingga menetapkannya secara acak akan gagal untuk sebagian sampel.",
+                "Nine cells. Eight of them are in the random pool. The conversational cell is offered by choice only, because it needs a WebGPU browser and downloads a model, so assigning it at random would fail for part of the sample. Within the pool, each new participant goes to the condition and advisor pair with the fewest people so far, ties broken at random, so the sixteen pairs fill evenly instead of drifting apart as they would under simple randomisation.",
+                "Sembilan sel. Delapan di antaranya masuk kumpulan acak. Sel percakapan hanya ditawarkan lewat pilihan, karena membutuhkan browser dengan WebGPU dan mengunduh model, sehingga menetapkannya secara acak akan gagal untuk sebagian sampel. Di dalam kumpulan itu, setiap peserta baru ditempatkan pada pasangan kondisi dan penasihat yang pesertanya paling sedikit sejauh ini, dengan seri diputuskan secara acak, sehingga keenam belas pasangan terisi merata dan tidak menjauh satu sama lain seperti pada pengacakan sederhana.",
               )}
             </p>
           </section>
@@ -397,6 +397,12 @@ export function DesignContent() {
                 {t(
                   "Sessions where the explanation style was assigned at random are the experiment. Sessions where a participant chose their style are a separate stratum, analysed as a preference signal and never pooled with the random one.",
                   "Sesi yang gaya penjelasannya ditetapkan secara acak adalah eksperimennya. Sesi yang gayanya dipilih sendiri oleh peserta adalah strata terpisah, dianalisis sebagai sinyal preferensi dan tidak pernah digabung dengan yang acak.",
+                )}
+              </li>
+              <li>
+                {t(
+                  "Dropout is compared across conditions. Every session records the condition it was given at consent, so a condition that loses more people than the others is visible and can be accounted for, rather than silently reshaping who is left to analyse.",
+                  "Putus di tengah jalan dibandingkan antarkondisi. Setiap sesi mencatat kondisi yang diterimanya saat persetujuan, sehingga kondisi yang kehilangan lebih banyak peserta daripada yang lain terlihat dan dapat diperhitungkan, alih-alih diam-diam mengubah siapa yang tersisa untuk dianalisis.",
                 )}
               </li>
               <li>

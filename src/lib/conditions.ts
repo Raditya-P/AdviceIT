@@ -89,8 +89,14 @@ export function modalityOf(spec: ConditionSpec): Modality {
   return spec.modality ?? "visual";
 }
 
+/* An own-property check, because `name in PRESETS` is also true for
+   "toString" or "constructor", which a hand-edited ?cond= link can carry. */
+export function isPreset(name: string): boolean {
+  return Object.hasOwn(PRESETS, name);
+}
+
 export function specFor(preset: string): ConditionSpec {
-  return PRESETS[preset] ?? PRESETS.none;
+  return isPreset(preset) ? PRESETS[preset] : PRESETS.none;
 }
 
 /* The seven participant-facing cards on /participate. "none" stays out of

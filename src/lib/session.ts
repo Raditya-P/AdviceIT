@@ -17,6 +17,7 @@
    they were assigned. Refreshing cannot be used to shop for another one. */
 
 import type { ContentPart, Form, Modality } from "./conditions";
+import type { AssignmentMethod } from "./records";
 
 export type ResumableStage = "literacy" | "characteristics" | "trial" | "exit";
 
@@ -29,6 +30,9 @@ export interface SavedSession {
   form: Form;
   modality: Modality;
   assignedBy: "random" | "chosen";
+  /* Absent in sessions saved before 2.12.0, which were all drawn in the
+     browser. */
+  assignmentMethod?: AssignmentMethod;
   stage: ResumableStage;
   litAnswers: Record<string, string>;
   pcAnswers: Record<string, number>;

@@ -23,6 +23,59 @@ import { ExplanationCard, ProbabilityBars } from "./explanation-boxes";
 
 type Ignored = Partial<Record<keyof Profile, boolean>>;
 
+/* The panel's small controls live out here. Defined inside the panel they
+   were a new component on every render, so React rebuilt them after each
+   change and keyboard focus fell off the control that had just been used. */
+function IgnoreToggle({
+  checked,
+  onToggle,
+  label,
+  text,
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  label: string;
+  text: string;
+}) {
+  return (
+    <label className="ml-2 inline-flex items-center gap-1 text-xs font-normal text-muted-foreground">
+      <Checkbox checked={checked} onCheckedChange={onToggle} aria-label={label} className="size-3.5" />
+      {text}
+    </label>
+  );
+}
+
+function Seg({
+  options,
+  value,
+  onChange,
+  name,
+}: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+  name: string;
+}) {
+  return (
+    <div role="radiogroup" aria-label={name} className="inline-flex flex-wrap overflow-hidden rounded-lg border">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          role="radio"
+          aria-checked={value === o.value}
+          onClick={() => onChange(o.value)}
+          className={`px-3 py-1.5 text-sm transition-colors not-last:border-r ${
+            value === o.value ? "bg-primary font-medium text-primary-foreground" : "hover:bg-muted"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function WhatIfPanel({
   result,
   onInteract,
@@ -69,40 +122,13 @@ export function WhatIfPanel({
     onInteract?.("move");
   };
 
-  const IgnoreToggle = ({ k }: { k: keyof Profile }) => (
-    <label className="ml-2 inline-flex items-center gap-1 text-xs font-normal text-muted-foreground">
-      <Checkbox checked={!!ignored[k]} onCheckedChange={() => toggleIgnore(k)} aria-label={`${t("Ignore", "Abaikan")} ${k}`} className="size-3.5" />
-      {t("ignore", "abaikan")}
-    </label>
-  );
-
-  const Seg = ({
-    options,
-    value,
-    onChange,
-    name,
-  }: {
-    options: { value: string; label: string }[];
-    value: string;
-    onChange: (v: string) => void;
-    name: string;
-  }) => (
-    <div role="radiogroup" aria-label={name} className="inline-flex flex-wrap overflow-hidden rounded-lg border">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          role="radio"
-          aria-checked={value === o.value}
-          onClick={() => onChange(o.value)}
-          className={`px-3 py-1.5 text-sm transition-colors not-last:border-r ${
-            value === o.value ? "bg-primary font-medium text-primary-foreground" : "hover:bg-muted"
-          }`}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
+  const ignoreToggle = (k: keyof Profile) => (
+    <IgnoreToggle
+      checked={!!ignored[k]}
+      onToggle={() => toggleIgnore(k)}
+      label={`${t("Ignore", "Abaikan")} ${k}`}
+      text={t("ignore", "abaikan")}
+    />
   );
 
   return (
@@ -118,7 +144,7 @@ export function WhatIfPanel({
           <div className="space-y-1.5">
             <Label>
               {t("Age", "Usia")}
-              <IgnoreToggle k="age" />
+              {ignoreToggle("age")}
             </Label>
             <NumberField
               min={18}
@@ -133,7 +159,7 @@ export function WhatIfPanel({
             <Label>
               {t("Investment horizon:", "Horizon investasi:")} <span className="tabular-nums text-primary">{whatIf.horizon}</span>{" "}
               {t("years", "tahun")}
-              <IgnoreToggle k="horizon" />
+              {ignoreToggle("horizon")}
             </Label>
             <Slider
               min={1}
@@ -147,7 +173,7 @@ export function WhatIfPanel({
           <div className="space-y-1.5">
             <Label>
               {t("Risk tolerance", "Toleransi risiko")}
-              <IgnoreToggle k="tolerance" />
+              {ignoreToggle("tolerance")}
             </Label>
             <Seg
               name={t("What-if tolerance", "Toleransi what-if")}
@@ -163,7 +189,7 @@ export function WhatIfPanel({
           <div className="space-y-1.5">
             <Label>
               {t("Emergency fund", "Dana darurat")}
-              <IgnoreToggle k="emergencyFund" />
+              {ignoreToggle("emergencyFund")}
             </Label>
             <Seg
               name={t("What-if emergency fund", "Dana darurat what-if")}
@@ -178,7 +204,7 @@ export function WhatIfPanel({
           <div className="space-y-1.5">
             <Label>
               {t("Income stability", "Stabilitas pendapatan")}
-              <IgnoreToggle k="incomeStable" />
+              {ignoreToggle("incomeStable")}
             </Label>
             <Seg
               name={t("What-if income", "Pendapatan what-if")}
@@ -193,7 +219,7 @@ export function WhatIfPanel({
           <div className="space-y-1.5">
             <Label>
               {t("Significant debt or obligations", "Utang atau kewajiban besar")}
-              <IgnoreToggle k="debtObligations" />
+              {ignoreToggle("debtObligations")}
             </Label>
             <Seg
               name={t("What-if debt", "Utang what-if")}
@@ -208,7 +234,7 @@ export function WhatIfPanel({
           <div className="space-y-1.5">
             <Label>
               {t("Money needed in the near term", "Dana dibutuhkan dalam waktu dekat")}
-              <IgnoreToggle k="nearTermNeed" />
+              {ignoreToggle("nearTermNeed")}
             </Label>
             <Seg
               name={t("What-if near-term need", "Kebutuhan jangka pendek what-if")}

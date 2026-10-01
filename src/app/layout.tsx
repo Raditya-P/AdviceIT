@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Geist_Mono, Instrument_Sans, Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import { COOKIE, LanguageProvider, type Locale } from "@/lib/i18n";
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const sans = Inter({
@@ -24,13 +25,27 @@ const mono = Geist_Mono({
   display: "swap",
 });
 
+/* The link preview is the study's recruitment poster: most people meet the
+   site as a link pasted into a chat. Pages set their own title and
+   description and inherit this card whole, image included (the image is
+   drawn by opengraph-image.tsx). */
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "AdviceIT: explainable AI investment advice, studied with you",
+    default: SITE_TITLE,
     template: "%s · AdviceIT",
   },
-  description:
-    "An open research study on which explanations help people trust AI investment advice the right amount. Try two advisors trained on expert-validated data, then contribute a 15-minute session.",
+  description: SITE_DESCRIPTION,
+  applicationName: "AdviceIT",
+  openGraph: {
+    type: "website",
+    siteName: "AdviceIT",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    locale: "en_US",
+    alternateLocale: ["id_ID"],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

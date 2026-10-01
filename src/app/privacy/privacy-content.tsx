@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
 import { tr, useLang } from "@/lib/i18n";
+import { CONTACT } from "@/lib/study";
 
 export function PrivacyContent() {
   const { locale } = useLang();
@@ -27,8 +28,8 @@ export function PrivacyContent() {
           <h2 className="text-xl font-semibold">{t("What is collected", "Apa yang dikumpulkan")}</h2>
           <p className="text-muted-foreground">
             {t(
-              "Only what you enter during a study session: your answers to the three financial-knowledge questions, the hypothetical cases you saw, the recommendation and explanation shown, your trust ratings and decisions, the optional free-text answers, and timing. Everything is stored under a random participant ID shown to you at the start and the end of the session.",
-              "Hanya yang Anda masukkan selama sesi studi: jawaban Anda atas tiga pertanyaan pengetahuan keuangan, kasus hipotetis yang Anda lihat, rekomendasi dan penjelasan yang ditampilkan, penilaian kepercayaan dan keputusan Anda, jawaban teks bebas yang opsional, dan waktu. Semuanya disimpan di bawah ID partisipan acak yang ditunjukkan kepada Anda di awal dan akhir sesi.",
+              "Only what you enter during a study session: your answers to the three financial-knowledge questions and to nine short statements about how you think and what you expect from the advice, the hypothetical cases you saw, the recommendation and explanation shown, your trust ratings and decisions, your five ratings of the explanations at the end, the optional free-text answers, and timing. Alongside them we record the site language, whether the device was a mobile one, and whether the session was left and picked up again. Everything is stored under a random participant ID shown to you at the end of the session.",
+              "Hanya yang Anda masukkan selama sesi studi: jawaban Anda atas tiga pertanyaan pengetahuan keuangan dan atas sembilan pernyataan singkat tentang cara Anda berpikir dan harapan Anda terhadap sarannya, kasus hipotetis yang Anda lihat, rekomendasi dan penjelasan yang ditampilkan, penilaian kepercayaan dan keputusan Anda, lima penilaian Anda atas penjelasan di bagian akhir, jawaban teks bebas yang opsional, dan waktu. Bersama itu kami mencatat bahasa situs, apakah Anda memakai perangkat seluler, dan apakah sesi sempat ditinggalkan lalu dilanjutkan. Semuanya disimpan di bawah ID partisipan acak yang ditunjukkan kepada Anda di akhir sesi.",
             )}
           </p>
           <h2 className="text-xl font-semibold">{t("What is not collected", "Apa yang tidak dikumpulkan")}</h2>
@@ -53,7 +54,12 @@ export function PrivacyContent() {
             )}
           </p>
           <h2 className="text-xl font-semibold">{t("Contact", "Kontak")}</h2>
-          <p className="text-muted-foreground">Raditya Pratama · radityapratama2077@gmail.com</p>
+          <p className="text-muted-foreground">
+            {CONTACT.name} ·{" "}
+            <a className="font-medium text-primary underline underline-offset-4" href={`mailto:${CONTACT.email}`}>
+              {CONTACT.email}
+            </a>
+          </p>
         </div>
       </main>
       <SiteFooter />

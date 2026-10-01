@@ -1,0 +1,32 @@
+# The checks the README asks for before a deploy, run on every push to main
+# and every pull request: types, lint, the verification suite (training
+# accuracies, Shapley efficiency, i18n, intent routing, sessions) and a
+# production build.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - name: Verification suite
+        run: |
+          npx --yes tsx scripts/verify.ts
+          npx --yes tsx scripts/i18n-smoke.ts
+          npx --yes tsx scripts/intent-smoke.ts
+          npx --yes tsx scripts/session-smoke.ts
+          npx --yes tsx scripts/sql-smoke.ts
+          npx --yes tsx scripts/records-smoke.ts
+      - run: npm run build

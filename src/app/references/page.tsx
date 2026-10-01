@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { pageLocale } from "@/lib/locale-server";
 
-export const metadata = { title: "References" };
+export const metadata = {
+  title: "References",
+  description: "The research, data and tools AdviceIT builds on.",
+};
 
 type L = { en: string; id: string };
 const SECTIONS: { title: L; refs: { text: string; use: L; href?: string }[] }[] = [

@@ -41,6 +41,32 @@ export const pct = (n: number, den: number) => (den ? `${Math.round((n / den) * 
 export const trials = (rows: Row[]) => rows.filter((r) => r.rowType === "trial" || r.rowType === undefined);
 export const exits = (rows: Row[]) => rows.filter((r) => r.rowType === "exit");
 
+/* A row stored twice (a resend whose first answer was lost, before the
+   collector learned to skip rows it already holds) has the same
+   participant, type, trial and client timestamp as its twin. The tables
+   count it once. */
+export function dedupeRows(rows: Row[]): Row[] {
+  const seen = new Set<string>();
+  return rows.filter((r) => {
+    const k = [r.participantId, r.rowType, r.trialIndex ?? "", r.timestamp ?? ""].join("|");
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
+/* The analysis population. The random stratum is the experiment proper,
+   and a participant who failed the attention check is usually excluded
+   whole, with every row they gave. */
+export function scopeRows(rows: Row[], opts: { randomOnly: boolean; dropFailedAttention: boolean }): Row[] {
+  const failed = new Set(rows.filter((r) => r.attentionCheck === "failed").map((r) => String(r.participantId)));
+  return rows.filter(
+    (r) =>
+      (!opts.randomOnly || r.assignedBy === "random") &&
+      (!opts.dropFailedAttention || !failed.has(String(r.participantId))),
+  );
+}
+
 export function overview(rows: Row[]) {
   const t = trials(rows);
   const participants = new Set(t.map((r) => r.participantId));
@@ -174,14 +200,46 @@ export function quality(rows: Row[]) {
   return { attentionTotal: att.length, attentionPassed: passed, byLevel, under2s: fastest };
 }
 
+/* Balanced assignment writes an "assign" row the moment a session starts.
+   Set beside the exit rows, these give dropout per condition: a condition
+   that loses more people than the others threatens the comparison on its
+   own, because whoever stays is no longer a random slice. Only sessions with
+   an assign row are counted, so started and finished describe the same
+   people. */
+export function assignmentTable(rows: Row[]) {
+  const assigned = rows.filter((r) => r.rowType === "assign");
+  const finished = new Set(exits(rows).map((r) => String(r.participantId)));
+  const out: { condition: string; started: number; finished: number; dropout: string; ml: number; logit: number }[] = [];
+  for (const c of CONDITION_ORDER) {
+    const rs = assigned.filter((r) => r.condition === c);
+    if (!rs.length) continue;
+    const ids = new Set(rs.map((r) => String(r.participantId)));
+    const done = Array.from(ids).filter((id) => finished.has(id)).length;
+    out.push({
+      condition: CONDITION_LABELS[c],
+      started: ids.size,
+      finished: done,
+      dropout: pct(ids.size - done, ids.size),
+      ml: rs.filter((r) => r.advisorModel === "ml").length,
+      logit: rs.filter((r) => r.advisorModel === "logit").length,
+    });
+  }
+  return out;
+}
+
 export function toCSV(rows: Row[]): string {
   const keys = Array.from(rows.reduce((set, r) => {
     Object.keys(r).forEach((k) => set.add(k));
     return set;
   }, new Set<string>()));
+  /* Free text comes from anonymous visitors. A text cell that starts like a
+     formula (= + - @, a tab or a carriage return) gets a leading apostrophe,
+     so a spreadsheet shows it instead of running it. Numbers are written
+     as they are, so negative values stay numeric. */
   const cell = (v: unknown) => {
     if (v === null || v === undefined) return "";
-    const s = String(v);
+    let s = String(v);
+    if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return [keys.join(","), ...rows.map((r) => keys.map((k) => cell(r[k])).join(","))].join("\r\n") + "\r\n";

@@ -3,7 +3,9 @@
 /* Resolves the assignment from the URL: cond (a preset, random among the
    assignable pool if absent or unknown), by (random or chosen), and an
    optional pid for researcher-issued links. Custom content and form are
-   accepted for researcher use via content= and form=. */
+   accepted for researcher use via content= and form=. The pid is cleaned to
+   what the collector accepts (letters, digits, - and _, up to 40), because
+   a pid like "P 07" would otherwise have every row of the session refused. */
 
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
@@ -11,7 +13,7 @@ import {
   CONTENT_PARTS,
   FORMS,
   MODALITIES,
-  PRESETS,
+  isPreset,
   modalityOf,
   presetFor,
   specFor,
@@ -19,6 +21,7 @@ import {
   type Form,
   type Modality,
 } from "@/lib/conditions";
+import { cleanParticipantId } from "@/lib/records";
 import { randomCondition } from "@/lib/study";
 import { StudyFlow, type Assignment } from "@/components/study/study-flow";
 
@@ -44,18 +47,21 @@ export function StudyEntry() {
         form,
         modality,
         assignedBy: "chosen",
-        pid: sp.get("pid") || undefined,
+        pid: cleanParticipantId(sp.get("pid")),
       };
     }
-    const condition = condParam in PRESETS ? condParam : randomCondition();
+    const condition = isPreset(condParam) ? condParam : randomCondition();
     const spec = specFor(condition);
     return {
       condition,
       content: [...spec.content],
       form: spec.form,
       modality: modalityParam ? modality : modalityOf(spec),
-      assignedBy: condParam in PRESETS ? by : "random",
-      pid: sp.get("pid") || undefined,
+      assignedBy: isPreset(condParam) ? by : "random",
+      /* The plain way in, with nothing fixed by the link: the server picks
+         the cell at consent, and this draw is only the fallback. */
+      balanced: !isPreset(condParam) && !modalityParam,
+      pid: cleanParticipantId(sp.get("pid")),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

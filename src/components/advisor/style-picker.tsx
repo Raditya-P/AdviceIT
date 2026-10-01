@@ -22,7 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CONTENT_PARTS, FORMS, MODALITIES, presetLabel, type ContentPart, type Form, type Modality } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
-import * as llm from "@/lib/llm";
+import { useWebGpu } from "@/lib/use-webgpu";
 import { Seg } from "./profile-form";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -147,7 +147,7 @@ export function StylePicker({
 }) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
-  const gpuMissing = !llm.supported();
+  const gpuMissing = !useWebGpu();
 
   return (
     <div className="space-y-6">

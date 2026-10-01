@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,6 +18,8 @@ import { grantResearcherAccess } from "@/lib/researcher";
 import { SiteHeader } from "@/components/site-header";
 import {
   CONDITION_LABELS,
+  assignmentTable,
+  dedupeRows,
   exits,
   fmt,
   mean,
@@ -25,6 +28,7 @@ import {
   perceptionTable,
   quality,
   relianceTable,
+  scopeRows,
   toCSV,
   toQualitativeCSV,
   trials,
@@ -36,26 +40,45 @@ export default function ResearcherPage() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [randomOnly, setRandomOnly] = useState(false);
+  const [dropFailedAttention, setDropFailedAttention] = useState(false);
 
+  /* The API returns pages of rows, oldest first, and the key goes in a
+     header so it never appears in a request log. */
   const fetchRows = async () => {
     setBusy(true);
     setStatus("Fetching");
     try {
-      const res = await fetch(`/api/responses?key=${encodeURIComponent(key)}`);
-      if (res.status === 401) {
-        setStatus("Wrong key.");
-        setRows(null);
-        return;
+      const all: Row[] = [];
+      let after: number | null = 0;
+      while (after !== null) {
+        const res: Response = await fetch(`/api/responses?after=${after}`, {
+          headers: { Authorization: `Bearer ${key}` },
+          cache: "no-store",
+        });
+        if (res.status === 401) {
+          setStatus("Wrong key.");
+          setRows(null);
+          return;
+        }
+        if (res.status === 503) {
+          setStatus("The database is not configured on this deployment (DATABASE_URL missing).");
+          setRows(null);
+          return;
+        }
+        if (!res.ok) {
+          setStatus(`The API answered ${res.status}. Nothing was loaded.`);
+          setRows(null);
+          return;
+        }
+        const data: { rows?: Row[]; next?: number | null } = await res.json();
+        all.push(...(data.rows ?? []));
+        after = data.next ?? null;
+        if (after !== null) setStatus(`Fetching, ${all.length} rows so far`);
       }
-      if (res.status === 503) {
-        setStatus("The database is not configured on this deployment (DATABASE_URL missing).");
-        setRows(null);
-        return;
-      }
-      const data = await res.json();
-      setRows(data.rows || []);
+      setRows(all);
       grantResearcherAccess();
-      setStatus(`${data.count} rows fetched. Researcher controls on the advisor pages are unlocked for this browser session.`);
+      setStatus(`${all.length} rows fetched. Researcher controls on the advisor pages are unlocked for this browser session.`);
     } catch {
       setStatus("Could not reach the API.");
     } finally {
@@ -84,16 +107,33 @@ export default function ResearcherPage() {
     download("adviceit-qualitative.csv", toQualitativeCSV(rows));
   };
 
-  const ov = rows ? overview(rows) : null;
-  const rel = rows ? relianceTable(rows) : [];
-  const meas = rows ? measuresTable(rows) : [];
-  const perc = rows ? perceptionTable(rows) : [];
-  const qual = rows ? quality(rows) : null;
-  const exitRows = rows ? exits(rows) : [];
+  /* The tables read deduplicated rows, and the experiment tables follow the
+     two analysis-population toggles. The CSV downloads stay the raw rows,
+     so no exclusion is decided for the analyst. */
+  const unique = rows ? dedupeRows(rows) : null;
+  const duplicates = rows && unique ? rows.length - unique.length : 0;
+  const failedParticipants = unique
+    ? new Set(unique.filter((r) => r.attentionCheck === "failed").map((r) => String(r.participantId))).size
+    : 0;
+  const experiment = unique
+    ? scopeRows(
+        unique.filter((r) => r.rowType !== "explore"),
+        { randomOnly, dropFailedAttention },
+      )
+    : null;
+  const ov = experiment ? overview(experiment) : null;
+  const rel = experiment ? relianceTable(experiment) : [];
+  const meas = experiment ? measuresTable(experiment) : [];
+  const perc = experiment ? perceptionTable(experiment) : [];
+  const qual = experiment ? quality(experiment) : null;
+  const exitRows = experiment ? exits(experiment) : [];
+  /* Dropout reads every started session, whatever the toggles say: a
+     person who left early never reaches the attention check. */
+  const attrition = unique ? assignmentTable(unique) : [];
   /* Visitor tryouts from the advisor pages. Self-chosen condition and
      self-written profile, so they are a convenience sample, reported apart
      from the experiment and excluded from every table above. */
-  const exploreRows = rows ? rows.filter((r) => r.rowType === "explore") : [];
+  const exploreRows = unique ? unique.filter((r) => r.rowType === "explore") : [];
   const exploreVisitors = new Set(exploreRows.map((r) => r.participantId)).size;
   const exploreByCondition = Object.entries(
     exploreRows.reduce<Record<string, number>>((acc, r) => {
@@ -103,7 +143,7 @@ export default function ResearcherPage() {
     }, {}),
   )
     .sort((a, b) => b[1] - a[1])
-    .map(([key, n]) => ({ key: CONDITION_LABELS[key] ?? key, n }));
+    .map(([key, n]) => ({ key: Object.hasOwn(CONDITION_LABELS, key) ? CONDITION_LABELS[key] : key, n }));
   const exploreTrust = mean(exploreRows.map((r) => Number(r.trustRating)).filter((n) => !isNaN(n)));
 
   return (
@@ -152,6 +192,27 @@ export default function ResearcherPage() {
             </CardContent>
           </Card>
 
+          {rows && (
+            <Card>
+              <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-6 text-sm">
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Analysis population
+                </span>
+                <label className="flex items-center gap-2">
+                  <Checkbox checked={randomOnly} onCheckedChange={(v) => setRandomOnly(v === true)} />
+                  Random assignment only (the experiment)
+                </label>
+                <label className="flex items-center gap-2">
+                  <Checkbox checked={dropFailedAttention} onCheckedChange={(v) => setDropFailedAttention(v === true)} />
+                  Exclude participants who failed the attention check ({failedParticipants})
+                </label>
+                {duplicates > 0 && (
+                  <span className="text-muted-foreground">{duplicates} duplicate rows are counted once.</span>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {ov && (
             <Card>
               <CardHeader>
@@ -170,6 +231,43 @@ export default function ResearcherPage() {
                     <BarList title="Scenario" items={ov.byScenario} />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {attrition.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Balanced assignment and dropout</CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Sessions placed by balanced assignment, per condition. Started counts the people given the condition at
+                  consent, finished those who reached the exit questionnaire. A condition that loses noticeably more
+                  people than the others can bias the comparison, because the ones who stay are no longer a random
+                  slice. The advisor columns count starts.
+                </p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      {["Condition", "started", "finished", "dropout", "AI advisor", "rule-based"].map((h) => (
+                        <TableHead key={h}>{h}</TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {attrition.map((r) => (
+                      <TableRow key={r.condition}>
+                        <TableCell className="font-medium">{r.condition}</TableCell>
+                        <TableCell>{r.started}</TableCell>
+                        <TableCell>{r.finished}</TableCell>
+                        <TableCell>{r.dropout}</TableCell>
+                        <TableCell>{r.ml}</TableCell>
+                        <TableCell>{r.logit}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           )}
@@ -330,7 +428,7 @@ export default function ResearcherPage() {
             </Card>
           )}
 
-          {rows && exitRows.length > 0 && (
+          {experiment && exitRows.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Exit answers (qualitative strand)</CardTitle>
@@ -349,7 +447,9 @@ export default function ResearcherPage() {
             </Card>
           )}
 
-          {rows && trials(rows).length === 0 && <p className="text-muted-foreground">No trial rows yet.</p>}
+          {experiment && trials(experiment).length === 0 && (
+            <p className="text-muted-foreground">No trial rows in this selection.</p>
+          )}
         </div>
       </main>
       <SiteFooter />

@@ -3,10 +3,10 @@
 /* The advisor page: a three-step flow. Choose how the advice gets explained,
    describe the investor, then read the recommendation with that explanation.
    Nothing here is logged as study data. The researcher flag (?researcher=1)
-   unlocks the scenario toggle, the labels and comparison line, the ILS-Bench
-   case loader and the example dropdown. */
+   unlocks the scenario toggle and the labels and comparison line. The
+   ILS-Bench case loader and the example dropdown are open to everyone. */
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, GraduationCap, Pencil, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,8 @@ import { TryResponse } from "./try-response";
 
 type Step = "style" | "profile" | "analyzing" | "result";
 
+const noSubscription = () => () => {};
+
 function advisorDescription(advisorId: "ml" | "logit", locale: "en" | "id") {
   if (locale === "en") return ADVISORS[advisorId].description;
   if (advisorId === "ml") {
@@ -48,12 +50,11 @@ export function Playground({
   const t = (en: string, id: string) => tr(locale, { en, id });
   const advisor = ADVISORS[advisorId];
   /* ?researcher=1 only asks. The controls unlock when the dashboard has
-     validated the key in this browser session. Read in an effect, because
-     sessionStorage does not exist during server rendering. */
-  const [researcher, setResearcher] = useState(false);
-  useEffect(() => {
-    setResearcher(researcherRequested && hasResearcherAccess());
-  }, [researcherRequested]);
+     validated the key in this browser session. sessionStorage does not exist
+     during server rendering, so useSyncExternalStore reads "locked" while
+     hydrating and the real answer straight after. */
+  const researcherAccess = useSyncExternalStore(noSubscription, hasResearcherAccess, () => false);
+  const researcher = researcherRequested && researcherAccess;
   const [step, setStep] = useState<Step>("style");
   const [profile, setProfile] = useState<FormProfile>(DEFAULT_PROFILE);
   const [preset, setPreset] = useState<string>("feature");
@@ -208,8 +209,8 @@ export function Playground({
               </h2>
               <p className="text-muted-foreground">
                 {t(
-                  "These are the questions a robo-advisor would ask before recommending anything. Everything here is hypothetical and nothing is stored.",
-                  "Ini pertanyaan yang akan diajukan robo-advisor sebelum merekomendasikan apa pun. Semuanya bersifat hipotetis dan tidak ada yang disimpan.",
+                  "These are the questions a robo-advisor would ask before recommending anything. Everything here is hypothetical, and nothing is stored unless you send the optional response at the end.",
+                  "Ini pertanyaan yang akan diajukan robo-advisor sebelum merekomendasikan apa pun. Semuanya bersifat hipotetis, dan tidak ada yang disimpan kecuali Anda mengirim respons opsional di bagian akhir.",
                 )}
               </p>
             </div>
@@ -343,8 +344,8 @@ export function Playground({
               </h2>
               <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
                 {t(
-                  "Did that explanation help you judge the advice, or just make it feel convincing? Ten anonymous minutes with six cases is how we find out.",
-                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Sepuluh menit anonim dengan enam kasus adalah cara kami mencari tahu.",
+                  "Did that explanation help you judge the advice, or just make it feel convincing? About fifteen anonymous minutes with six cases is how we find out.",
+                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Sekitar lima belas menit anonim dengan enam kasus adalah cara kami mencari tahu.",
                 )}
               </p>
               <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">

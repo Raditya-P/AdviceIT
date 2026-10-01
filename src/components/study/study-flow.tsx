@@ -28,10 +28,17 @@ import { ADVISORS } from "@/lib/advisor/advisors";
 import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
 import { outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
-import { presetLabel, type ContentPart, type Form, type Modality } from "@/lib/conditions";
-import { ArrowRight, UserRound } from "lucide-react";
+import { modalityOf, presetLabel, specFor, type ContentPart, type Form, type Modality } from "@/lib/conditions";
+import { ArrowRight, Check, Copy, UserRound } from "lucide-react";
 import { tr, useLang } from "@/lib/i18n";
-import { markParticipated, priorParticipation, submitRow, type StudyRow } from "@/lib/records";
+import {
+  markParticipated,
+  priorParticipation,
+  requestAssignment,
+  submitRow,
+  type AssignmentMethod,
+  type StudyRow,
+} from "@/lib/records";
 import {
   clearSession,
   noSession,
@@ -43,6 +50,8 @@ import {
 } from "@/lib/session";
 import * as llm from "@/lib/llm";
 import {
+  ASSIGNABLE_CONDITIONS,
+  CONTACT,
   EOS_ITEMS,
   LITERACY_CORRECT,
   NFC_ITEMS,
@@ -73,6 +82,8 @@ export interface Assignment {
   form: Form;
   modality?: Modality;
   assignedBy: "random" | "chosen";
+  /* True on the plain way in, where the server picks the cell at consent. */
+  balanced?: boolean;
   pid?: string;
 }
 
@@ -109,10 +120,10 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   const LQ = literacyFor(locale);
 
   const [pid] = useState(() => restored?.pid || assignment.pid || randomParticipantId());
-  const [advisorId] = useState<"ml" | "logit">(() => restored?.advisorId ?? randomAdvisor());
+  const [advisorId, setAdvisorId] = useState<"ml" | "logit">(() => restored?.advisorId ?? randomAdvisor());
   /* The condition in force. A restored session carries its own, so coming
      back through a different link cannot move anyone into another one. */
-  const [live] = useState<Assignment>(() =>
+  const [live, setLive] = useState<Assignment>(() =>
     restored
       ? {
           condition: restored.condition,
@@ -124,6 +135,10 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         }
       : assignment,
   );
+  const [method, setMethod] = useState<AssignmentMethod>(() =>
+    restored ? (restored.assignmentMethod ?? "simple") : assignment.balanced ? "simple" : "url",
+  );
+  const [assigning, setAssigning] = useState(false);
   const [stage, setStage] = useState<Stage>(restored ? restored.stage : "consent");
   const [consented, setConsented] = useState(restored !== null);
   const [litAnswers, setLitAnswers] = useState<Record<string, string>>(() => restored?.litAnswers ?? {});
@@ -135,6 +150,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   const [perception, setPerception] = useState<Record<string, number>>(() => restored?.perception ?? {});
   const [exit1, setExit1] = useState(restored?.exit1 ?? "");
   const [exit2, setExit2] = useState(restored?.exit2 ?? "");
+  const [exitBusy, setExitBusy] = useState(false);
   const prior = useMemo(() => (typeof window === "undefined" ? null : priorParticipation()), []);
   const router = useRouter();
   const [resumed, setResumed] = useState<{ stage: ResumableStage; trialIdx: number } | null>(() =>
@@ -175,6 +191,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
       form: live.form,
       modality: live.modality ?? "visual",
       assignedBy: live.assignedBy,
+      assignmentMethod: method,
       stage: stage as ResumableStage,
       litAnswers,
       pcAnswers,
@@ -186,7 +203,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
       updatedAt: now,
       resumes: resumes.current,
     });
-  }, [stage, pid, advisorId, live, litAnswers, pcAnswers, trialIdx, perception, exit1, exit2]);
+  }, [stage, pid, advisorId, live, method, litAnswers, pcAnswers, trialIdx, perception, exit1, exit2]);
 
   const startOver = () => {
     clearSession();
@@ -232,6 +249,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
     explanationForm: live.form,
     explanationModality: live.modality ?? "visual",
     assignedBy: live.assignedBy,
+    assignmentMethod: method,
     advisorModel: advisorId,
     advisorAssignedBy: "random",
     language: locale,
@@ -256,8 +274,15 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
     setSaved(ok ? "server" : "local");
   };
 
+  /* Guarded like the trial submit, so a double click on the last button
+     cannot send the exit row twice. */
   const finishExit = async () => {
-    await submitRow({
+    if (exitBusy) return;
+    setExitBusy(true);
+    /* The exit row goes out last, behind anything still buffered, so its
+       fate is the session's: stored means every row arrived, and the done
+       screen tells the participant when some are still waiting here. */
+    const ok = await submitRow({
       ...baseRow(),
       rowType: "exit",
       timestamp: new Date().toISOString(),
@@ -269,9 +294,36 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
       exitDistrustMoment: exit1.trim().slice(0, 2000),
       exitMissingExplanation: exit2.trim().slice(0, 2000),
     } as StudyRow);
+    setSaved(ok ? "server" : "local");
     markParticipated(pid);
     clearSession();
     setStage("debrief");
+  };
+
+  /* Balanced assignment happens at consent: after the person has agreed to
+     take part, so whether someone consents cannot depend on their cell, and
+     before anything about the cell is shown. If the collector cannot answer,
+     the condition and advisor drawn in this browser stand, and every row
+     says so through assignmentMethod. */
+  const begin = async () => {
+    if (assignment.balanced && !restored) {
+      setAssigning(true);
+      const cell = await requestAssignment(pid, locale);
+      if (cell && (ASSIGNABLE_CONDITIONS as readonly string[]).includes(cell.condition)) {
+        const spec = specFor(cell.condition);
+        setLive((current) => ({
+          ...current,
+          condition: cell.condition,
+          content: [...spec.content],
+          form: spec.form,
+          modality: modalityOf(spec),
+        }));
+        setAdvisorId(cell.advisor);
+        setMethod("balanced");
+      }
+      setAssigning(false);
+    }
+    setStage("literacy");
   };
 
   /* ---------------------------- Stages ---------------------------- */
@@ -294,6 +346,18 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
             {para}
           </p>
         ))}
+        <p className="text-muted-foreground">
+          {t(
+            "For questions, or to have your data deleted later, write to",
+            "Untuk pertanyaan, atau untuk meminta data Anda dihapus nanti, tulis kepada",
+          )}{" "}
+          <ContactLine />.{" "}
+          {t("The", "")}{" "}
+          <Link href="/privacy" target="_blank" rel="noopener" className="underline underline-offset-4">
+            {t("privacy page", "Halaman privasi")}
+          </Link>{" "}
+          {t("lists everything that is recorded.", "mencantumkan semua yang direkam.")}
+        </p>
         <label className="flex items-start gap-2 pt-2 font-medium">
           <Checkbox checked={consented} onCheckedChange={(v) => setConsented(v === true)} className="mt-0.5" />
           {t(
@@ -302,8 +366,8 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           )}
         </label>
         <div className="flex items-center gap-3 pt-2">
-          <Button disabled={!consented} onClick={() => setStage("literacy")}>
-            {t("Start", "Mulai")}
+          <Button disabled={!consented || assigning} onClick={begin}>
+            {assigning ? t("Starting", "Memulai") : t("Start", "Mulai")}
           </Button>
           <Button asChild variant="ghost">
             <Link href="/">{t("Back to the homepage", "Kembali ke beranda")}</Link>
@@ -437,26 +501,36 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   }
 
   if (stage === "exit") {
+    /* The perception items rate "the explanations", which a participant in
+       the no-explanation control never saw. They skip the block and their
+       perception fields stay empty, which the analysis reads as missing,
+       not as a low rating. Interactive-only keeps it: the what-if controls
+       are the explanation there. */
+    const sawExplanation = live.content.length > 0 || live.form !== "static";
     return (
       <StageShell title={TX.exitTitle} notice={resumeNotice}>
-        <p className="text-muted-foreground">
-          {t(
-            "First, how did you find the explanations you were shown?",
-            "Pertama, bagaimana menurut Anda penjelasan yang ditampilkan tadi?",
-          )}
-        </p>
-        <div className="space-y-4">
-          {itemsFor(PERCEPTION_ITEMS, locale).map((it, i) => (
-            <LikertRow
-              key={it.name}
-              index={i + 1}
-              label={it.text}
-              value={perception[it.name]}
-              onChange={(v) => setPerception((a) => ({ ...a, [it.name]: v }))}
-            />
-          ))}
-        </div>
-        <p className="pt-2 text-muted-foreground">{TX.exitIntro}</p>
+        {sawExplanation && (
+          <>
+            <p className="text-muted-foreground">
+              {t(
+                "First, how did you find the explanations you were shown?",
+                "Pertama, bagaimana menurut Anda penjelasan yang ditampilkan tadi?",
+              )}
+            </p>
+            <div className="space-y-4">
+              {itemsFor(PERCEPTION_ITEMS, locale).map((it, i) => (
+                <LikertRow
+                  key={it.name}
+                  index={i + 1}
+                  label={it.text}
+                  value={perception[it.name]}
+                  onChange={(v) => setPerception((a) => ({ ...a, [it.name]: v }))}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        <p className={sawExplanation ? "pt-2 text-muted-foreground" : "text-muted-foreground"}>{TX.exitIntro}</p>
         <div className="space-y-1.5">
           <Label htmlFor="exit1">{TX.exitQ1}</Label>
           <Textarea id="exit1" rows={3} value={exit1} onChange={(e) => setExit1(e.target.value)} />
@@ -465,7 +539,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           <Label htmlFor="exit2">{TX.exitQ2}</Label>
           <Textarea id="exit2" rows={3} value={exit2} onChange={(e) => setExit2(e.target.value)} />
         </div>
-        <Button size="lg" className="h-11 rounded-full px-6" onClick={finishExit}>
+        <Button size="lg" className="h-11 rounded-full px-6" onClick={finishExit} disabled={exitBusy}>
           {t("Continue", "Lanjut")}
         </Button>
       </StageShell>
@@ -486,6 +560,9 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
             ))}
         </ul>
         <p className="text-muted-foreground">{TX.debriefOutro}</p>
+        <p className="text-muted-foreground">
+          {t("Contact:", "Kontak:")} <ContactLine />.
+        </p>
         <Button onClick={() => setStage("done")}>{t("Finish", "Selesai")}</Button>
       </StageShell>
     );
@@ -494,9 +571,10 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   return (
     <StageShell title={TX.doneTitle}>
       <p className="text-muted-foreground">{TX.done}</p>
-      <p className="rounded-lg border bg-muted/40 px-4 py-3 text-center font-mono text-2xl tracking-widest">
-        {completionCode(pid)}
-      </p>
+      <div className="flex flex-col items-center gap-3 rounded-lg border bg-muted/40 px-4 py-3 sm:flex-row sm:justify-center">
+        <p className="select-all font-mono text-2xl tracking-widest">{completionCode(pid)}</p>
+        <CopyButton value={completionCode(pid)} />
+      </div>
       <p className="text-sm text-muted-foreground">
         {locale === "id" ? (
           <>
@@ -524,6 +602,40 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         </Button>
       </div>
     </StageShell>
+  );
+}
+
+function ContactLine() {
+  return (
+    <>
+      {CONTACT.name} (
+      <a className="font-medium text-primary underline underline-offset-4" href={`mailto:${CONTACT.email}`}>
+        {CONTACT.email}
+      </a>
+      )
+    </>
+  );
+}
+
+/* Participants on a recruitment platform paste the completion code
+   elsewhere, which is fiddly to select on a phone. */
+function CopyButton({ value }: { value: string }) {
+  const { locale } = useLang();
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard blocked: the code stays selectable by hand */
+    }
+  };
+  return (
+    <Button variant="outline" size="sm" className="rounded-full" onClick={copy}>
+      {copied ? <Check data-icon="inline-start" /> : <Copy data-icon="inline-start" />}
+      {copied ? tr(locale, { en: "Copied", id: "Disalin" }) : tr(locale, { en: "Copy code", id: "Salin kode" })}
+    </Button>
   );
 }
 

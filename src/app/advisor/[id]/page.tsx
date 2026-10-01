@@ -9,7 +9,17 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return { title: id === "ml" ? "AI advisor" : "Interpretable rule-based advisor" };
+  return id === "ml"
+    ? {
+        title: "AI advisor",
+        description:
+          "Try the AI advisor, a neural network trained on 400 expert-reviewed investor cases that explains every recommendation it makes.",
+      }
+    : {
+        title: "Interpretable rule-based advisor",
+        description:
+          "Try the interpretable advisor, a points scorecard fitted on the same 400 expert-reviewed cases, with every weight open to read.",
+      };
 }
 
 export default async function AdvisorPage({

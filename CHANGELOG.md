@@ -3,6 +3,98 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.12.0 (2026-10-01)
+
+An audit pass, balanced assignment and a new mark. Most of it protects the data the study collects.
+
+### Added
+
+- **Balanced assignment.** Simple randomisation over sixteen cells (eight explanation conditions times
+  two advisors) leaves a pilot-sized sample badly uneven, some cells with one or two people and others
+  with seven or eight. A participant who starts through the plain way in is now placed, at consent, in
+  the cell with the fewest people so far, ties broken at random, the way Gorilla's balanced randomiser
+  and Qualtrics' "evenly present" work. A cell counts everyone who finished in it plus everyone given it
+  in the last two hours, so an abandoned session gives its place back. `POST /api/assign` does this in
+  one locked transaction, so two people starting at once cannot both land in the emptiest cell. If it
+  cannot answer within four seconds the condition drawn in the browser stands, and every row records
+  `assignmentMethod` as `balanced`, `simple` or `url`. No migration: assignments are rows of a new
+  type, `assign`, in the existing table, and only the server can write them.
+- **Dropout per condition.** The assign rows say who started in which cell, so the dashboard now shows
+  started, finished and dropout per condition. A condition that loses more people than the others
+  threatens the comparison on its own, and until now it was invisible.
+- `scripts/sql-smoke.ts`, twenty checks that run the collector's own SQL on an in-memory Postgres
+  (PGlite): a resent row is skipped and a new one is not, sixteen starts fill sixteen cells, abandoned
+  sessions free their cell, finished ones keep it, chosen sessions never count. Each assignment case is
+  built so the right rule and the wrong one pick different cells, so a regression cannot pass by luck.
+- `scripts/records-smoke.ts`, nineteen checks on the response buffer against a fake collector: a row
+  waits while offline, a 120-row backlog drains in accepted batches, long free text is split by size,
+  a refused batch is dropped without blocking the rows behind it, a server error keeps everything.
+  Restoring the old one-request buffer makes four of them fail, starting with "0 of 121 rows stored".
+- Contact details in the consent and the debrief. Both promised that the researcher could be contacted
+  and named nobody.
+- A copy button for the completion code.
+- Link previews: Open Graph and Twitter metadata and a preview image drawn at build time, so a link
+  shared in a chat shows a card instead of a bare address. Page descriptions, `robots.txt`, a sitemap, a
+  404 page in the site's own design, and `noindex` on the dashboard and the session page.
+- Two analysis toggles on the dashboard, random assignment only and excluding participants who failed the
+  attention check. The tables count duplicate rows once. The CSV downloads stay the raw rows.
+- `npm run typecheck`, a Node 20.9 floor in `engines`, and a GitHub Actions workflow that runs the type
+  check, lint, the six verification scripts and a production build on every push and pull request.
+
+### Changed
+
+- **A new mark.** A dial with three zones, too little trust, appropriate trust and too much, with the
+  needle resting in the middle one, because that is the question the study asks. The zones are the
+  slate, blue and amber of the site palette. It replaces the banknote, which read as a money app. The
+  favicon follows the browser's light or dark tab, the copies in `public/brand` have the wordmark
+  outlined from Instrument Sans so they render the same without the font, and the README opens with it.
+- Functions run in Singapore (`sin1`, set in `vercel.json`), next to the participants and the Neon
+  database in `ap-southeast-1`. They ran in Washington, so every saved response crossed the Pacific twice.
+- The consent describes the session as it is: three knowledge questions and nine short statements before
+  the cases, a few ratings and two open questions after.
+- Participants in the no-explanation control no longer rate "the explanations" they never saw. They skip
+  the five perception items, which stay empty and read as missing, not as low.
+- The dashboard sends the key in an `Authorization` header instead of the query string, which request logs
+  record. `?key=` still works for scripts. `GET /api/responses` returns pages of 1,000 rows with a `next`
+  cursor, because the whole data set would pass the 4.5 MB response ceiling after a few hundred
+  participants, and the dashboard follows the pages.
+- CSV export prefixes text cells that start like a spreadsheet formula with an apostrophe. The free text
+  comes from anonymous visitors.
+- The 400 ILS-Bench cases (345 KB) load on the first click of "Load an ILS-Bench case" instead of shipping
+  with every advisor and study page.
+- The privacy page lists everything a session records, including the nine statements before the cases,
+  the five explanation ratings at the end, the device type and the resume count.
+- Security headers (`nosniff`, a referrer policy, a permissions policy) and no `x-powered-by`.
+
+### Fixed
+
+- **A browser could stop delivering rows for good.** The client sent its whole offline buffer in one
+  request, and the collector refuses more than 50 rows. A shared lab machine that buffered past 50 during
+  an outage had every later request refused, silently. The buffer now drains in batches the collector
+  accepts, and a batch the server refuses as invalid is dropped instead of being resent for ever.
+- **A failed insert could duplicate rows.** Rows were inserted one by one, so an error part way through
+  stored some of the batch, and the client's retry stored them again. Each batch is now one transaction,
+  and the collector skips a row it already holds (same participant, type, trial and client timestamp),
+  so resending a batch whose answer was lost is harmless too.
+- **Random assignment could leak through a shared link.** The start button put the drawn condition in the
+  address (`/study?cond=none&by=random`). A participant who passed that link on sent the next person into
+  the same cell, logged as random. The address no longer carries a drawn condition, so a shared link
+  draws afresh. A chosen style still travels in the address, marked as chosen.
+- **The advisor and participate pages failed hydration in every WebGPU browser** (React error 418, most
+  Chrome and Edge visitors). Both read `navigator.gpu` while rendering, which the server cannot see. The
+  check now goes through `useSyncExternalStore`, and so does the researcher-access check.
+- **Keyboard focus fell off the what-if controls after every press.** Two of its components were defined
+  inside the panel's render, so React rebuilt them on each change. This was the interactive condition.
+- A researcher link with an unusual participant id (`?pid=P 07`) had every row refused by the collector
+  while the participant was told the answers were saved. The id is now cleaned to what the collector
+  accepts before the session starts.
+- A hand-edited `?cond=toString` crashed the study page, because `in` also matches inherited object keys.
+- A double click on the last button of the exit questionnaire could send the exit row twice.
+- The request size cap is checked on the bytes received, not only on the declared length.
+- `npm run lint` failed on twenty errors already on main. It passes now, which the new CI needs.
+- The advisor page said the study takes ten minutes, everywhere else says fifteen. It said nothing is
+  stored on a page that offers to store an optional response.
+
 ## 2.11.3 (2026-09-17)
 
 ### Changed

@@ -1,18 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 32 32" fill="none">
-  <rect x="1" y="7" width="30" height="18" rx="3.96" fill="#2f7fd0"/>
-  <rect x="2.3" y="8.3" width="27.4" height="15.4" rx="2.34" fill="none" stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.9"/>
-  <circle cx="4.4" cy="10.6" r="1.25" fill="#ffffff" fill-opacity="0.85"/>
-  <circle cx="27.6" cy="21.4" r="1.25" fill="#ffffff" fill-opacity="0.85"/>
-  <g fill="#ffffff" stroke="#2f7fd0" stroke-width="0.9" stroke-linejoin="round">
-    <circle cx="9.4" cy="14.7" r="2.15"/>
-    <path d="M5.7 23.7 L5.7 21.1 A3.7 3.7 0 0 1 13.1 21.1 L13.1 23.7 Z"/>
-  </g>
-  <g fill="#ffffff" stroke="#2f7fd0" stroke-width="0.9" stroke-linejoin="round">
-    <circle cx="22.6" cy="14.7" r="2.15"/>
-    <path d="M18.9 23.7 L18.9 21.1 A3.7 3.7 0 0 1 26.3 21.1 L26.3 23.7 Z"/>
-  </g>
-  <g fill="#ffffff" stroke="#2f7fd0" stroke-width="0.9" stroke-linejoin="round">
-    <circle cx="16" cy="12.5" r="2.6"/>
-    <path d="M11.5 23.7 L11.5 20.2 A4.5 4.5 0 0 1 20.5 20.2 L20.5 23.7 Z"/>
-  </g>
+  <style>
+    .low { stroke: #8fa3ba } .mid { stroke: #2f7fd0 } .high { stroke: #e0a136 }
+    .needle { stroke: #0d1725 } .pivot { fill: #0d1725 }
+    @media (prefers-color-scheme: dark) {
+      .low { stroke: #7f93ab } .mid { stroke: #61a5e8 } .high { stroke: #e8b357 }
+      .needle { stroke: #eaf0f8 } .pivot { fill: #eaf0f8 }
+    }
+  </style>
+  <path class="low" d="M3.75 21.75A12.25 12.25 0 0 1 8.8 11.84" stroke-width="4.5"/>
+  <path class="mid" d="M10.63 10.74A12.25 12.25 0 0 1 21.37 10.74" stroke-width="4.5"/>
+  <path class="high" d="M23.2 11.84A12.25 12.25 0 0 1 28.25 21.75" stroke-width="4.5"/>
+  <path class="needle" d="M16 21.75V11.75" stroke-width="2.8" stroke-linecap="round"/>
+  <circle class="pivot" cx="16" cy="21.75" r="3"/>
 </svg>

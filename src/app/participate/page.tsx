@@ -29,8 +29,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { CARDS } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
-import { randomCondition } from "@/lib/study";
-import * as llm from "@/lib/llm";
+import { useWebGpu } from "@/lib/use-webgpu";
 
 const CARDS_ID: Record<string, { title: string; tagline: string }> = {
   feature: { title: "Mengapa", tagline: "Lihat input Anda yang mana yang mendorong saran, dan seberapa besar." },
@@ -79,10 +78,16 @@ export default function ParticipatePage() {
   const [busy, setBusy] = useState(false);
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
+  const webGpu = useWebGpu();
 
-  const go = (condition: string, assignedBy: "random" | "chosen") => {
+  /* The random draw happens on /study itself, so the address a participant
+     sees, and might pass on to a friend, never carries a condition. A shared
+     /study link draws afresh rather than putting the next person in the same
+     cell under the "random" label. A chosen style still travels in the URL,
+     marked as chosen. */
+  const go = (chosen?: string) => {
     setBusy(true);
-    router.push(`/study?cond=${condition}&by=${assignedBy}`);
+    router.push(chosen ? `/study?cond=${chosen}&by=chosen` : "/study");
   };
 
   const FACTS = [
@@ -124,7 +129,7 @@ export default function ParticipatePage() {
                 size="lg"
                 className="h-12 rounded-full px-8 text-base"
                 disabled={busy}
-                onClick={() => go(randomCondition(), "random")}
+                onClick={() => go()}
               >
                 <Dices data-icon="inline-start" />
                 {t("Start the study", "Mulai studinya")}
@@ -179,7 +184,7 @@ export default function ParticipatePage() {
               </div>
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {CARDS.filter((c) => group.items.includes(c.id)).map((c) => {
-              const gpuBlocked = c.needsGpu && !llm.supported();
+              const gpuBlocked = c.needsGpu && !webGpu;
               const disp = locale === "id" ? (CARDS_ID[c.id] ?? c) : c;
               const Icon = ICONS[c.id] ?? Layers;
               return (
@@ -203,7 +208,7 @@ export default function ParticipatePage() {
                     variant="outline"
                     className="mt-5 w-full rounded-full"
                     disabled={busy || gpuBlocked}
-                    onClick={() => go(c.id, "chosen")}
+                    onClick={() => go(c.id)}
                   >
                     {gpuBlocked
                       ? t("Not available in this browser", "Tidak tersedia di browser ini")

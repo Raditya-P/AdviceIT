@@ -8,7 +8,10 @@ import { classes, logitMeta, logitTemperature, mlMeta, mlTemperature } from "@/l
 import { pageLocale } from "@/lib/locale-server";
 import { CasesBrowser } from "./cases-browser";
 
-export const metadata = { title: "Training data" };
+export const metadata = {
+  title: "Training data",
+  description: "ILS-Bench, the 400 expert-validated investor cases both advisors learned from, with live statistics, the cross-validated results and every case to browse.",
+};
 
 interface IlsCase {
   id: string;

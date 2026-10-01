@@ -1,18 +1,23 @@
 <div align="center">
 
-# AdviceIT
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/brand/adviceit-logo-dark.svg">
+    <img alt="AdviceIT" src="public/brand/adviceit-logo.svg" width="340">
+  </picture>
+</h1>
 
 **An open research instrument for studying how explanations calibrate trust in AI investment advice.**
 
 Two advisors learned from the same expert-validated data, one opaque and one transparent. Explanations you can compose from content and delivery. A study flow that measures whether people rely on advice appropriately. All in the browser, now in English and Bahasa Indonesia.
 
-[![Version](https://img.shields.io/badge/version-2.10.0-2f7fd0)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.12.0-2f7fd0)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-1f7a4d)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/training%20data-ILS--Bench%20CC%20BY%204.0-7a5300)](https://doi.org/10.17632/w48mh2dtg5.1)
 [![Stack](https://img.shields.io/badge/stack-Next.js%20%2B%20numpy-555)](#project-structure)
 [![Languages](https://img.shields.io/badge/languages-EN%20%2B%20ID-2f7fd0)](#the-language-toggle)
 
-[How it works](#how-it-works) · [What is new in 2.0](#what-is-new-in-20) · [Study design](v1/docs/study-design.md) · [Design decisions](v1/docs/design-decisions.md) · [Changelog](CHANGELOG.md) · [The v1 instrument, live](https://raditya-p.github.io/AdviceIT/v1/)
+[How it works](#how-it-works) · [What is new in 2.0](#what-is-new-in-20) · [Study design](v1/docs/study-design.md) · [Design decisions](v1/docs/design-decisions.md) · [Changelog](CHANGELOG.md) · [The live site](https://www.advice-it.online) · [The v1 instrument, live](https://raditya-p.github.io/AdviceIT/v1/)
 
 </div>
 
@@ -30,9 +35,9 @@ It is a research instrument, not a financial service. Nothing here is investment
 | --- | --- |
 | **Two advisors, same data** | A neural network (the AI advisor) and an interpretable rule-based advisor (a scorecard fitted by logistic regression), both trained on ILS-Bench, 400 investor cases whose suitability labels and outcomes were validated by a panel of four financial-domain experts. One opaque, one transparent, so explanation fidelity becomes a factor. |
 | **Six outcomes** | Capital preservation, Conservative, Balanced, Growth, Aggressive growth, or **Human review**. The experts refused to automate almost half the cases. Both advisors learned when to hand off to a person. |
-| **Explanations as content times delivery** | Content: *why* (exact contributions or exact Shapley values), *what would change it* (counterfactuals found by search), *how sure* (calibrated probabilities). Delivery: static, interactive what-if, adaptive to literacy, or conversational with a language model running in the browser. Nine named cells of a fractional design, any custom combination, and the reasoning is on [`/design`](https://advice-it.vercel.app/design). |
+| **Explanations as content times delivery** | Content: *why* (exact contributions or exact Shapley values), *what would change it* (counterfactuals found by search), *how sure* (calibrated probabilities). Delivery: static, interactive what-if, adaptive to literacy, or conversational with a language model running in the browser. Nine named cells of a fractional design, any custom combination, and the reasoning is on [`/design`](https://www.advice-it.online/design). |
 | **Sound and flawed advice** | The flawed scenario shifts the recommendation two portfolios the wrong way while the explanation stays honest. Following sound advice and overriding flawed advice is appropriate reliance, computed per condition. |
-| **A full study flow** | Consent, the Lusardi and Mitchell literacy questions, six fixed cases in an order seeded by the participant ID, an attention check, a debrief, a completion code. Participants are assigned an explanation condition and an advisor at random, and both assignments are logged. |
+| **A full study flow** | Consent, the Lusardi and Mitchell literacy questions, six fixed cases in an order seeded by the participant ID, an attention check, a debrief, a completion code. Participants are placed in an explanation condition and an advisor by balanced assignment, the least-filled of the sixteen cells with ties broken at random, and every row records how. |
 | **Rich responses** | Trust, Follow / Adjust (to which portfolio) / Reject / Ask a human adviser, understanding, decision confidence, mental demand, free-text reason, decision time. |
 | **A collector and a dashboard** | Responses go to a Postgres database through one sanitised API route, with a local buffer when the network is down. The key-gated researcher dashboard shows reliance, trust, time and the secondary measures per condition, with CSV export. |
 | **Two languages** | The whole site, including the generated explanations and the study flow, runs in English and Bahasa Indonesia. |
@@ -63,19 +68,25 @@ The English output is byte-identical to 1.0.0, which `scripts/i18n-smoke.ts` ver
 
 ## Quick start
 
+Node.js 20.9 or newer is required (Next.js 16 does not run on Node 18).
+
 ```bash
 npm install
 npm run dev          # http://localhost:3000
 ```
 
-Verification, all three should pass before a deploy:
+Verification, all of these should pass before a deploy. The same checks, plus a production build, run in
+GitHub Actions on every push and pull request (`.github/workflows/ci.yml`):
 
 ```bash
 npx tsx scripts/verify.ts       # 22 checks: training accuracies, Shapley efficiency, counterfactual truth, seeding
 npx tsx scripts/i18n-smoke.ts   # EN output byte-identical, ID translations complete
 npx tsx scripts/intent-smoke.ts # conversational routing accuracy, both languages
 npx tsx scripts/session-smoke.ts # resumable sessions: round trip, expiry, rejection, cleanup
-npx tsc --noEmit                # types
+npx tsx scripts/sql-smoke.ts     # the collector SQL on an in-memory Postgres: dedupe, balanced assignment
+npx tsx scripts/records-smoke.ts # the response buffer: offline, backlog batching, refused and failed batches
+npm run typecheck               # types
+npm run lint                    # lint
 ```
 
 Production builds need roughly 2 GB of free memory. On a small machine skip the local build and let Vercel build.
@@ -102,6 +113,7 @@ The conversational delivery and the free-text reading run an open-weight languag
 | `/design` | The design stated publicly: two factors, the nine cells of the fractional design, the interpretable contrasts, the mixed-methods structure and the analysis plan. |
 | `/references`, `/privacy` | References and tools, privacy and consent. |
 | `POST /api/responses` | The collector. Sanitised, capped, key-whitelisted rows. `GET` requires the researcher key. |
+| `POST /api/assign` | Balanced assignment at consent: the least-filled condition and advisor cell, written as an `assign` row. |
 
 ## How it works
 
@@ -171,7 +183,7 @@ Sound advice is the advisor's real outcome. **Flawed advice** shifts it two port
 
 ### 5. Running a study
 
-Participants get a random ID, an explanation condition, an advisor, and a completion code derived from the ID. The assignment audit fields are `assignedBy` (`random` or `chosen`) and `advisorAssignedBy` (always `random`). Analyse the `random` stratum as the experiment. The `chosen` rows are a quasi-experimental stratum and a preference signal in their own right.
+Participants get a random ID, an explanation condition, an advisor, and a completion code derived from the ID. The assignment audit fields are `assignedBy` (`random` or `chosen`), `advisorAssignedBy` (always `random`) and `assignmentMethod`: `balanced` when the server placed the participant in the least-filled cell, `simple` when the browser drew the cell because the server could not answer (and in every session before 2.12.0), `url` when the link fixed the condition. A cell counts everyone who finished in it plus everyone given it in the last two hours, so abandoned sessions give their place back. Each balanced start also writes an `assign` row, which gives the dropout per condition on the dashboard. Analyse the `random` stratum as the experiment. The `chosen` rows are a quasi-experimental stratum and a preference signal in their own right.
 
 Rows are anonymous by construction: no name, email, IP profile or tracker exists anywhere in the flow. One table, `responses`, holds `participant_id`, `row_type`, `condition`, `advisor`, `scenario`, `language`, `created_at` and the full sanitised row as jsonb.
 
@@ -208,7 +220,7 @@ AdviceIT/
 │   └── version.ts           the version shown in the footer
 ├── src/data/                trained weights and the 400 cases (generated)
 ├── public/brand/            logo mark and wordmark as SVG, light and dark
-├── scripts/                 verify.ts, i18n-smoke.ts, intent-smoke.ts, session-smoke.ts
+├── scripts/                 verify.ts and five smoke scripts (i18n, intent, session, sql, records)
 ├── db/schema.sql            one table, two indexes
 ├── v1/                      the original single-page instrument, still runnable
 │   ├── index.html ...       the five pages, plain HTML, CSS and JavaScript
@@ -226,9 +238,16 @@ AdviceIT/
 - `DATABASE_URL`, the Neon connection string
 - `RESEARCHER_KEY`, a long random string that gates the collected data
 
+`vercel.json` runs the functions in Singapore (`sin1`), next to the participants and the Neon database
+(`ap-southeast-1`). If the database ever moves, move the region with it: every saved response and every
+dashboard load makes the round trip between the two.
+
 **3. Smoke-test.** Open the home page, try both advisors, run a full session from `/participate`, then check the row count on `/researcher` with the key.
 
 Locally, put the same two variables in `.env.local`, which is gitignored and must never be committed.
+
+The public address lives in `src/lib/site.ts`. Link previews, the sitemap and `robots.txt` are built from it, so
+change it there if the domain moves.
 
 ## Security model
 
@@ -236,8 +255,9 @@ What each gate does, so nobody mistakes a convenience for a control.
 
 | Surface | What it exposes | How it is protected |
 | --- | --- | --- |
-| `POST /api/responses` | Accepts anonymous study rows | Key whitelist on every field, strings capped, participant ids pattern-checked, 50 rows and 256 KB per request, 60 requests per 10 minutes per IP (best effort, per instance), no data returned |
-| `GET /api/responses` | Every collected row | `RESEARCHER_KEY`, compared in constant time. Responses are `no-store` |
+| `POST /api/responses` | Accepts anonymous study rows | Key whitelist on every field, strings capped, participant ids pattern-checked, 50 rows and 256 KB per request (checked on the bytes received, not only the declared length), 60 requests per 10 minutes per IP (best effort, per instance), no data returned. Each batch is one transaction, and a row the database already holds is skipped, so a client retry never stores half a batch or a duplicate |
+| `POST /api/assign` | Places a starting participant in a cell | Participant id pattern-checked, 1 KB body cap, 20 requests per 10 minutes per IP (best effort), one locked transaction, one `assign` row per participant whatever the number of requests. Writes nothing a client chose: the cell comes from the database |
+| `GET /api/responses` | Every collected row, in pages of 1,000 (pass the returned `next` as `?after=`) | `RESEARCHER_KEY` in an `Authorization: Bearer` header, compared in constant time. A `?key=` query still works for old scripts but lands in request logs. Responses are `no-store` |
 | `?researcher=1` on the advisor pages | The flawed-advice toggle, suitability labels and advisor comparison. No data | Unlocks only after the dashboard has validated the key in the same browser session. The parameter alone does nothing |
 | `/researcher` | The dashboard | Needs the key for every fetch |
 

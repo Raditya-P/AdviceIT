@@ -17,7 +17,6 @@ import { EXAMPLE_PROFILES } from "@/lib/advisor/model";
 import type { RawProfile } from "@/lib/advisor/types";
 import { tr, useLang } from "@/lib/i18n";
 import * as llm from "@/lib/llm";
-import benchData from "@/data/ils_bench_cases.json";
 
 export interface FormProfile extends RawProfile {
   tolerance: "low" | "medium" | "high";
@@ -118,7 +117,11 @@ export function ProfileForm({
     onChange({ ...DEFAULT_PROFILE, ...ex.profile, toleranceInconsistent: false } as FormProfile);
   };
 
-  const loadIlsCase = () => {
+  /* The 400 benchmark cases weigh 345 KB, so they are fetched on the first
+     click instead of shipping with every advisor and study page (the study
+     imports Seg from this file). */
+  const loadIlsCase = async () => {
+    const { default: benchData } = await import("@/data/ils_bench_cases.json");
     const cases = (benchData as { cases: IlsCase[] }).cases;
     const c = cases[Math.floor(Math.random() * cases.length)];
     setNarrative(c.narrative);

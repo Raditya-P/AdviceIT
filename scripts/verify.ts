@@ -26,20 +26,27 @@ function ageOf(text: string) { for (const p of AGE_PATTERNS) { const m = text.ma
 // direct label evaluation requires bypassing form rules: emulate via profile that produces the labels? Instead evaluate through label-consistent profiles is complex; use featureVector path indirectly:
 // simplest: reuse mlProbabilities on a profile whose derived labels equal the case labels is not general. So test differently: reconstruct via weights like v1 harness.
 import weights from "../src/data/ml_weights.json";
-const Wt = weights as any;
+type Layer = { activation: string; W: number[][]; b: number[] };
+const Wt = weights as unknown as {
+  featureLayout: { tolerance: string[]; capacity: string[]; liquidity: string[]; age: { mean: number; std: number } };
+  classes: string[];
+  layers: Layer[];
+  logit: { W: number[][]; b: number[] };
+};
+type BenchCase = { narrative: string; tolerance: string; capacity: string; liquidity: string; portfolio: string };
 const oh = (v: string, o: string[]) => o.map((k) => (k === v ? 1 : 0));
 function fwd(x: number[]) { let a = x; for (const L of Wt.layers) { const o: number[] = []; for (let j = 0; j < L.b.length; j++) { let s = L.b[j]; for (let k = 0; k < a.length; k++) s += a[k] * L.W[k][j]; o[j] = L.activation === "relu" ? Math.max(0, s) : s; } a = o; } return a; }
 function lfwd(x: number[]) { const o: number[] = []; for (let j = 0; j < Wt.logit.b.length; j++) { let s = Wt.logit.b[j]; for (let k = 0; k < x.length; k++) s += x[k] * Wt.logit.W[k][j]; o[j] = s; } return o; }
 const argmax = (a: number[]) => a.indexOf(Math.max(...a));
 let okMl = 0, okLg = 0;
-for (const c of (bench as any).cases) {
+for (const c of (bench as unknown as { cases: BenchCase[] }).cases) {
   const age = ageOf(c.narrative)!;
   const x = [...oh(c.tolerance, Wt.featureLayout.tolerance), ...oh(c.capacity, Wt.featureLayout.capacity), ...oh(c.liquidity, Wt.featureLayout.liquidity), (age - Wt.featureLayout.age.mean) / Wt.featureLayout.age.std];
   if (Wt.classes[argmax(fwd(x))] === c.portfolio) okMl++;
   if (Wt.classes[argmax(lfwd(x))] === c.portfolio) okLg++;
 }
-check("ml train accuracy reproduced", Math.abs(okMl / 400 - (mlMeta as any).trainAccuracy) < 0.005, `${okMl / 400} vs ${(mlMeta as any).trainAccuracy}`);
-check("logit train accuracy reproduced", Math.abs(okLg / 400 - (logitMeta as any).trainAccuracy) < 0.005, `${okLg / 400} vs ${(logitMeta as any).trainAccuracy}`);
+check("ml train accuracy reproduced", Math.abs(okMl / 400 - mlMeta.trainAccuracy) < 0.005, `${okMl / 400} vs ${mlMeta.trainAccuracy}`);
+check("logit train accuracy reproduced", Math.abs(okLg / 400 - logitMeta.trainAccuracy) < 0.005, `${okLg / 400} vs ${logitMeta.trainAccuracy}`);
 
 // 3. Shapley efficiency + counterfactual truth + contrastive on a grid
 let effBad = 0, cfBad = 0, N = 0;
@@ -54,11 +61,11 @@ for (const ef of [true, false]) for (const inc of [true, false]) for (const debt
     const cf = counterfactualExplanation(r);
     for (let i = 0; i < cf.sentences.length; i++) {
       const s = cf.sentences[i];
-      const q: any = { ...p };
+      const q: RawProfile = { ...p };
       let m: RegExpMatchArray | null;
       if ((m = s.match(/If your age were (\d+)/))) q.age = +m[1];
       else if ((m = s.match(/If your horizon were (\d+)/))) q.horizon = +m[1];
-      else if ((m = s.match(/risk tolerance were (\w+)/))) q.tolerance = m[1].toLowerCase();
+      else if ((m = s.match(/risk tolerance were (\w+)/))) q.tolerance = m[1].toLowerCase() as RawProfile["tolerance"];
       else if (/did not have a 6-month/.test(s)) q.emergencyFund = false;
       else if (/had a 6-month/.test(s)) q.emergencyFund = true;
       else if (/income were variable/.test(s)) q.incomeStable = false;
