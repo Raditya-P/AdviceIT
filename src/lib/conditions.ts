@@ -58,17 +58,17 @@ export const PRESET_LABELS: Record<string, string> = {
 
 const PRESET_LABELS_ID: Record<string, string> = {
   none: "Tanpa penjelasan",
-  feature: "Mengapa (visual)",
-  "feature-textual": "Mengapa (tekstual)",
-  "feature-hybrid": "Mengapa (hibrida)",
-  counterfactual: "Apa yang mengubahnya (kontrafaktual)",
-  confidence: "Seberapa yakin (keyakinan)",
-  hybrid: "Ketiganya (hibrida)",
-  interactive: "Hanya interaktif",
-  "interactive-hybrid": "Interaktif dengan ketiganya",
-  adaptive: "Adaptif terhadap literasi",
-  llm: "Percakapan (LLM)",
-  custom: "Kustom",
+  feature: "Mengapa (grafik)",
+  "feature-textual": "Mengapa (teks)",
+  "feature-hybrid": "Mengapa (grafik dan teks)",
+  counterfactual: "Apa yang bisa mengubahnya",
+  confidence: "Seberapa yakin",
+  hybrid: "Ketiganya sekaligus",
+  interactive: "Interaktif saja",
+  "interactive-hybrid": "Interaktif dengan ketiga penjelasan",
+  adaptive: "Disesuaikan dengan literasi",
+  llm: "Percakapan dengan AI",
+  custom: "Kombinasi sendiri",
 };
 
 export function presetLabel(name: string, locale: "en" | "id") {

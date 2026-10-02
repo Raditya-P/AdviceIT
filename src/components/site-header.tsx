@@ -14,7 +14,7 @@ export function SiteHeader() {
   const t = (en: string, id: string) => tr(locale, { en, id });
   const NAV = [
     { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
-    { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat interpretable") },
+    { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat transparan") },
     { href: "/about", label: t("About", "Tentang") },
     { href: "/about#researchers", label: t("For researchers", "Untuk peneliti") },
   ];

@@ -21,14 +21,14 @@ export default async function NotFound() {
           title={t("This page does not exist", "Halaman ini tidak ada")}
           lead={t(
             "The link may be old or mistyped. These are the usual ways in.",
-            "Tautannya mungkin sudah lama atau salah ketik. Ini jalan masuk yang biasa.",
+            "Tautannya mungkin sudah usang atau salah ketik. Silakan mulai dari salah satu halaman ini.",
           )}
           width="max-w-3xl"
         >
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg" className="h-12 rounded-full pl-7 pr-6">
               <Link href="/participate">
-                {t("Take part in the study", "Ikut serta dalam studi")}
+                {t("Take part in the study", "Ikut penelitian")}
                 <ArrowRight />
               </Link>
             </Button>

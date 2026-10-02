@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { ADVISORS, BASELINE } from "@/lib/advisor/advisors";
 import { OUTCOMES } from "@/lib/advisor/model";
-import { outcomeName } from "@/lib/advisor/strings";
+import { num, outcomeName } from "@/lib/advisor/strings";
 import { contrastiveExplanation, featureExplanation } from "@/lib/advisor/explanations";
 import type { AdvisorResult, Profile, RawProfile } from "@/lib/advisor/types";
 import { tr, useLang } from "@/lib/i18n";
@@ -132,11 +132,11 @@ export function WhatIfPanel({
   );
 
   return (
-    <ExplanationCard icon={SlidersHorizontal} title={t("Explore what would change the advice", "Jelajahi apa yang akan mengubah saran")}>
+    <ExplanationCard icon={SlidersHorizontal} title={t("Explore what would change the advice", "Cari tahu apa yang bisa mengubah saran")}>
       <p className="text-muted-foreground">
         {t(
           "Move the controls to see how the advice would change. Tick ignore to see what the advisor would say if it did not know that input. Your actual profile and recommendation stay as they are.",
-          "Gerakkan kontrolnya untuk melihat bagaimana saran akan berubah. Centang abaikan untuk melihat apa kata penasihat jika ia tidak mengetahui input itu. Profil dan rekomendasi Anda yang sebenarnya tidak berubah.",
+          "Ubah pilihan di bawah untuk melihat bagaimana sarannya berubah. Centang abaikan untuk melihat saran penasihat jika ia tidak tahu faktor itu. Profil dan rekomendasi Anda yang sebenarnya tidak ikut berubah.",
         )}
       </p>
       <div className="grid gap-5 min-[680px]:grid-cols-2">
@@ -152,12 +152,12 @@ export function WhatIfPanel({
               value={whatIf.age}
               onCommit={(age) => bump({ age })}
               className="max-w-28"
-              aria-label={t("What-if age", "Usia what-if")}
+              aria-label={t("What-if age", "Usia (simulasi)")}
             />
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Investment horizon:", "Horizon investasi:")} <span className="tabular-nums text-primary">{whatIf.horizon}</span>{" "}
+              {t("Investment horizon:", "Jangka waktu investasi:")} <span className="tabular-nums text-primary">{whatIf.horizon}</span>{" "}
               {t("years", "tahun")}
               {ignoreToggle("horizon")}
             </Label>
@@ -167,7 +167,7 @@ export function WhatIfPanel({
               step={1}
               value={[whatIf.horizon]}
               onValueChange={(v: number[]) => bump({ horizon: v[0] })}
-              aria-label={t("What-if horizon", "Horizon what-if")}
+              aria-label={t("What-if horizon", "Jangka waktu (simulasi)")}
             />
           </div>
           <div className="space-y-1.5">
@@ -176,7 +176,7 @@ export function WhatIfPanel({
               {ignoreToggle("tolerance")}
             </Label>
             <Seg
-              name={t("What-if tolerance", "Toleransi what-if")}
+              name={t("What-if tolerance", "Toleransi risiko (simulasi)")}
               options={[
                 { value: "low", label: t("Low", "Rendah") },
                 { value: "medium", label: t("Medium", "Sedang") },
@@ -192,7 +192,7 @@ export function WhatIfPanel({
               {ignoreToggle("emergencyFund")}
             </Label>
             <Seg
-              name={t("What-if emergency fund", "Dana darurat what-if")}
+              name={t("What-if emergency fund", "Dana darurat (simulasi)")}
               options={[
                 { value: "yes", label: t("Yes", "Ya") },
                 { value: "no", label: t("No", "Tidak") },
@@ -203,11 +203,11 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Income stability", "Stabilitas pendapatan")}
+              {t("Income stability", "Kestabilan pendapatan")}
               {ignoreToggle("incomeStable")}
             </Label>
             <Seg
-              name={t("What-if income", "Pendapatan what-if")}
+              name={t("What-if income", "Pendapatan (simulasi)")}
               options={[
                 { value: "stable", label: t("Stable", "Stabil") },
                 { value: "variable", label: t("Variable", "Tidak tetap") },
@@ -222,7 +222,7 @@ export function WhatIfPanel({
               {ignoreToggle("debtObligations")}
             </Label>
             <Seg
-              name={t("What-if debt", "Utang what-if")}
+              name={t("What-if debt", "Utang (simulasi)")}
               options={[
                 { value: "no", label: t("No", "Tidak") },
                 { value: "yes", label: t("Yes", "Ya") },
@@ -233,11 +233,11 @@ export function WhatIfPanel({
           </div>
           <div className="space-y-1.5">
             <Label>
-              {t("Money needed in the near term", "Dana dibutuhkan dalam waktu dekat")}
+              {t("Money needed in the near term", "Butuh dana dalam waktu dekat")}
               {ignoreToggle("nearTermNeed")}
             </Label>
             <Seg
-              name={t("What-if near-term need", "Kebutuhan jangka pendek what-if")}
+              name={t("What-if near-term need", "Kebutuhan dana dalam waktu dekat (simulasi)")}
               options={[
                 { value: "no", label: t("No", "Tidak") },
                 { value: "yes", label: t("Yes", "Ya") },
@@ -250,7 +250,7 @@ export function WhatIfPanel({
 
         <div className="min-w-0 space-y-3 rounded-2xl border border-border/70 bg-muted/50 p-4" aria-live="polite">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            {t("With these inputs the advice would be", "Dengan input ini sarannya akan menjadi")}
+            {t("With these inputs the advice would be", "Dengan pilihan ini, sarannya menjadi")}
           </div>
           <div className="text-2xl font-semibold tracking-tight">{outcomeName(preview.portfolio.name)}</div>
           {assess && (
@@ -270,7 +270,7 @@ export function WhatIfPanel({
           {top3.length > 0 && (
             <div className="space-y-1 border-t border-border/70 pt-2">
               <p className="text-xs text-muted-foreground">
-                {t("Largest contributions", "Kontribusi terbesar")} ({fx.targetUnit}):
+                {t("Largest contributions", "Faktor paling berpengaruh")} ({fx.targetUnit}):
               </p>
               {top3.map((it) => (
                 <div key={it.key} className="flex items-center justify-between gap-2 text-sm">
@@ -278,7 +278,7 @@ export function WhatIfPanel({
                     {it.label} <span className="text-xs text-muted-foreground">({it.valueText})</span>
                   </span>
                   <span className={`font-semibold tabular-nums ${it.points > 0 ? "text-emerald-700" : "text-red-700"}`}>
-                    {it.points > 0 ? `+${it.points}` : it.points}
+                    {it.points > 0 ? `+${num(it.points)}` : num(it.points)}
                   </span>
                 </div>
               ))}
@@ -295,8 +295,8 @@ export function WhatIfPanel({
             onInteract?.("whynot");
           }}
         >
-          <SelectTrigger className="w-full max-w-72" aria-label={t("Why not another outcome", "Mengapa bukan hasil lain")}>
-            <SelectValue placeholder={t("Why not another outcome?", "Mengapa bukan hasil lain?")} />
+          <SelectTrigger className="w-full max-w-72" aria-label={t("Why not another outcome", "Mengapa bukan pilihan lain")}>
+            <SelectValue placeholder={t("Why not another outcome?", "Mengapa bukan pilihan lain?")} />
           </SelectTrigger>
           <SelectContent>
             {OUTCOMES.filter((o) => o.name !== result.portfolio.name).map((o) => (
@@ -311,7 +311,7 @@ export function WhatIfPanel({
       <p className="text-xs text-muted-foreground">
         {t(
           "Every preview is a real re-run of the same advisor. Interactions are counted in the study log.",
-          "Setiap pratinjau adalah eksekusi ulang penasihat yang sama. Interaksi dihitung dalam log studi.",
+          "Setiap pratinjau dihitung ulang langsung oleh penasihat yang sama. Interaksi Anda dicatat dalam log studi.",
         )}
       </p>
     </ExplanationCard>

@@ -22,7 +22,7 @@ export function OutcomeGuide({ result }: { result: AdvisorResult }) {
     <section className="panel overflow-hidden">
       <div className="space-y-2 border-b border-border/70 p-6">
         <h3 className="text-lg font-semibold tracking-tight">
-          {t("What this recommendation means", "Apa arti rekomendasi ini")}
+          {t("What this recommendation means", "Arti rekomendasi ini")}
         </h3>
         <p className="text-sm leading-relaxed text-muted-foreground">{guide.goal}</p>
         <p className="text-sm leading-relaxed text-muted-foreground">{guide.expect}</p>
@@ -31,7 +31,7 @@ export function OutcomeGuide({ result }: { result: AdvisorResult }) {
       {alloc && (
         <div className="p-2">
           <p className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            {t("The building blocks", "Blok penyusunnya")}
+            {t("The building blocks", "Komponennya")}
           </p>
           <Accordion type="single" collapsible className="w-full">
             {notes.map((n) => (
@@ -50,11 +50,11 @@ export function OutcomeGuide({ result }: { result: AdvisorResult }) {
                 <AccordionContent className="space-y-2 pb-4 text-sm leading-relaxed text-muted-foreground">
                   <p>{n.what}</p>
                   <p>
-                    <span className="font-medium text-foreground">{t("For example", "Sebagai contoh")}: </span>
+                    <span className="font-medium text-foreground">{t("For example", "Contohnya")}: </span>
                     {n.examples}
                   </p>
                   <p>
-                    <span className="font-medium text-foreground">{t("Its job in the mix", "Perannya dalam campuran")}: </span>
+                    <span className="font-medium text-foreground">{t("Its job in the mix", "Perannya dalam portofolio")}: </span>
                     {n.role}
                   </p>
                 </AccordionContent>
@@ -67,7 +67,7 @@ export function OutcomeGuide({ result }: { result: AdvisorResult }) {
       <p className="border-t border-border/70 bg-muted/40 px-6 py-4 text-xs leading-relaxed text-muted-foreground">
         {t(
           "These model portfolios are stylised teaching examples for the research, not products and not financial advice. Percentages are the allocation the advisor recommends, not a prediction of any return.",
-          "Portofolio model ini adalah contoh ilustratif untuk penelitian, bukan produk dan bukan saran keuangan. Persentasenya adalah alokasi yang direkomendasikan penasihat, bukan ramalan imbal hasil apa pun.",
+          "Portofolio di sini hanya contoh untuk keperluan penelitian, bukan produk dan bukan saran keuangan. Persentasenya adalah pembagian dana yang disarankan penasihat, bukan perkiraan imbal hasil.",
         )}
       </p>
     </section>

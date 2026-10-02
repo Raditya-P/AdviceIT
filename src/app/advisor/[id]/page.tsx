@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Playground } from "@/components/advisor/playground";
+import { localTitle } from "@/lib/locale-server";
 
 export function generateStaticParams() {
   return [{ id: "ml" }, { id: "logit" }];
@@ -11,12 +12,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   return id === "ml"
     ? {
-        title: "AI advisor",
+        title: await localTitle("AI advisor", "Penasihat AI"),
         description:
           "Try the AI advisor, a neural network trained on 400 expert-reviewed investor cases that explains every recommendation it makes.",
       }
     : {
-        title: "Interpretable rule-based advisor",
+        title: await localTitle("Interpretable rule-based advisor", "Penasihat transparan berbasis aturan"),
         description:
           "Try the interpretable advisor, a points scorecard fitted on the same 400 expert-reviewed cases, with every weight open to read.",
       };

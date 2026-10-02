@@ -32,26 +32,26 @@ import { tr, useLang } from "@/lib/i18n";
 import { useWebGpu } from "@/lib/use-webgpu";
 
 const CARDS_ID: Record<string, { title: string; tagline: string }> = {
-  feature: { title: "Mengapa", tagline: "Lihat input Anda yang mana yang mendorong saran, dan seberapa besar." },
+  feature: { title: "Mengapa", tagline: "Lihat faktor mana yang paling memengaruhi saran, dan seberapa besar." },
   counterfactual: {
-    title: "Apa yang mengubahnya",
-    tagline: "Perubahan terkecil pada situasi Anda yang akan membalik sarannya.",
+    title: "Apa yang bisa mengubahnya",
+    tagline: "Perubahan terkecil pada situasi Anda yang akan mengubah sarannya.",
   },
   confidence: {
     title: "Seberapa yakin",
-    tagline: "Keyakinan terkalibrasi si penasihat, dengan gambaran probabilitas lengkap.",
+    tagline: "Seberapa yakin penasihat, lengkap dengan peluang setiap hasil.",
   },
-  hybrid: { title: "Ketiganya", tagline: "Mengapa, apa yang mengubahnya, dan seberapa yakin, bersama-sama." },
+  hybrid: { title: "Ketiganya", tagline: "Mengapa, apa yang bisa mengubahnya, dan seberapa yakin, sekaligus." },
   interactive: {
-    title: "Hanya interaktif",
-    tagline: "Geser sendiri inputnya, tanpa tulisan apa pun yang menjelaskan sarannya.",
+    title: "Interaktif saja",
+    tagline: "Ubah sendiri datanya dan lihat sarannya berubah, tanpa penjelasan tertulis.",
   },
   "interactive-hybrid": {
-    title: "Interaktif dengan ketiganya",
-    tagline: "Ketiga penjelasan sekaligus, ditambah kendali untuk menggeser input dan melihat sarannya bereaksi.",
+    title: "Interaktif dengan ketiga penjelasan",
+    tagline: "Ketiga penjelasan sekaligus, ditambah tombol dan penggeser untuk mengubah data dan melihat sarannya berubah.",
   },
-  adaptive: { title: "Adaptif", tagline: "Penjelasan yang menyesuaikan diri dengan literasi keuangan Anda." },
-  llm: { title: "Percakapan", tagline: "Mengobrol dengan penjelas yang berjalan sepenuhnya di browser Anda." },
+  adaptive: { title: "Adaptif", tagline: "Penjelasan yang disesuaikan dengan pengetahuan keuangan Anda." },
+  llm: { title: "Percakapan", tagline: "Tanya jawab dengan asisten AI yang berjalan sepenuhnya di browser Anda." },
 };
 
 /* Two factors, shown as two groups: the content presets change what is
@@ -92,7 +92,7 @@ export default function ParticipatePage() {
 
   const FACTS = [
     { icon: Clock3, text: t("About 15 minutes", "Sekitar 15 menit") },
-    { icon: Lock, text: t("Anonymous, no account", "Anonim, tanpa akun") },
+    { icon: Lock, text: t("Anonymous, no account", "Anonim, tanpa perlu akun") },
     { icon: Layers, text: t("Six made-up cases", "Enam kasus rekaan") },
     { icon: Wallet, text: t("No real money involved", "Tanpa uang sungguhan") },
   ];
@@ -108,12 +108,12 @@ export default function ParticipatePage() {
               {t("Take part", "Ikut serta")}
             </p>
             <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-              {t("Help us find out what makes AI advice trustworthy", "Bantu kami menemukan apa yang membuat saran AI layak dipercaya")}
+              {t("Help us find out what makes AI advice trustworthy", "Bantu kami mencari tahu kapan saran AI layak dipercaya")}
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {t(
                 "You read six short cases about made-up people. For each one, the advisor recommends something and explains why, and you tell us what you would do. A few short questions before and after, and that is the session.",
-                "Anda membaca enam kasus singkat tentang orang rekaan. Untuk tiap kasus, penasihat merekomendasikan sesuatu dan menjelaskan mengapa, dan Anda memberi tahu kami apa yang akan Anda lakukan. Beberapa pertanyaan singkat sebelum dan sesudahnya, dan selesailah sesinya.",
+                "Anda akan membaca enam kasus singkat tentang orang rekaan. Di setiap kasus, penasihat memberi rekomendasi beserta alasannya, lalu Anda memberi tahu kami apa yang akan Anda lakukan. Ditambah beberapa pertanyaan singkat di awal dan di akhir, dan selesai.",
               )}
             </p>
             <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
@@ -132,12 +132,12 @@ export default function ParticipatePage() {
                 onClick={() => go()}
               >
                 <Dices data-icon="inline-start" />
-                {t("Start the study", "Mulai studinya")}
+                {t("Start the study", "Mulai penelitian")}
               </Button>
               <p className="max-w-md text-sm text-muted-foreground">
                 {t(
                   "We pick the kind of explanation you will see. You do not need to choose anything. Some people get a session with no explanation at all, and that is a normal part of the study.",
-                  "Kami yang memilih jenis penjelasan yang akan Anda lihat. Anda tidak perlu memilih apa pun. Sebagian orang mendapat sesi tanpa penjelasan sama sekali, dan itu bagian normal dari studi.",
+                  "Kami yang menentukan jenis penjelasan yang akan Anda lihat, jadi Anda tidak perlu memilih apa pun. Sebagian peserta mendapat sesi tanpa penjelasan sama sekali, dan itu memang bagian dari penelitian.",
                 )}
               </p>
             </div>
@@ -151,12 +151,12 @@ export default function ParticipatePage() {
                 <span className="text-lg font-semibold tracking-tight">
                   {t("Prefer to choose the explanation style yourself?", "Ingin memilih sendiri gaya penjelasannya?")}
                 </span>
-                <span className="text-sm text-primary group-open:hidden">{t("Show the options", "Tampilkan pilihannya")}</span>
+                <span className="text-sm text-primary group-open:hidden">{t("Show the options", "Tampilkan pilihan")}</span>
               </span>
               <span className="mt-1 block max-w-2xl text-sm text-muted-foreground">
                 {t(
                   "Optional. The button above is the normal way in. If you choose a style here, we record that it was your choice and keep those sessions separate.",
-                  "Opsional. Tombol di atas adalah jalan masuk yang biasa. Jika Anda memilih gaya di sini, kami mencatat bahwa itu pilihan Anda dan memisahkan sesi tersebut.",
+                  "Opsional. Biasanya cukup lewat tombol di atas. Jika Anda memilih gaya di sini, kami mencatatnya sebagai pilihan Anda dan memisahkan sesi itu dalam analisis.",
                 )}
               </span>
             </summary>
@@ -168,17 +168,17 @@ export default function ParticipatePage() {
                 <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">
                   {group.key === "content"
                     ? t("What is explained", "Apa yang dijelaskan")
-                    : t("How it is delivered", "Bagaimana penyajiannya")}
+                    : t("How it is delivered", "Cara penyajiannya")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {group.key === "content"
                     ? t(
                         "Different material about the same recommendation, shown as a static panel.",
-                        "Materi yang berbeda tentang rekomendasi yang sama, ditampilkan sebagai panel statis.",
+                        "Isi penjelasan yang berbeda untuk rekomendasi yang sama, ditampilkan sebagai panel biasa.",
                       )
                     : t(
                         "The same three contents, handed over in a different way. The last one drops the written explanation entirely.",
-                        "Ketiga konten yang sama, disampaikan dengan cara berbeda. Yang terakhir menghilangkan penjelasan tertulis sepenuhnya.",
+                        "Isi yang sama, disajikan dengan cara berbeda. Yang terakhir sama sekali tanpa penjelasan tertulis.",
                       )}
                 </p>
               </div>
@@ -198,7 +198,7 @@ export default function ParticipatePage() {
                     </span>
                     {c.needsGpu && (
                       <Badge variant="secondary" className="text-[11px]">
-                        {t("needs a modern GPU browser", "butuh browser dengan GPU modern")}
+                        {t("needs a modern GPU browser", "perlu browser dengan GPU modern")}
                       </Badge>
                     )}
                   </div>
@@ -226,10 +226,10 @@ export default function ParticipatePage() {
           <p className="mt-8 text-center text-sm text-muted-foreground">
             {t(
               "Either way, the session ends with a debrief that tells you which recommendations were deliberately wrong.",
-              "Bagaimanapun caranya, sesi berakhir dengan debrief yang memberi tahu Anda rekomendasi mana yang sengaja dibuat keliru.",
+              "Apa pun pilihannya, di akhir sesi kami akan memberi tahu rekomendasi mana yang sengaja dibuat keliru.",
             )}{" "}
             <Link href="/about#researchers" className="font-medium text-primary underline underline-offset-4">
-              {t("Researchers: how the study is designed", "Peneliti: bagaimana studi ini dirancang")}
+              {t("Researchers: how the study is designed", "Untuk peneliti: cara penelitian ini dirancang")}
             </Link>
             .
           </p>

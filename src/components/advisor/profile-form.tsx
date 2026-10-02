@@ -41,10 +41,10 @@ export const DEFAULT_PROFILE: FormProfile = {
 };
 
 const EXAMPLE_LABELS_ID: Record<string, string> = {
-  young: "Investor muda berhorizon panjang",
-  midcareer: "Karier menengah, tanpa jaring pengaman",
+  young: "Investor muda, jangka panjang",
+  midcareer: "Usia produktif, tanpa dana darurat",
   retirement: "Investor menjelang pensiun",
-  escalation: "Horizon pendek, tanpa penyangga",
+  escalation: "Jangka pendek, tanpa dana cadangan",
 };
 
 interface IlsCase {
@@ -133,14 +133,14 @@ export function ProfileForm({
   const readNarrative = async () => {
     const text = narrative.trim();
     if (!text) {
-      setNarrativeStatus(t("Write or load a description first.", "Tulis atau muat deskripsi terlebih dahulu."));
+      setNarrativeStatus(t("Write or load a description first.", "Tulis atau muat deskripsinya dulu."));
       return;
     }
     if (!llm.supported()) {
       setNarrativeStatus(
         t(
           "This browser has no WebGPU, the language model cannot run here.",
-          "Browser ini tidak punya WebGPU, model bahasa tidak bisa berjalan di sini.",
+          "Browser ini tidak mendukung WebGPU, jadi model bahasanya tidak bisa berjalan di sini.",
         ),
       );
       return;
@@ -163,7 +163,7 @@ export function ProfileForm({
         setNarrativeStatus(
           t(
             "The model did not return anything readable. Try again or fill in the form by hand.",
-            "Model tidak mengembalikan apa pun yang terbaca. Coba lagi atau isi formulir secara manual.",
+            "Model tidak memberi jawaban yang bisa dibaca. Coba lagi, atau isi formulirnya sendiri.",
           ),
         );
         return;
@@ -173,12 +173,12 @@ export function ProfileForm({
       const missing: string[] = [];
       const F = {
         age: t("age", "usia"),
-        when: t("when the money is needed", "kapan uang dibutuhkan"),
+        when: t("when the money is needed", "kapan dana dibutuhkan"),
         tol: t("risk tolerance", "toleransi risiko"),
         fund: t("emergency fund", "dana darurat"),
         income: t("income", "pendapatan"),
         debt: t("debt", "utang"),
-        need: t("near-term need", "kebutuhan jangka pendek"),
+        need: t("near-term need", "kebutuhan dalam waktu dekat"),
       };
       const next: Partial<FormProfile> = { toleranceInconsistent: pf.toleranceInconsistent };
       if (pf.age !== null) (next.age = pf.age), filled.push(F.age);
@@ -201,7 +201,7 @@ export function ProfileForm({
       const missingText = missing.length
         ? t(
             `. Not found in the text: ${missing.join(", ")}, left as they were.`,
-            `. Tidak ditemukan dalam teks: ${missing.join(", ")}, dibiarkan seperti semula.`,
+            `. Tidak disebutkan dalam teks: ${missing.join(", ")}, jadi dibiarkan seperti semula.`,
           )
         : ".";
       setNarrativeStatus(
@@ -210,13 +210,13 @@ export function ProfileForm({
           (pf.toleranceInconsistent
             ? t(
                 " Risk attitude read as Inconsistent (high stated appetite against a weak position).",
-                " Sikap risiko terbaca Tidak konsisten (selera tinggi yang dinyatakan berlawanan dengan posisi yang lemah).",
+                " Sikap terhadap risiko dinilai tidak konsisten (ingin risiko tinggi, tetapi kondisi keuangannya lemah).",
               )
             : ""),
       );
     } catch (err) {
       setNarrativeStatus(
-        t("Could not read the description: ", "Tidak bisa membaca deskripsi: ") +
+        t("Could not read the description: ", "Deskripsi tidak bisa dibaca: ") +
           (err instanceof Error ? err.message : String(err)),
       );
     } finally {
@@ -228,7 +228,7 @@ export function ProfileForm({
   return (
     <div className="space-y-5">
       <div className="space-y-1.5">
-          <Label htmlFor="example-select">{t("Load an example profile", "Muat profil contoh")}</Label>
+          <Label htmlFor="example-select">{t("Load an example profile", "Pakai profil contoh")}</Label>
           <Select onValueChange={loadExample}>
             <SelectTrigger id="example-select" className="w-full max-w-72">
               <SelectValue placeholder={t("Choose a profile", "Pilih profil")} />
@@ -251,12 +251,12 @@ export function ProfileForm({
 
       <div className="space-y-1.5">
         <Label>
-          {t("Investment horizon:", "Horizon investasi:")} <span className="tabular-nums text-primary">{profile.horizon}</span>{" "}
+          {t("Investment horizon:", "Jangka waktu investasi:")} <span className="tabular-nums text-primary">{profile.horizon}</span>{" "}
           {t("years", "tahun")}
         </Label>
-        <Slider min={1} max={40} step={1} value={[profile.horizon]} onValueChange={(v: number[]) => set({ horizon: v[0] })} aria-label={t("Investment horizon", "Horizon investasi")} />
+        <Slider min={1} max={40} step={1} value={[profile.horizon]} onValueChange={(v: number[]) => set({ horizon: v[0] })} aria-label={t("Investment horizon", "Jangka waktu investasi")} />
         <p className="text-xs text-muted-foreground">
-          {t("How many years until you expect to need this money.", "Berapa tahun lagi Anda memperkirakan membutuhkan uang ini.")}
+          {t("How many years until you expect to need this money.", "Kira-kira berapa tahun lagi uang ini akan Anda butuhkan.")}
         </p>
       </div>
 
@@ -277,7 +277,7 @@ export function ProfileForm({
             <Badge variant="secondary" className="bg-amber-100 text-amber-900">
               {t(
                 "Risk tolerance read as Inconsistent from the description",
-                "Toleransi risiko terbaca Tidak konsisten dari deskripsi",
+                "Dari deskripsinya, toleransi risiko dinilai tidak konsisten",
               )}
             </Badge>{" "}
             <button type="button" className="text-muted-foreground underline" onClick={() => set({ toleranceInconsistent: false })}>
@@ -289,7 +289,7 @@ export function ProfileForm({
 
       <div className="space-y-1.5">
         <Label>
-          {t("Emergency fund covering at least 6 months of expenses", "Dana darurat yang menutup minimal 6 bulan pengeluaran")}
+          {t("Emergency fund covering at least 6 months of expenses", "Dana darurat yang cukup untuk minimal 6 bulan pengeluaran")}
         </Label>
         <Seg
           name={t("Emergency fund", "Dana darurat")}
@@ -303,9 +303,9 @@ export function ProfileForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label>{t("Income stability", "Stabilitas pendapatan")}</Label>
+        <Label>{t("Income stability", "Kestabilan pendapatan")}</Label>
         <Seg
-          name={t("Income stability", "Stabilitas pendapatan")}
+          name={t("Income stability", "Kestabilan pendapatan")}
           options={[
             { value: "stable", label: t("Stable", "Stabil") },
             { value: "variable", label: t("Variable", "Tidak tetap") },
@@ -316,7 +316,7 @@ export function ProfileForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label>{t("Significant debt or large fixed obligations", "Utang besar atau kewajiban tetap yang besar")}</Label>
+        <Label>{t("Significant debt or large fixed obligations", "Utang besar atau cicilan dan pengeluaran tetap yang besar")}</Label>
         <Seg
           name={t("Debt and obligations", "Utang dan kewajiban")}
           options={[
@@ -329,17 +329,17 @@ export function ProfileForm({
         <p className="text-xs text-muted-foreground">
           {t(
             "For example high-interest debt, or fixed expenses that leave little room. Lowers risk capacity.",
-            "Misalnya utang berbunga tinggi, atau pengeluaran tetap yang menyisakan sedikit ruang. Menurunkan kapasitas risiko.",
+            "Misalnya utang berbunga tinggi, atau pengeluaran tetap yang hampir menghabiskan pendapatan. Ini menurunkan kemampuan menanggung risiko.",
           )}
         </p>
       </div>
 
       <div className="space-y-1.5">
         <Label>
-          {t("Could you need this money much sooner than planned?", "Mungkinkah Anda membutuhkan uang ini jauh lebih cepat dari rencana?")}
+          {t("Could you need this money much sooner than planned?", "Mungkinkah uang ini Anda butuhkan jauh lebih cepat dari rencana?")}
         </Label>
         <Seg
-          name={t("Near-term need", "Kebutuhan jangka pendek")}
+          name={t("Near-term need", "Kebutuhan dalam waktu dekat")}
           options={[
             { value: "no", label: t("No", "Tidak") },
             { value: "yes", label: t("Yes", "Ya") },
@@ -350,13 +350,13 @@ export function ProfileForm({
         <p className="text-xs text-muted-foreground">
           {t(
             "For example rent, tuition or a tax bill within a year or two. Makes the liquidity need urgent whatever the horizon.",
-            "Misalnya sewa, uang kuliah, atau tagihan pajak dalam satu dua tahun. Membuat kebutuhan likuiditas mendesak berapa pun horizonnya.",
+            "Misalnya biaya sewa, uang kuliah, atau tagihan pajak dalam satu atau dua tahun ke depan. Jika ya, kebutuhan dana dianggap mendesak, berapa pun jangka waktunya.",
           )}
         </p>
       </div>
 
       <div className="space-y-1.5">
-        <Label>{t("Financial knowledge, self-rated", "Pengetahuan keuangan, penilaian sendiri")}</Label>
+        <Label>{t("Financial knowledge, self-rated", "Pengetahuan keuangan (menurut Anda sendiri)")}</Label>
         <Seg
           name={t("Financial knowledge", "Pengetahuan keuangan")}
           options={[
@@ -370,7 +370,7 @@ export function ProfileForm({
         <p className="text-xs text-muted-foreground">
           {t(
             "Recorded only, it does not affect the recommendation. In the study it is a moderator variable.",
-            "Hanya direkam, tidak memengaruhi rekomendasi. Dalam studi ini menjadi variabel moderator.",
+            "Hanya dicatat, tidak memengaruhi rekomendasi. Dalam penelitian ini dipakai sebagai variabel moderator.",
           )}
         </p>
       </div>
@@ -378,7 +378,7 @@ export function ProfileForm({
       {showNarrative && (
         <div className="space-y-2 rounded-xl border bg-muted/30 p-4">
           <Label htmlFor="narrative">
-            {t("Or describe your situation in your own words", "Atau gambarkan situasi Anda dengan kata-kata sendiri")}
+            {t("Or describe your situation in your own words", "Atau ceritakan situasinya dengan kata-kata sendiri")}
           </Label>
           <Textarea
             id="narrative"
@@ -390,15 +390,15 @@ export function ProfileForm({
             }}
             placeholder={t(
               "For example: I am 52, saving for retirement in about 12 years, steady salary, six months of expenses in the bank, and I can live with market swings.",
-              "Misalnya: Saya berusia 52 tahun, menabung untuk pensiun sekitar 12 tahun lagi, gaji tetap, enam bulan pengeluaran di bank, dan saya sanggup menghadapi naik turun pasar.",
+              "Misalnya: Saya berusia 52 tahun dan menabung untuk pensiun sekitar 12 tahun lagi. Gaji saya tetap, tabungan saya cukup untuk enam bulan pengeluaran, dan saya tidak masalah dengan naik turunnya pasar.",
             )}
           />
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" variant="outline" onClick={readNarrative} disabled={reading}>
-              {t("Read description into the form", "Baca deskripsi ke dalam formulir")}
+              {t("Read description into the form", "Isi formulir dari deskripsi")}
             </Button>
             <Button size="sm" variant="ghost" onClick={loadIlsCase}>
-              {t("Load an ILS-Bench case", "Muat kasus ILS-Bench")}
+              {t("Load an ILS-Bench case", "Pakai kasus ILS-Bench")}
             </Button>
           </div>
           {narrativeStatus && (
@@ -408,24 +408,24 @@ export function ProfileForm({
           )}
           {ilsCase && (
             <div className="space-y-1 rounded-lg border bg-background p-3 text-xs">
-              <p className="font-semibold text-primary">{ilsCase.id} (ILS-Bench, {t("expert consensus", "konsensus ahli")})</p>
+              <p className="font-semibold text-primary">{ilsCase.id} (ILS-Bench, {t("expert consensus", "kesepakatan para ahli")})</p>
               <p>
-                {t("Recommended outcome", "Hasil yang direkomendasikan")}: {ilsCase.portfolio}
-                {ilsCase.escalation === "Yes" ? t(" (escalate to a human)", " (eskalasi ke manusia)") : ""}
+                {t("Recommended outcome", "Hasil rekomendasi")}: {ilsCase.portfolio}
+                {ilsCase.escalation === "Yes" ? t(" (escalate to a human)", " (dirujuk ke penasihat manusia)") : ""}
               </p>
               <p>
-                {t("Risk tolerance", "Toleransi risiko")} {ilsCase.tolerance}, {t("risk capacity", "kapasitas risiko")}{" "}
-                {ilsCase.capacity}, {t("liquidity need", "kebutuhan likuiditas")} {ilsCase.liquidity}
+                {t("Risk tolerance", "Toleransi risiko")} {ilsCase.tolerance}, {t("risk capacity", "kemampuan menanggung risiko")}{" "}
+                {ilsCase.capacity}, {t("liquidity need", "kebutuhan dana cepat")} {ilsCase.liquidity}
               </p>
               <p className="text-muted-foreground">
-                {t("Evidence the experts pointed to", "Bukti yang dirujuk para ahli")}: {ilsCase.evidence}
+                {t("Evidence the experts pointed to", "Alasan yang ditunjuk para ahli")}: {ilsCase.evidence}
               </p>
             </div>
           )}
           <p className="text-xs text-muted-foreground">
             {t(
               "The in-browser language model reads the description and fills in the fields above, following the ILS-Bench language-to-suitability procedure. Check the fields before continuing. The reading step works best with English descriptions.",
-              "Model bahasa dalam browser membaca deskripsi dan mengisi isian di atas, mengikuti prosedur bahasa-ke-kesesuaian ILS-Bench. Periksa isiannya sebelum melanjutkan. Langkah pembacaan bekerja paling baik dengan deskripsi berbahasa Inggris.",
+              "Model bahasa di browser Anda membaca deskripsinya lalu mengisi formulir di atas, mengikuti prosedur ILS-Bench untuk menilai kesesuaian dari teks. Periksa hasilnya sebelum lanjut. Fitur ini paling akurat untuk deskripsi berbahasa Inggris.",
             )}
           </p>
         </div>

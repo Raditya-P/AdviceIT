@@ -217,25 +217,25 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   const resumeNotice =
     resumed && atResumePoint ? (
       <Alert>
-        <AlertTitle>{t("Welcome back, we kept your place", "Selamat datang kembali, tempat Anda kami simpan")}</AlertTitle>
+        <AlertTitle>{t("Welcome back, we kept your place", "Selamat datang kembali, posisi terakhir Anda sudah kami simpan")}</AlertTitle>
         <AlertDescription className="space-y-2">
           <p>
             {resumed.stage === "trial"
               ? t(
                   `You had finished ${resumed.trialIdx} of ${plan.length} cases. You are in the same condition as before, and case ${resumed.trialIdx + 1} starts from its description again so you can read it fresh.`,
-                  `Anda telah menyelesaikan ${resumed.trialIdx} dari ${plan.length} kasus. Kondisi Anda tetap sama seperti sebelumnya, dan kasus ${resumed.trialIdx + 1} dimulai lagi dari deskripsinya agar Anda dapat membacanya kembali.`,
+                  `Anda sudah menyelesaikan ${resumed.trialIdx} dari ${plan.length} kasus. Anda tetap berada di kelompok yang sama, dan kasus ${resumed.trialIdx + 1} dimulai lagi dari deskripsinya supaya Anda bisa membacanya dari awal.`,
                 )
               : t(
                   "Your answers so far are still here and you can carry on where you left off.",
-                  "Jawaban Anda sejauh ini masih tersimpan dan Anda dapat melanjutkan dari tempat Anda berhenti.",
+                  "Jawaban Anda sejauh ini masih tersimpan, jadi Anda bisa melanjutkan dari bagian terakhir.",
                 )}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="ghost" size="sm" onClick={() => setResumed(null)}>
-              {t("Got it", "Mengerti")}
+              {t("Got it", "Baik")}
             </Button>
             <Button variant="ghost" size="sm" onClick={startOver}>
-              {t("Start a new session instead", "Mulai sesi baru saja")}
+              {t("Start a new session instead", "Mulai sesi baru dari awal")}
             </Button>
           </div>
         </AlertDescription>
@@ -336,7 +336,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
             <AlertDescription>
               {t(
                 `This browser completed a session as ${prior.pid}. A second run is fine for trying things out, but the researcher may exclude repeat sessions from the analysis.`,
-                `Browser ini menyelesaikan sesi sebagai ${prior.pid}. Menjalankan sesi kedua boleh saja untuk mencoba-coba, tetapi peneliti dapat mengecualikan sesi berulang dari analisis.`,
+                `Browser ini sudah pernah menyelesaikan sesi dengan ID ${prior.pid}. Anda boleh ikut lagi untuk mencoba-coba, tetapi peneliti mungkin tidak menyertakan sesi ulang dalam analisis.`,
               )}
             </AlertDescription>
           </Alert>
@@ -349,20 +349,20 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         <p className="text-muted-foreground">
           {t(
             "For questions, or to have your data deleted later, write to",
-            "Untuk pertanyaan, atau untuk meminta data Anda dihapus nanti, tulis kepada",
+            "Jika ada pertanyaan, atau jika nanti ingin data Anda dihapus, hubungi",
           )}{" "}
           <ContactLine />.{" "}
-          {t("The", "")}{" "}
+          {t("The", "Semua data yang dicatat dijelaskan di")}{" "}
           <Link href="/privacy" target="_blank" rel="noopener" className="underline underline-offset-4">
-            {t("privacy page", "Halaman privasi")}
-          </Link>{" "}
-          {t("lists everything that is recorded.", "mencantumkan semua yang direkam.")}
+            {t("privacy page", "halaman privasi")}
+          </Link>
+          {t(" lists everything that is recorded.", ".")}
         </p>
         <label className="flex items-start gap-2 pt-2 font-medium">
           <Checkbox checked={consented} onCheckedChange={(v) => setConsented(v === true)} className="mt-0.5" />
           {t(
             "I have read the information above and I agree to take part.",
-            "Saya telah membaca informasi di atas dan setuju untuk ikut serta.",
+            "Saya sudah membaca informasi di atas dan bersedia ikut serta.",
           )}
         </label>
         <div className="flex items-center gap-3 pt-2">
@@ -387,7 +387,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
               {i + 1}. {q.text}
             </p>
             <Seg
-              name={t(`Literacy question ${i + 1}`, `Pertanyaan literasi ${i + 1}`)}
+              name={t(`Literacy question ${i + 1}`, `Pertanyaan ${i + 1}`)}
               options={q.options}
               value={litAnswers[q.name] || ""}
               onChange={(v) => setLitAnswers((a) => ({ ...a, [q.name]: v }))}
@@ -401,7 +401,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
               setLitError(
                 t(
                   'Please answer all three questions ("Do not know" is a valid answer).',
-                  'Mohon jawab ketiga pertanyaan ("Tidak tahu" adalah jawaban yang sah).',
+                  'Mohon jawab ketiga pertanyaan. Jawaban "Tidak tahu" juga boleh dipilih.',
                 ),
               );
               return;
@@ -424,7 +424,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         <p className="text-muted-foreground">
           {t(
             "These nine statements are not a test and have no right answers. They measure two traits that are known to change how people respond to explanations, so that we can account for them.",
-            "Sembilan pernyataan berikut bukan tes dan tidak ada jawaban benar. Keduanya mengukur dua sifat yang diketahui memengaruhi cara orang menanggapi penjelasan, agar kami dapat memperhitungkannya.",
+            "Sembilan pernyataan berikut bukan tes, jadi tidak ada jawaban yang benar atau salah. Pernyataan ini mengukur dua sifat yang diketahui memengaruhi cara orang menanggapi penjelasan, supaya kami bisa memperhitungkannya dalam analisis.",
           )}
         </p>
         <div className="space-y-4">
@@ -441,7 +441,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         <p className="pt-2 text-muted-foreground">
           {t(
             "And three statements about what you expect from the advice you are about to see.",
-            "Dan tiga pernyataan tentang apa yang Anda harapkan dari saran yang akan Anda lihat.",
+            "Lalu tiga pernyataan tentang apa yang Anda harapkan dari saran yang akan Anda lihat.",
           )}
         </p>
         <div className="space-y-4">
@@ -461,14 +461,14 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           className="h-11 rounded-full px-6"
           onClick={() => {
             if (answered < NFC_ITEMS.length + EOS_ITEMS.length) {
-              setPcError(t("Please answer every statement.", "Mohon jawab setiap pernyataan."));
+              setPcError(t("Please answer every statement.", "Mohon tanggapi setiap pernyataan."));
               return;
             }
             setPcError("");
             setStage("trial");
           }}
         >
-          {t("Start the cases", "Mulai kasusnya")}
+          {t("Start the cases", "Mulai mengerjakan kasus")}
         </Button>
       </StageShell>
     );
@@ -514,7 +514,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
             <p className="text-muted-foreground">
               {t(
                 "First, how did you find the explanations you were shown?",
-                "Pertama, bagaimana menurut Anda penjelasan yang ditampilkan tadi?",
+                "Pertama, bagaimana pendapat Anda tentang penjelasan yang ditampilkan tadi?",
               )}
             </p>
             <div className="space-y-4">
@@ -578,7 +578,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
       <p className="text-sm text-muted-foreground">
         {locale === "id" ? (
           <>
-            ID partisipan Anda adalah <span className="font-mono">{pid}</span>. Simpan jika suatu saat Anda ingin data
+            ID peserta Anda adalah <span className="font-mono">{pid}</span>. Simpan ID ini jika nanti Anda ingin data
             Anda dihapus.
           </>
         ) : (
@@ -590,7 +590,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         {saved === "local" &&
           t(
             " Note: the responses could not reach the server and are stored in this browser. They will be sent when you revisit this site online.",
-            " Catatan: respons belum bisa mencapai server dan tersimpan di browser ini. Respons akan terkirim saat Anda membuka kembali situs ini dalam keadaan online.",
+            " Catatan: jawaban Anda belum terkirim ke server dan untuk sementara disimpan di browser ini. Jawaban akan dikirim otomatis saat Anda membuka situs ini lagi dalam keadaan online.",
           )}
       </p>
       <div className="flex gap-3">
@@ -598,7 +598,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           <Link href="/">{t("Back to the homepage", "Kembali ke beranda")}</Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/training-data">{t("See what powers the advisors", "Lihat apa yang menggerakkan para penasihat")}</Link>
+          <Link href="/training-data">{t("See what powers the advisors", "Lihat cara kerja para penasihat")}</Link>
         </Button>
       </div>
     </StageShell>
@@ -634,7 +634,7 @@ function CopyButton({ value }: { value: string }) {
   return (
     <Button variant="outline" size="sm" className="rounded-full" onClick={copy}>
       {copied ? <Check data-icon="inline-start" /> : <Copy data-icon="inline-start" />}
-      {copied ? tr(locale, { en: "Copied", id: "Disalin" }) : tr(locale, { en: "Copy code", id: "Salin kode" })}
+      {copied ? tr(locale, { en: "Copied", id: "Tersalin" }) : tr(locale, { en: "Copy code", id: "Salin kode" })}
     </Button>
   );
 }
@@ -732,12 +732,12 @@ function TrialStage({
       return;
     }
     if (decision === "adjust" && !adjustedTo) {
-      setError(t("Please choose which portfolio you would adjust to.", "Silakan pilih portofolio tujuan penyesuaian Anda."));
+      setError(t("Please choose which portfolio you would adjust to.", "Silakan pilih portofolio pengganti yang Anda inginkan."));
       return;
     }
     if (trust === null || understanding === null || decisionConfidence === null || mentalDemand === null) {
       setMissing(true);
-      setError(t("Please answer all four rating questions.", "Mohon jawab keempat pertanyaan penilaian."));
+      setError(t("Please answer all four rating questions.", "Mohon isi keempat penilaian."));
       return;
     }
     setMissing(false);
@@ -798,14 +798,14 @@ function TrialStage({
   const p0 = trial.profile;
   const facts = [
     `${t("Age", "Usia")} ${p0.age}`,
-    `${p0.horizon} ${t("year horizon", "tahun horizon")}`,
+    t(`${p0.horizon} year horizon`, `Jangka waktu ${p0.horizon} tahun`),
     `${t("Stated risk tolerance", "Toleransi risiko yang dinyatakan")}: ${
       p0.tolerance === "low" ? t("Low", "Rendah") : p0.tolerance === "high" ? t("High", "Tinggi") : t("Medium", "Sedang")
     }`,
-    p0.emergencyFund ? t("Has an emergency fund", "Punya dana darurat") : t("No emergency fund", "Tanpa dana darurat"),
+    p0.emergencyFund ? t("Has an emergency fund", "Punya dana darurat") : t("No emergency fund", "Tidak punya dana darurat"),
     p0.incomeStable ? t("Stable income", "Pendapatan stabil") : t("Variable income", "Pendapatan tidak tetap"),
-    ...(p0.debtObligations ? [t("Significant debt or obligations", "Utang atau kewajiban besar")] : []),
-    ...(p0.nearTermNeed ? [t("May need the money sooner", "Mungkin membutuhkan uangnya lebih cepat")] : []),
+    ...(p0.debtObligations ? [t("Significant debt or obligations", "Punya utang atau kewajiban besar")] : []),
+    ...(p0.nearTermNeed ? [t("May need the money sooner", "Mungkin butuh uangnya dalam waktu dekat")] : []),
   ];
   const caseFacts = (
     <ul className="mt-3 flex flex-wrap gap-2 text-xs">
@@ -827,7 +827,7 @@ function TrialStage({
           <p className="text-muted-foreground">
             {presetLabel(assignment.condition, locale)}
             {saved === "local" &&
-              t(" · offline, responses buffered in this browser", " · offline, respons disimpan sementara di browser ini")}
+              t(" · offline, responses buffered in this browser", " · offline, jawaban disimpan sementara di browser ini")}
           </p>
         </div>
         <div aria-hidden className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -853,7 +853,7 @@ function TrialStage({
             <p className="mt-5 text-sm text-muted-foreground">
               {t(
                 "In a moment the advisor will recommend something for this person, and you will judge that advice as if it were being given to them.",
-                "Sebentar lagi penasihat akan merekomendasikan sesuatu untuk orang ini, dan Anda akan menilai saran itu seolah-olah diberikan kepadanya.",
+                "Sebentar lagi penasihat akan memberi rekomendasi untuk orang ini. Nilailah saran itu seolah-olah saran itu ditujukan kepadanya.",
               )}
             </p>
           </section>
@@ -866,7 +866,7 @@ function TrialStage({
                 setPhase("analyzing");
               }}
             >
-              {t("Ask the advisor", "Tanya penasihatnya")}
+              {t("Ask the advisor", "Tanya penasihat")}
               <ArrowRight />
             </Button>
           </div>
@@ -911,26 +911,26 @@ function TrialStage({
 
       <section className="panel overflow-hidden">
         <header className="border-b border-border/70 px-5 py-4 sm:px-6">
-          <h2 className="font-semibold tracking-tight">{t("Your response", "Respons Anda")}</h2>
+          <h2 className="font-semibold tracking-tight">{t("Your response", "Tanggapan Anda")}</h2>
         </header>
         <div className="space-y-5 p-5 sm:p-6">
           {trial.attention && (
             <Alert>
-              <AlertTitle>{t("Attention check", "Pemeriksaan atensi")}</AlertTitle>
+              <AlertTitle>{t("Attention check", "Cek perhatian")}</AlertTitle>
               <AlertDescription>
                 {t(
                   "For this case, please choose Reject whatever the advice says.",
-                  "Untuk kasus ini, pilih Tolak apa pun sarannya.",
+                  "Untuk kasus ini, pilih Tolak, apa pun saran yang diberikan.",
                 )}
               </AlertDescription>
             </Alert>
           )}
           <div className="space-y-5">
             <RatingScale
-              label={t("How much do you trust this recommendation?", "Seberapa besar Anda memercayai rekomendasi ini?")}
+              label={t("How much do you trust this recommendation?", "Seberapa percaya Anda pada rekomendasi ini?")}
               value={trust}
               onChange={setTrust}
-              low={t("1, not at all", "1, tidak sama sekali")}
+              low={t("1, not at all", "1, sama sekali tidak")}
               high={t("7, completely", "7, sepenuhnya")}
               invalid={missing && trust === null}
             />
@@ -950,7 +950,7 @@ function TrialStage({
             />
             {decision === "adjust" && (
               <div className="mt-2 space-y-1.5 rounded-lg bg-muted/50 p-3">
-                <Label>{t("Adjust to which portfolio?", "Menyesuaikan ke portofolio yang mana?")}</Label>
+                <Label>{t("Adjust to which portfolio?", "Ingin disesuaikan ke portofolio apa?")}</Label>
                 <Select value={adjustedTo || undefined} onValueChange={setAdjustedTo}>
                   <SelectTrigger className="w-full max-w-64">
                     <SelectValue placeholder={t("Choose a portfolio", "Pilih portofolio")} />
@@ -972,32 +972,32 @@ function TrialStage({
               {t("About this decision", "Tentang keputusan ini")}
             </p>
             <RatingScale
-              label={t("How well do you understand why this advice was given?", "Seberapa baik Anda memahami mengapa saran ini diberikan?")}
+              label={t("How well do you understand why this advice was given?", "Seberapa paham Anda alasan saran ini diberikan?")}
               value={understanding}
               onChange={setUnderstanding}
-              low={t("1, not at all", "1, tidak sama sekali")}
+              low={t("1, not at all", "1, sama sekali tidak")}
               high={t("7, completely", "7, sepenuhnya")}
               invalid={missing && understanding === null}
             />
             <RatingScale
-              label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan Anda?")}
+              label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan ini?")}
               value={decisionConfidence}
               onChange={setDecisionConfidence}
-              low={t("1, not at all", "1, tidak sama sekali")}
+              low={t("1, not at all", "1, sama sekali tidak")}
               high={t("7, completely", "7, sepenuhnya")}
               invalid={missing && decisionConfidence === null}
             />
             <RatingScale
-              label={t("How mentally demanding was this decision?", "Seberapa menuntut secara mental keputusan ini?")}
+              label={t("How mentally demanding was this decision?", "Seberapa besar usaha berpikir yang dibutuhkan untuk keputusan ini?")}
               value={mentalDemand}
               onChange={setMentalDemand}
-              low={t("1, very low", "1, sangat rendah")}
-              high={t("7, very high", "7, sangat tinggi")}
+              low={t("1, very low", "1, sangat kecil")}
+              high={t("7, very high", "7, sangat besar")}
               invalid={missing && mentalDemand === null}
             />
             <div className="space-y-1.5">
-              <Label htmlFor="reason">{t("Why did you decide this? (optional)", "Mengapa Anda memutuskan demikian? (opsional)")}</Label>
-              <Textarea id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("In your own words", "Dengan kata-kata Anda sendiri")} />
+              <Label htmlFor="reason">{t("Why did you decide this? (optional)", "Apa alasan keputusan Anda? (opsional)")}</Label>
+              <Textarea id="reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} placeholder={t("In your own words", "Tulis dengan kata-kata Anda sendiri")} />
             </div>
           </div>
 

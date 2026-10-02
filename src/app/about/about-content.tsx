@@ -21,10 +21,10 @@ export function AboutContent() {
   const TEAM = [
     {
       name: "Raditya Pratama",
-      role: t("Lead developer and research design", "Pengembang utama dan rancangan penelitian"),
+      role: t("Lead developer and research design", "Pengembang utama dan perancang penelitian"),
       text: t(
         "Built the website, the two advisors, the explanation methods and the study flow, and leads the research design.",
-        "Membangun situs web, kedua penasihat, metode penjelasan, dan alur studi, serta memimpin rancangan penelitian.",
+        "Membangun situs web, kedua penasihat, metode penjelasan, dan alur studi, serta memimpin perancangan penelitian.",
       ),
     },
     {
@@ -32,7 +32,7 @@ export function AboutContent() {
       role: t("AI ecosystem and core resources", "Ekosistem AI dan sumber daya inti"),
       text: t(
         "Provides the infrastructure, compute and tooling the advisors and the site are built and served on.",
-        "Menyediakan infrastruktur, komputasi, dan perkakas tempat para penasihat dan situs ini dibangun dan dijalankan.",
+        "Menyediakan infrastruktur, daya komputasi, dan perangkat yang dipakai untuk membangun dan menjalankan para penasihat dan situs ini.",
       ),
     },
     {
@@ -40,7 +40,7 @@ export function AboutContent() {
       role: t("Quality assurance and research validation", "Penjaminan mutu dan validasi penelitian"),
       text: t(
         "Tests the instrument against the research objectives and reviews the flow, the wording and the measures.",
-        "Menguji instrumen terhadap tujuan penelitian dan meninjau alur, redaksi, serta ukuran-ukurannya.",
+        "Memeriksa apakah alat penelitian ini sesuai dengan tujuan penelitian, serta meninjau alur, susunan kata, dan alat ukurnya.",
       ),
     },
   ];
@@ -62,25 +62,25 @@ export function AboutContent() {
       href: "/references",
       icon: BookOpen,
       title: t("References", "Referensi"),
-      text: t("The work each design decision rests on.", "Karya yang menjadi pijakan tiap keputusan rancangan."),
+      text: t("The work each design decision rests on.", "Karya ilmiah yang menjadi dasar setiap keputusan rancangan."),
     },
     {
       href: "/researcher",
       icon: ShieldCheck,
       title: t("Researcher dashboard", "Dasbor peneliti"),
-      text: t("Collected responses, key-gated, with CSV export.", "Respons yang terkumpul, dilindungi kunci, dengan ekspor CSV."),
+      text: t("Collected responses, key-gated, with CSV export.", "Jawaban yang terkumpul, dilindungi kunci akses, dengan ekspor CSV."),
     },
     {
       href: "https://github.com/Raditya-P/AdviceIT",
       icon: Code2,
       title: t("Source code", "Kode sumber"),
-      text: t("Everything on this site, MIT licensed, with the verification suite.", "Semua yang ada di situs ini, berlisensi MIT, beserta rangkaian verifikasinya."),
+      text: t("Everything on this site, MIT licensed, with the verification suite.", "Seluruh isi situs ini, berlisensi MIT, lengkap dengan skrip pengujiannya."),
     },
     {
       href: "/privacy",
       icon: Scale,
       title: t("Privacy and consent", "Privasi dan persetujuan"),
-      text: t("What is recorded, what is not, and the consent text in full.", "Apa yang direkam, apa yang tidak, dan teks persetujuan selengkapnya."),
+      text: t("What is recorded, what is not, and the consent text in full.", "Apa yang dicatat, apa yang tidak, dan teks persetujuan lengkap."),
     },
   ];
 
@@ -93,7 +93,7 @@ export function AboutContent() {
           title="AdviceIT"
           lead={t(
             "A research simulation about explaining AI investment advice, built by a team of three. It exists to find out which kinds of explanation help people follow good advice and catch bad advice. Nothing on this site is real financial advice.",
-            "Simulasi penelitian tentang menjelaskan saran investasi AI, dibangun tim beranggotakan tiga orang. Situs ini ada untuk mencari tahu jenis penjelasan mana yang membantu orang mengikuti saran yang baik dan menangkap saran yang buruk. Tidak ada apa pun di situs ini yang merupakan saran keuangan sungguhan.",
+            "Simulasi penelitian tentang cara menjelaskan saran investasi dari AI, dibuat oleh tim tiga orang. Tujuannya mencari tahu jenis penjelasan mana yang membantu orang mengikuti saran yang baik dan mengenali saran yang buruk. Tidak ada isi situs ini yang merupakan saran keuangan sungguhan.",
           )}
           width="max-w-4xl"
         />
@@ -104,23 +104,23 @@ export function AboutContent() {
             <p className="leading-relaxed text-muted-foreground">
               {t(
                 "The site has a working AI advisor that recommends an investment mix for a made-up person. It also has several ways of explaining that recommendation. People who take part read six short cases, see the advisor's recommendation with one kind of explanation, and say what they would do. Half of the recommendations are deliberately wrong, and the study measures whether the explanation helped people notice.",
-                "Situs ini punya penasihat AI yang berfungsi dan merekomendasikan campuran investasi untuk orang rekaan. Situs ini juga punya beberapa cara menjelaskan rekomendasi itu. Peserta membaca enam kasus singkat, melihat rekomendasi penasihat dengan satu jenis penjelasan, dan mengatakan apa yang akan mereka lakukan. Separuh rekomendasi sengaja dibuat keliru, dan studi ini mengukur apakah penjelasannya membantu orang menyadarinya.",
+                "Situs ini punya penasihat AI yang benar-benar berfungsi dan menyarankan komposisi investasi untuk orang rekaan, beserta beberapa cara untuk menjelaskan saran itu. Peserta membaca enam kasus singkat, melihat rekomendasi penasihat dengan satu jenis penjelasan, lalu menjawab apa yang akan mereka lakukan. Separuh rekomendasi sengaja dibuat keliru, dan penelitian ini mengukur apakah penjelasan tersebut membantu orang menyadarinya.",
               )}
             </p>
             <p className="leading-relaxed text-muted-foreground">
               {t(
                 "The advisor learned from 400 cases that were reviewed by a panel of four financial experts. Everything runs in your browser, nothing about you is collected, and the whole thing is open source.",
-                "Penasihatnya belajar dari 400 kasus yang ditinjau panel empat ahli keuangan. Semuanya berjalan di browser Anda, tidak ada data tentang Anda yang dikumpulkan, dan seluruhnya bersifat sumber terbuka.",
+                "Penasihat ini belajar dari 400 kasus yang sudah ditinjau oleh empat ahli keuangan. Semuanya berjalan di browser Anda, tidak ada data pribadi Anda yang dikumpulkan, dan seluruh kodenya terbuka (open source).",
               )}
             </p>
           </section>
 
           <section className="space-y-5">
-            <h2 className="text-2xl font-semibold tracking-tight">{t("The team", "Timnya")}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("The team", "Tim kami")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
                 "AdviceIT is a team research project from the Department of Information Systems, Institut Teknologi Sepuluh Nopember, Surabaya. It grew out of a systematic literature review the three of us wrote together on trust and algorithm aversion in the choice between human and AI financial advisors.",
-                "AdviceIT adalah proyek penelitian tim dari Departemen Sistem Informasi, Institut Teknologi Sepuluh Nopember, Surabaya. Proyek ini tumbuh dari systematic literature review yang kami bertiga tulis bersama tentang kepercayaan dan algorithm aversion dalam pilihan antara penasihat keuangan manusia dan AI.",
+                "AdviceIT adalah proyek penelitian tim dari Departemen Sistem Informasi, Institut Teknologi Sepuluh Nopember (ITS), Surabaya. Proyek ini berawal dari tinjauan pustaka sistematis (systematic literature review) yang kami bertiga tulis bersama, tentang kepercayaan dan keengganan terhadap algoritma (algorithm aversion) saat orang memilih antara penasihat keuangan manusia dan AI.",
               )}
             </p>
             <div className="grid gap-4 md:grid-cols-3">
@@ -135,7 +135,7 @@ export function AboutContent() {
             <p className="text-sm text-muted-foreground">
               {t(
                 "Roles as agreed within the team. Author order on any paper is decided per paper.",
-                "Peran sesuai kesepakatan tim. Urutan penulis pada makalah ditentukan per makalah.",
+                "Pembagian peran sesuai kesepakatan tim. Urutan penulis ditentukan terpisah untuk setiap makalah.",
               )}
             </p>
           </section>
@@ -151,7 +151,7 @@ export function AboutContent() {
               <p className="leading-relaxed text-muted-foreground">
                 {t(
                   "The study design, the training data, the model results, the references and the collected responses are each published on their own page.",
-                  "Rancangan studi, data pelatihan, hasil model, referensi, dan respons yang terkumpul masing-masing dipublikasikan di halamannya sendiri.",
+                  "Rancangan studi, data pelatihan, hasil model, referensi, dan jawaban yang terkumpul masing-masing punya halaman sendiri.",
                 )}
               </p>
             </div>
@@ -175,18 +175,18 @@ export function AboutContent() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
-              {t(`Version ${VERSION}. To cite the instrument, use the citation file in the repository.`, `Versi ${VERSION}. Untuk mengutip instrumen ini, gunakan berkas sitasi di repositori.`)}
+              {t(`Version ${VERSION}. To cite the instrument, use the citation file in the repository.`, `Versi ${VERSION}. Untuk mengutip alat penelitian ini, gunakan berkas sitasi di repositori.`)}
             </p>
           </section>
 
           <section className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">{t("Take part in the study", "Ikut serta dalam studi")}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("Take part in the study", "Ikut penelitian")}</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               {t("About fifteen minutes, anonymous, and no real money involved.", "Sekitar lima belas menit, anonim, dan tanpa uang sungguhan.")}
             </p>
             <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">
               <Link href="/participate">
-                {t("Take part in the study", "Ikut serta dalam studi")}
+                {t("Take part in the study", "Ikut penelitian")}
                 <ArrowRight />
               </Link>
             </Button>

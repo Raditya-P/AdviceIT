@@ -8,9 +8,9 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 import { setStringsLocale } from "@/lib/advisor/strings";
+import { COOKIE, type Locale } from "@/lib/locale";
 
-export type Locale = "en" | "id";
-export const COOKIE = "adviceit-lang";
+export type { Locale };
 
 const LangContext = createContext<{ locale: Locale; setLocale: (l: Locale) => void }>({
   locale: "en",

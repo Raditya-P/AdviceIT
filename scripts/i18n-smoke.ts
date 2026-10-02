@@ -64,7 +64,7 @@ for (const advisorFn of [mlRecommend, logitRecommend]) {
 }
 
 setStringsLocale("id");
-ok(outcomeName("Human review") === "Tinjauan manusia", "ID outcome name");
+ok(outcomeName("Human review") === "Tinjauan penasihat manusia", "ID outcome name");
 setStringsLocale("en");
 ok(outcomeName("Human review") === "Human review", "EN outcome name");
 

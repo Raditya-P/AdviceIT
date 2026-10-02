@@ -42,47 +42,47 @@ const ICONS: Record<string, LucideIcon> = {
 const TAGLINES: Record<string, { en: string; id: string }> = {
   none: {
     en: "Just the recommendation. This is the control condition in the study.",
-    id: "Hanya rekomendasinya. Ini adalah kondisi kontrol dalam studi.",
+    id: "Hanya rekomendasinya. Ini kondisi pembanding (kontrol) dalam penelitian.",
   },
   feature: {
     en: "See which of your answers pushed the advice, and by how much, as bars.",
-    id: "Lihat jawaban Anda yang mana yang mendorong saran dan seberapa besar, dalam bentuk batang.",
+    id: "Lihat faktor mana yang paling memengaruhi saran dan seberapa besar, dalam bentuk grafik batang.",
   },
   "feature-textual": {
     en: "The same reasoning, written out as sentences instead of bars.",
-    id: "Penalaran yang sama, ditulis sebagai kalimat alih-alih batang.",
+    id: "Alasan yang sama, ditulis sebagai kalimat, bukan grafik.",
   },
   "feature-hybrid": {
     en: "The bars and the sentences together, each covering what the other misses.",
-    id: "Batang dan kalimat sekaligus, saling menutupi kekurangan masing-masing.",
+    id: "Grafik dan kalimat sekaligus, saling melengkapi.",
   },
   counterfactual: {
     en: "The smallest change to your situation that would flip the advice.",
-    id: "Perubahan terkecil pada situasi Anda yang akan membalik sarannya.",
+    id: "Perubahan terkecil pada situasi Anda yang akan mengubah sarannya.",
   },
   confidence: {
     en: "The advisor's calibrated confidence, with the full probability picture.",
-    id: "Keyakinan terkalibrasi si penasihat, dengan gambaran probabilitas lengkap.",
+    id: "Seberapa yakin penasihat, lengkap dengan peluang setiap hasil.",
   },
   hybrid: {
     en: "Why, what would change it, and how sure, together.",
-    id: "Mengapa, apa yang mengubahnya, dan seberapa yakin, bersama-sama.",
+    id: "Mengapa, apa yang bisa mengubahnya, dan seberapa yakin, sekaligus.",
   },
   interactive: {
     en: "Move the inputs yourself, with nothing written to explain the advice.",
-    id: "Geser sendiri inputnya, tanpa tulisan apa pun yang menjelaskan sarannya.",
+    id: "Ubah sendiri datanya dan lihat sarannya berubah, tanpa penjelasan tertulis.",
   },
   "interactive-hybrid": {
     en: "All three explanations, plus controls to move the inputs and watch the advice react.",
-    id: "Ketiga penjelasan sekaligus, ditambah kendali untuk menggeser input dan melihat sarannya bereaksi.",
+    id: "Ketiga penjelasan sekaligus, ditambah tombol dan penggeser untuk mengubah data dan melihat sarannya berubah.",
   },
   adaptive: {
     en: "An explanation that adjusts to your financial literacy.",
-    id: "Penjelasan yang menyesuaikan diri dengan literasi keuangan Anda.",
+    id: "Penjelasan yang disesuaikan dengan pengetahuan keuangan Anda.",
   },
   llm: {
     en: "Chat with an explainer running entirely in your browser.",
-    id: "Mengobrol dengan penjelas yang berjalan sepenuhnya di browser Anda.",
+    id: "Tanya jawab dengan asisten AI yang berjalan sepenuhnya di browser Anda.",
   },
 };
 
@@ -96,25 +96,25 @@ const GROUPS: { key: string; title: { en: string; id: string }; note: { en: stri
     title: { en: "What is explained", id: "Apa yang dijelaskan" },
     note: {
       en: "Different material about the same recommendation, shown as a static panel.",
-      id: "Materi yang berbeda tentang rekomendasi yang sama, ditampilkan sebagai panel statis.",
+      id: "Isi penjelasan yang berbeda untuk rekomendasi yang sama, ditampilkan sebagai panel biasa.",
     },
     items: ["feature", "counterfactual", "confidence", "hybrid", "none"],
   },
   {
     key: "delivery",
-    title: { en: "How it is delivered", id: "Bagaimana penyajiannya" },
+    title: { en: "How it is delivered", id: "Cara penyajiannya" },
     note: {
       en: "The same three contents, handed over in a different way. The last one drops the written explanation entirely.",
-      id: "Ketiga konten yang sama, disampaikan dengan cara berbeda. Yang terakhir menghilangkan penjelasan tertulis sepenuhnya.",
+      id: "Isi yang sama, disajikan dengan cara berbeda. Yang terakhir sama sekali tanpa penjelasan tertulis.",
     },
     items: ["interactive-hybrid", "adaptive", "llm", "interactive"],
   },
   {
     key: "modality",
-    title: { en: "How the why is presented", id: "Bagaimana bagian mengapa ditampilkan" },
+    title: { en: "How the why is presented", id: "Cara bagian \"mengapa\" ditampilkan" },
     note: {
       en: "The same attribution, as bars, as sentences, or as both. Not in the random pool, these are for the modality study.",
-      id: "Atribusi yang sama, sebagai batang, sebagai kalimat, atau keduanya. Tidak masuk kumpulan acak, ini untuk studi modalitas.",
+      id: "Penjelasan \"mengapa\" yang sama, sebagai grafik, kalimat, atau keduanya. Tidak diundi untuk peserta, hanya untuk studi tentang bentuk penyajian.",
     },
     items: ["feature-textual", "feature-hybrid"],
   },
@@ -158,7 +158,7 @@ export function StylePicker({
         <p className="text-muted-foreground">
           {t(
             "Pick one style now. You can come back and try another one on the same profile at any point.",
-            "Pilih satu gaya sekarang. Anda bisa kembali dan mencoba gaya lain pada profil yang sama kapan saja.",
+            "Pilih satu gaya dulu. Anda bisa kembali kapan saja untuk mencoba gaya lain dengan profil yang sama.",
           )}
         </p>
       </div>
@@ -205,8 +205,8 @@ export function StylePicker({
               {name === "llm" && (
                 <Badge variant="secondary" className="mt-3 text-[11px]">
                   {blocked
-                    ? t("needs a WebGPU browser", "butuh browser dengan WebGPU")
-                    : t("downloads a model on first use", "mengunduh model saat pertama dipakai")}
+                    ? t("needs a WebGPU browser", "perlu browser dengan WebGPU")
+                    : t("downloads a model on first use", "mengunduh model saat pertama kali dipakai")}
                 </Badge>
               )}
             </button>
@@ -218,12 +218,12 @@ export function StylePicker({
 
       <details className="rounded-2xl border border-border/70 bg-muted/40 p-5 text-sm">
           <summary className="cursor-pointer font-medium text-primary">
-            {t("Build your own combination", "Susun kombinasi Anda sendiri")}
+            {t("Build your own combination", "Susun kombinasi sendiri")}
           </summary>
           <div className="mt-4 space-y-4">
             <div className="flex flex-wrap items-center gap-4">
               <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {t("Content", "Konten")}
+                {t("Content", "Isi")}
               </span>
               {CONTENT_PARTS.map((part) => (
                 <label key={part} className="flex items-center gap-1.5">
@@ -254,7 +254,7 @@ export function StylePicker({
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                {t("Modality of the why", "Modalitas bagian mengapa")}
+                {t("Modality of the why", "Bentuk penjelasan \"mengapa\"")}
               </span>
               <RadioGroup
                 value={modality}
@@ -280,7 +280,7 @@ export function StylePicker({
                 <Seg
                   name={t("Advice scenario", "Skenario saran")}
                   options={[
-                    { value: "sound", label: t("Sound advice", "Saran tepat") },
+                    { value: "sound", label: t("Sound advice", "Saran yang benar") },
                     { value: "flawed", label: t("Flawed advice", "Saran keliru") },
                   ]}
                   value={scenario}
@@ -291,7 +291,7 @@ export function StylePicker({
             <p className="text-xs text-muted-foreground">
               {t(
                 "Content is what is explained: why, what would change it, how sure. Delivery is how it reaches you: static, interactive, adapted to literacy, or conversational. A preset is one combination of the two, and both parts are recorded.",
-                "Konten adalah apa yang dijelaskan: mengapa, apa yang mengubahnya, seberapa yakin. Penyajian adalah cara sampainya kepada Anda: statis, interaktif, disesuaikan dengan literasi, atau percakapan. Preset adalah satu kombinasi keduanya, dan kedua bagian itu dicatat.",
+                "Isi adalah apa yang dijelaskan: mengapa, apa yang bisa mengubahnya, dan seberapa yakin. Penyajian adalah cara penjelasan itu sampai kepada Anda: biasa, interaktif, disesuaikan dengan literasi, atau lewat percakapan. Setiap gaya adalah satu kombinasi keduanya, dan keduanya dicatat.",
               )}
             </p>
           </div>

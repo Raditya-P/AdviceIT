@@ -19,12 +19,14 @@ const CASES: Case[] = [
   { q: "What made you pick this one?", want: "why", locale: "en" },
   { q: "Mengapa rekomendasi ini?", want: "why", locale: "id" },
   { q: "Apa alasan saran ini?", want: "why", locale: "id" },
+  { q: "Mengapa rekomendasinya ini?", want: "why", locale: "id" },
   // change
   { q: "What would change the advice?", want: "change", locale: "en" },
   { q: "How can I change it?", want: "change", locale: "en" },
   { q: "What could I do to improve this?", want: "change", locale: "en" },
   { q: "Apa yang mengubah sarannya?", want: "change", locale: "id" },
   { q: "Apa yang bisa saya lakukan?", want: "change", locale: "id" },
+  { q: "Apa yang bisa mengubahnya?", want: "change", locale: "id" },
   // confidence
   { q: "How sure are you?", want: "confidence", locale: "en" },
   { q: "What is the probability of that outcome?", want: "confidence", locale: "en" },
@@ -43,6 +45,8 @@ const CASES: Case[] = [
   { q: "What does risk capacity mean?", want: "input", locale: "en" },
   { q: "What is my risk tolerance?", want: "input", locale: "en" },
   { q: "Apa arti kapasitas risiko?", want: "input", locale: "id" },
+  { q: "Apa arti kemampuan menanggung risiko?", want: "input", locale: "id" },
+  { q: "Apa arti kebutuhan dana cepat?", want: "input", locale: "id" },
   // out of scope, must fall through to the model
   { q: "Should I buy bitcoin?", want: null, locale: "en" },
   { q: "What do you think of the market this year?", want: null, locale: "en" },

@@ -17,27 +17,31 @@ export function stringsLocale() {
 
 const pick = <T,>(en: T, id: T): T => (L === "id" ? id : en);
 
+/* Indonesian writes decimals with a comma (4,2): a point there separates
+   thousands, so "4.2 poin" reads wrong. English output is untouched. */
+export const num = (n: number | string) => (L === "id" ? String(n).replace(".", ",") : String(n));
+
 /* ---------------- Display names ---------------- */
 export const OUTCOME_ID: Record<string, string> = {
-  "Capital preservation": "Preservasi modal",
+  "Capital preservation": "Perlindungan modal",
   Conservative: "Konservatif",
   Balanced: "Seimbang",
   Growth: "Pertumbuhan",
   "Aggressive growth": "Pertumbuhan agresif",
-  "Human review": "Tinjauan manusia",
+  "Human review": "Tinjauan penasihat manusia",
 };
 export function outcomeName(name: string) {
   return L === "id" ? (OUTCOME_ID[name] ?? name) : name;
 }
 
 const SUMMARY_ID: Record<string, string> = {
-  "capital-preservation": "Menjaga modal terlebih dahulu: sebagian besar obligasi dan kas, porsi saham kecil.",
-  conservative: "Pertumbuhan moderat dengan gejolak terbatas: obligasi memimpin, saham mendukung.",
-  balanced: "Campuran seimbang antara pertumbuhan dan stabilitas, jalan tengah yang klasik.",
-  growth: "Berorientasi pertumbuhan: saham mendominasi, obligasi meredam gejolak.",
-  "aggressive-growth": "Pertumbuhan jangka panjang maksimal, menerima gejolak besar dalam jangka pendek.",
+  "capital-preservation": "Utamakan keamanan modal: sebagian besar obligasi dan kas, dengan sedikit saham.",
+  conservative: "Tumbuh perlahan dengan naik turun yang terbatas: obligasi sebagai andalan, saham sebagai pelengkap.",
+  balanced: "Seimbang antara pertumbuhan dan kestabilan, jalan tengah yang paling umum.",
+  growth: "Mengejar pertumbuhan: saham sebagai andalan, obligasi meredam naik turunnya.",
+  "aggressive-growth": "Pertumbuhan jangka panjang setinggi mungkin, dengan naik turun yang besar dalam jangka pendek.",
   "human-review":
-    "Tidak ada portofolio otomatis. Situasi ini sebaiknya ditinjau oleh penasihat manusia sebelum saran apa pun diberikan.",
+    "Tidak ada portofolio otomatis. Situasi ini sebaiknya ditinjau penasihat manusia sebelum ada saran apa pun.",
 };
 export function outcomeSummary(id: string, enSummary: string) {
   return L === "id" ? (SUMMARY_ID[id] ?? enSummary) : enSummary;
@@ -67,36 +71,36 @@ export function labelValue(en: string) {
 /* ---------------- Input labels and value texts ---------------- */
 const INPUT_LABEL_ID: Record<string, string> = {
   Age: "Usia",
-  "Investment horizon": "Horizon investasi",
+  "Investment horizon": "Jangka waktu investasi",
   "Risk tolerance": "Toleransi risiko",
   "Emergency fund": "Dana darurat",
-  "Income stability": "Stabilitas pendapatan",
+  "Income stability": "Kestabilan pendapatan",
   "Debt and obligations": "Utang dan kewajiban",
-  "Near-term need": "Kebutuhan jangka pendek",
-  "Risk capacity": "Kapasitas risiko",
-  "Liquidity need": "Kebutuhan likuiditas",
+  "Near-term need": "Kebutuhan dalam waktu dekat",
+  "Risk capacity": "Kemampuan menanggung risiko",
+  "Liquidity need": "Kebutuhan dana cepat",
 };
 export function inputLabel(en: string) {
   return L === "id" ? (INPUT_LABEL_ID[en] ?? en) : en;
 }
 
 export const V = {
-  yearsOld: (age: number) => pick(`${age} years old`, `berusia ${age} tahun`),
+  yearsOld: (age: number) => pick(`${age} years old`, `${age} tahun`),
   years: (n: number) => (L === "id" ? `${n} tahun` : `${n} ${n === 1 ? "year" : "years"}`),
   toleranceText: (t: string, inconsistent: boolean) => {
     const name = { low: pick("Low", "Rendah"), medium: pick("Medium", "Sedang"), high: pick("High", "Tinggi") }[t] ?? t;
-    return pick(`${name} tolerance${inconsistent ? ", read as Inconsistent" : ""}`, `toleransi ${name.toLowerCase()}${inconsistent ? ", terbaca Tidak konsisten" : ""}`);
+    return pick(`${name} tolerance${inconsistent ? ", read as Inconsistent" : ""}`, `${name.toLowerCase()}${inconsistent ? ", tetapi dinilai tidak konsisten" : ""}`);
   },
-  fund: (has: boolean) => pick(has ? "6 months covered" : "no 6-month buffer", has ? "dana 6 bulan tersedia" : "tanpa dana penyangga 6 bulan"),
-  income: (stable: boolean) => pick(stable ? "stable income" : "variable income", stable ? "pendapatan stabil" : "pendapatan tidak tetap"),
-  debt: (has: boolean) => pick(has ? "significant debt or obligations" : "no significant debt", has ? "utang atau kewajiban besar" : "tanpa utang besar"),
-  need: (has: boolean) => pick(has ? "money may be needed soon" : "no near-term need", has ? "dana mungkin segera dibutuhkan" : "tidak ada kebutuhan jangka pendek"),
+  fund: (has: boolean) => pick(has ? "6 months covered" : "no 6-month buffer", has ? "cukup untuk 6 bulan" : "tidak cukup untuk 6 bulan"),
+  income: (stable: boolean) => pick(stable ? "stable income" : "variable income", stable ? "stabil" : "tidak tetap"),
+  debt: (has: boolean) => pick(has ? "significant debt or obligations" : "no significant debt", has ? "ada utang atau kewajiban besar" : "tidak ada utang besar"),
+  need: (has: boolean) => pick(has ? "money may be needed soon" : "no near-term need", has ? "mungkin segera dibutuhkan" : "tidak ada"),
 };
 
 /* ---------------- Feature explanation ---------------- */
 export const FX = {
-  targetProbability: (name: string) => pick(`the probability of ${name}`, `probabilitas ${outcomeName(name)}`),
-  targetEvidence: (name: string) => pick(`the evidence for ${name}`, `bukti untuk ${outcomeName(name)}`),
+  targetProbability: (name: string) => pick(`the probability of ${name}`, `peluang ${outcomeName(name)}`),
+  targetEvidence: (name: string) => pick(`the evidence for ${name}`, `skor ${outcomeName(name)}`),
   unitPct: () => pick("percentage points", "poin persentase"),
   unitLogOdds: () => pick("log-odds points", "poin log-odds"),
   sentenceChanged: (label: string, valueText: string, up: boolean, points: string, target: string) =>
@@ -111,42 +115,42 @@ export const FX = {
     ),
   points: (v: number) => {
     const n = Math.round(Math.abs(v) * 10) / 10;
-    return pick(`${n} ${n === 1 ? "point" : "points"}`, `${n} poin`);
+    return pick(`${n} ${n === 1 ? "point" : "points"}`, `${num(n)} poin`);
   },
   methodShapley: (target: string) =>
     pick(
       `These are Shapley values of ${target}: the average effect of each input across all orders of adding inputs, computed post hoc by re-running the network 128 times against the baseline profile. They describe the network's behaviour, not readable rules.`,
-      `Ini adalah nilai Shapley dari ${target}: efek rata-rata setiap input pada semua urutan penambahan input, dihitung setelah keputusan dengan menjalankan ulang jaringan 128 kali terhadap profil acuan. Angka ini menggambarkan perilaku jaringan, bukan aturan yang dapat dibaca.`,
+      `Angka ini adalah nilai Shapley untuk ${target}: pengaruh rata-rata setiap faktor, dihitung setelah keputusan dibuat dengan menjalankan ulang jaringan 128 kali terhadap profil acuan. Angka ini menggambarkan perilaku jaringan, bukan aturan yang bisa dibaca.`,
     ),
   methodWeights: () =>
     pick(
       "These contributions are read directly from the scorecard's weights: weight of the recommended outcome times the input, minus the same for the baseline profile. They are exact, not estimated, and they add up to the change in evidence.",
-      "Kontribusi ini dibaca langsung dari bobot scorecard: bobot hasil yang direkomendasikan dikali input, dikurangi nilai yang sama untuk profil acuan. Angka ini eksak, bukan estimasi, dan jumlahnya sama dengan perubahan bukti.",
+      "Kontribusi ini dibaca langsung dari bobot tabel poin: bobot hasil yang direkomendasikan dikalikan nilai faktornya, dikurangi hal yang sama untuk profil acuan. Angkanya pasti, bukan perkiraan, dan jumlahnya sama dengan perubahan skornya.",
     ),
   toleranceNote: () =>
     pick(
       "Risk tolerance is an input to this model, so it appears above as its own contribution.",
-      "Toleransi risiko adalah input model ini, sehingga muncul di atas sebagai kontribusi tersendiri.",
+      "Toleransi risiko adalah salah satu faktor dalam model ini, jadi pengaruhnya ditampilkan tersendiri di atas.",
     ),
   introMl: (name: string) =>
     pick(
       `Compared with a neutral baseline profile, each of your inputs moved the probability of ${name} as follows (largest effect first, in percentage points):`,
-      `Dibandingkan profil acuan yang netral, setiap input Anda menggeser probabilitas ${outcomeName(name)} sebagai berikut (efek terbesar lebih dulu, dalam poin persentase):`,
+      `Dibandingkan dengan profil acuan yang netral, setiap faktor dalam profil Anda menggeser peluang ${outcomeName(name)} seperti berikut (pengaruh terbesar lebih dulu, dalam poin persentase):`,
     ),
   totalMl: (base: number, full: number, name: string) =>
     pick(
       `Baseline profile ${base} percent plus contributions = ${full} percent probability of ${name} for your profile.`,
-      `Profil acuan ${base} persen ditambah kontribusi = probabilitas ${full} persen untuk ${outcomeName(name)} pada profil Anda.`,
+      `Profil acuan ${num(base)} persen, ditambah semua kontribusi, menjadi peluang ${num(full)} persen untuk ${outcomeName(name)} pada profil Anda.`,
     ),
   introLogit: (name: string) =>
     pick(
       `Compared with a neutral baseline profile, each input moved the evidence for ${name} as follows (largest effect first, in log-odds points, read directly from the model's weights):`,
-      `Dibandingkan profil acuan yang netral, setiap input menggeser bukti untuk ${outcomeName(name)} sebagai berikut (efek terbesar lebih dulu, dalam poin log-odds, dibaca langsung dari bobot model):`,
+      `Dibandingkan dengan profil acuan yang netral, setiap faktor menggeser skor ${outcomeName(name)} seperti berikut (pengaruh terbesar lebih dulu, dalam poin log-odds, dibaca langsung dari bobot model):`,
     ),
   totalLogit: (base: number, full: number, name: string, pct: number) =>
     pick(
       `Baseline evidence ${base} plus contributions = ${full} log-odds points for ${name}, which the model turns into a ${pct} percent probability.`,
-      `Bukti acuan ${base} ditambah kontribusi = ${full} poin log-odds untuk ${outcomeName(name)}, yang oleh model diubah menjadi probabilitas ${pct} persen.`,
+      `Skor acuan ${num(base)}, ditambah semua kontribusi, menjadi ${num(full)} poin log-odds untuk ${outcomeName(name)}. Model mengubahnya menjadi peluang ${num(pct)} persen.`,
     ),
 };
 
@@ -155,18 +159,17 @@ export const CF = {
   intro: (current: string) =>
     pick(
       `The recommendation is ${current}. The smallest single changes that would alter it:`,
-      `Rekomendasinya adalah ${outcomeName(current)}. Perubahan tunggal terkecil yang akan mengubahnya:`,
+      `Rekomendasinya: ${outcomeName(current)}. Perubahan terkecil pada satu faktor yang akan mengubahnya:`,
     ),
   none: (current: string) =>
     pick(
       `No single change to one input would alter this recommendation. It would take changes to more than one input to move away from ${current}.`,
-      `Tidak ada perubahan tunggal pada satu input yang akan mengubah rekomendasi ini. Dibutuhkan perubahan pada lebih dari satu input untuk beranjak dari ${outcomeName(current)}.`,
+      `Tidak ada satu perubahan pun pada satu faktor yang akan mengubah rekomendasi ini. Perlu perubahan pada lebih dari satu faktor agar hasilnya bukan lagi ${outcomeName(current)}.`,
     ),
   numeric: (label: "age" | "horizon", value: number, old: number, outcome: string) => {
     if (L === "id") {
-      const lab = label === "age" ? "usia" : "horizon";
-      const unit = label === "age" ? "tahun" : "tahun";
-      return `Jika ${lab} Anda ${value} ${unit} alih-alih ${old}, sarannya berubah menjadi ${outcomeName(outcome)}.`;
+      const lab = label === "age" ? "usia" : "jangka waktu investasi";
+      return `Jika ${lab} Anda ${value} tahun, bukan ${old}, sarannya akan menjadi ${outcomeName(outcome)}.`;
     }
     const unit = label === "age" ? "years old" : "years";
     return `If your ${label} were ${value} ${unit} instead of ${old}, the advice would change to ${outcome}.`;
@@ -174,7 +177,7 @@ export const CF = {
   tolerance: (to: string, from: string, outcome: string) =>
     pick(
       `If your risk tolerance were ${to} instead of ${from}, the advice would change to ${outcome}.`,
-      `Jika toleransi risiko Anda ${labelValue(to === "Medium" ? "Moderate" : to)} alih-alih ${labelValue(from === "Medium" ? "Moderate" : from)}, sarannya berubah menjadi ${outcomeName(outcome)}.`,
+      `Jika toleransi risiko Anda ${labelValue(to === "Medium" ? "Moderate" : to).toLowerCase()}, bukan ${labelValue(from === "Medium" ? "Moderate" : from).toLowerCase()}, sarannya akan menjadi ${outcomeName(outcome)}.`,
     ),
   fund: (had: boolean, outcome: string) =>
     pick(
@@ -182,8 +185,8 @@ export const CF = {
         ? `If you did not have a 6-month emergency fund, the advice would change to ${outcome}.`
         : `If you had a 6-month emergency fund, the advice would change to ${outcome}.`,
       had
-        ? `Jika Anda tidak memiliki dana darurat 6 bulan, sarannya berubah menjadi ${outcomeName(outcome)}.`
-        : `Jika Anda memiliki dana darurat 6 bulan, sarannya berubah menjadi ${outcomeName(outcome)}.`,
+        ? `Jika Anda tidak punya dana darurat untuk 6 bulan, sarannya akan menjadi ${outcomeName(outcome)}.`
+        : `Jika Anda punya dana darurat untuk 6 bulan, sarannya akan menjadi ${outcomeName(outcome)}.`,
     ),
   income: (wasStable: boolean, outcome: string) =>
     pick(
@@ -191,8 +194,8 @@ export const CF = {
         ? `If your income were variable instead of stable, the advice would change to ${outcome}.`
         : `If your income were stable instead of variable, the advice would change to ${outcome}.`,
       wasStable
-        ? `Jika pendapatan Anda tidak tetap alih-alih stabil, sarannya berubah menjadi ${outcomeName(outcome)}.`
-        : `Jika pendapatan Anda stabil alih-alih tidak tetap, sarannya berubah menjadi ${outcomeName(outcome)}.`,
+        ? `Jika pendapatan Anda tidak tetap, sarannya akan menjadi ${outcomeName(outcome)}.`
+        : `Jika pendapatan Anda stabil, sarannya akan menjadi ${outcomeName(outcome)}.`,
     ),
   debt: (had: boolean, outcome: string) =>
     pick(
@@ -200,8 +203,8 @@ export const CF = {
         ? `If you did not have significant debt or obligations, the advice would change to ${outcome}.`
         : `If you had significant debt or obligations, the advice would change to ${outcome}.`,
       had
-        ? `Jika Anda tidak memiliki utang atau kewajiban besar, sarannya berubah menjadi ${outcomeName(outcome)}.`
-        : `Jika Anda memiliki utang atau kewajiban besar, sarannya berubah menjadi ${outcomeName(outcome)}.`,
+        ? `Jika Anda tidak punya utang atau kewajiban besar, sarannya akan menjadi ${outcomeName(outcome)}.`
+        : `Jika Anda punya utang atau kewajiban besar, sarannya akan menjadi ${outcomeName(outcome)}.`,
     ),
   need: (had: boolean, outcome: string) =>
     pick(
@@ -209,13 +212,13 @@ export const CF = {
         ? `If you did not expect to need this money in the near term, the advice would change to ${outcome}.`
         : `If you expected to need this money in the near term, the advice would change to ${outcome}.`,
       had
-        ? `Jika Anda tidak memperkirakan butuh dana ini dalam waktu dekat, sarannya berubah menjadi ${outcomeName(outcome)}.`
-        : `Jika Anda memperkirakan butuh dana ini dalam waktu dekat, sarannya berubah menjadi ${outcomeName(outcome)}.`,
+        ? `Jika dana ini tidak akan Anda butuhkan dalam waktu dekat, sarannya akan menjadi ${outcomeName(outcome)}.`
+        : `Jika dana ini mungkin Anda butuhkan dalam waktu dekat, sarannya akan menjadi ${outcomeName(outcome)}.`,
     ),
   rerunNote: (isNetwork: boolean) =>
     pick(
       `Each statement was produced by re-running the same ${isNetwork ? "network" : "model"} with only that input changed.`,
-      `Setiap pernyataan dihasilkan dengan menjalankan ulang ${isNetwork ? "jaringan" : "model"} yang sama dengan hanya input itu yang diubah.`,
+      `Setiap kalimat di atas didapat dengan menjalankan ulang ${isNetwork ? "jaringan" : "model"} yang sama, dengan hanya satu faktor yang diubah.`,
     ),
 };
 
@@ -228,14 +231,16 @@ export const CX = {
     ),
   sentence: (who: "ml" | "logit", label: "high" | "moderate" | "low", name: string, pTop: number, neighbour: string | null, pSecond: number | null) => {
     if (L === "id") {
-      const subj = who === "logit" ? "Model" : "Jaringan";
+      const subj = who === "logit" ? "Model" : "Jaringan saraf";
       const n = outcomeName(name);
       const nb = neighbour ? outcomeName(neighbour) : null;
+      const top = num(pTop);
+      const second = pSecond === null ? "" : num(pSecond);
       if (label === "low")
-        return `${subj} memberi ${n} probabilitas hanya ${pTop} persen${nb ? `, dengan ${nb} menyusul dekat di ${pSecond} persen` : ""}. Perubahan kecil pada profil Anda dapat menggesernya.`;
+        return `${subj} hanya memberi peluang ${top} persen untuk ${n}${nb ? `, dengan ${nb} tidak jauh di belakang (${second} persen)` : ""}. Perubahan kecil pada profil Anda bisa mengubahnya.`;
       if (label === "moderate")
-        return `${subj} memberi ${n} probabilitas ${pTop} persen${nb ? `, berbanding ${pSecond} persen untuk ${nb}` : ""}. Perubahan sedang pada profil Anda dapat menggesernya.`;
-      return `${subj} memberi ${n} probabilitas ${pTop} persen${nb ? `, jauh di atas ${nb} yang ${pSecond} persen` : ""}. Dibutuhkan perubahan besar pada profil Anda untuk menggesernya.`;
+        return `${subj} memberi peluang ${top} persen untuk ${n}${nb ? `, dibandingkan ${second} persen untuk ${nb}` : ""}. Perubahan yang tidak terlalu besar pada profil Anda bisa mengubahnya.`;
+      return `${subj} memberi peluang ${top} persen untuk ${n}${nb ? `, jauh di atas ${nb} (${second} persen)` : ""}. Perlu perubahan besar pada profil Anda untuk mengubahnya.`;
     }
     const subj = who === "logit" ? "The model" : "The network";
     if (label === "low")
@@ -247,7 +252,7 @@ export const CX = {
   detail: (pTop: number, margin: number) =>
     pick(
       `${pTop} percent calibrated probability, ${margin} points ahead of the next outcome.`,
-      `Probabilitas terkalibrasi ${pTop} persen, unggul ${margin} poin atas hasil berikutnya.`,
+      `Peluang terkalibrasi ${num(pTop)} persen, ${num(margin)} poin di atas hasil berikutnya.`,
     ),
 };
 
@@ -256,9 +261,10 @@ export function escalationReason(who: "ml" | "logit", tolerance: string, capacit
   if (L === "id") {
     const subj =
       who === "ml"
-        ? "Jaringan, yang dilatih pada keputusan para ahli,"
-        : "Model interpretable, yang dilatih pada keputusan para ahli,";
-    return `${subj} menilai profil ini (toleransi ${labelValue(tolerance)}, kapasitas ${labelValue(capacity)}, kebutuhan likuiditas ${labelValue(liquidity)}) sebaiknya ditangani penasihat manusia.`;
+        ? "Jaringan saraf, yang dilatih dari keputusan para ahli,"
+        : "Model transparan, yang dibuat dari keputusan para ahli,";
+    const low = (v: string) => labelValue(v).toLowerCase();
+    return `${subj} menilai profil ini (toleransi risiko ${low(tolerance)}, kemampuan menanggung risiko ${low(capacity)}, kebutuhan dana cepat ${low(liquidity)}) sebaiknya ditangani penasihat manusia.`;
   }
   const subj =
     who === "ml" ? "The network, trained on expert decisions," : "The interpretable model, fitted on expert decisions,";
@@ -268,48 +274,55 @@ export function escalationReason(who: "ml" | "logit", tolerance: string, capacit
 export function labelReasonText(en: string) {
   if (L === "en") return en;
   const map: [string, string][] = [
-    ["emergency fund, stable income, no significant debt", "dana darurat ada, pendapatan stabil, tanpa utang besar"],
+    ["emergency fund, stable income, no significant debt", "ada dana darurat, pendapatan stabil, tanpa utang besar"],
     ["no emergency fund", "tanpa dana darurat"],
     ["variable income", "pendapatan tidak tetap"],
     ["significant debt or obligations", "utang atau kewajiban besar"],
     ["the money may be needed in the near term", "dana mungkin dibutuhkan dalam waktu dekat"],
     [" and ", " dan "],
-    ["years horizon", "tahun horizon"],
-    ["year horizon", "tahun horizon"],
   ];
   let out = en;
   for (const [a, b] of map) out = out.split(a).join(b);
-  return out;
+  /* "15 years horizon" reads the other way round in Indonesian. */
+  return out.replace(/(\d+) years? horizon/, "jangka waktu $1 tahun");
 }
 
 /* ---------------- Interpretable-advisor value texts ---------------- */
 const STATED_ID: Record<string, string> = { low: "rendah", medium: "sedang", high: "tinggi" };
+/* The ILS-Bench label each stated answer maps to, to spot when they agree. */
+const STATED_EN: Record<string, string> = { low: "low", medium: "moderate", high: "high" };
+/* In Indonesian the value and its reason share one parenthesis, so a
+   sentence reads "Kebutuhan dana cepat (rendah, jangka waktu 15 tahun)"
+   rather than nesting a second pair of brackets. */
 export const LT = {
   tolValue: (labelTol: string, inconsistent: boolean, stated: string) =>
     L === "id"
-      ? labelValue(labelTol) + (inconsistent ? " (dibaca dari deskripsi)" : ` (dinyatakan ${STATED_ID[stated] ?? stated})`)
+      ? labelValue(labelTol).toLowerCase() +
+        (inconsistent ? ", disimpulkan dari deskripsi" : labelTol.toLowerCase() === (STATED_EN[stated] ?? stated) ? ", sesuai pernyataan" : `, dinyatakan ${STATED_ID[stated] ?? stated}`)
       : labelTol + (inconsistent ? " (read from the description)" : ` (stated ${stated})`),
-  capValue: (cap: string, reason: string) => `${labelValue(cap)} (${labelReasonText(reason)})`,
-  liqValue: (liq: string, reason: string) => `${labelValue(liq)} (${labelReasonText(reason)})`,
+  capValue: (cap: string, reason: string) =>
+    L === "id" ? `${labelValue(cap).toLowerCase()}, ${labelReasonText(reason)}` : `${labelValue(cap)} (${labelReasonText(reason)})`,
+  liqValue: (liq: string, reason: string) =>
+    L === "id" ? `${labelValue(liq).toLowerCase()}, ${labelReasonText(reason)}` : `${labelValue(liq)} (${labelReasonText(reason)})`,
 };
 
 /* ---------------- Contrastive ---------------- */
 export const CT = {
   already: (current: string) =>
-    pick(`${current} is already the recommendation.`, `${outcomeName(current)} sudah menjadi rekomendasi.`),
+    pick(`${current} is already the recommendation.`, `${outcomeName(current)} sudah menjadi rekomendasinya.`),
   numericText: (label: "age" | "horizon", v: number, old: number) => {
-    if (L === "id") return `${label === "age" ? "usia" : "horizon"} Anda ${v} tahun alih-alih ${old}`;
+    if (L === "id") return `${label === "age" ? "usia" : "jangka waktu investasi"} Anda ${v} tahun, bukan ${old}`;
     return `your ${label} were ${v} ${label === "age" ? "years old" : "years"} instead of ${old}`;
   },
   tolText: (to: string, from: string) =>
     pick(
       `your risk tolerance were ${to} instead of ${from}`,
-      `toleransi risiko Anda ${labelValue(to === "Medium" ? "Moderate" : to).toLowerCase()} alih-alih ${labelValue(from === "Medium" ? "Moderate" : from).toLowerCase()}`,
+      `toleransi risiko Anda ${labelValue(to === "Medium" ? "Moderate" : to).toLowerCase()}, bukan ${labelValue(from === "Medium" ? "Moderate" : from).toLowerCase()}`,
     ),
   fundText: (had: boolean) =>
     pick(
       had ? "you had no 6-month emergency fund" : "you had a 6-month emergency fund",
-      had ? "Anda tidak punya dana darurat 6 bulan" : "Anda punya dana darurat 6 bulan",
+      had ? "Anda tidak punya dana darurat untuk 6 bulan" : "Anda punya dana darurat untuk 6 bulan",
     ),
   incomeText: (wasStable: boolean) =>
     pick(
@@ -319,26 +332,26 @@ export const CT = {
   debtText: (had: boolean) =>
     pick(
       had ? "you had no significant debt" : "you had significant debt or obligations",
-      had ? "Anda tanpa utang besar" : "Anda punya utang atau kewajiban besar",
+      had ? "Anda tidak punya utang besar" : "Anda punya utang atau kewajiban besar",
     ),
   needText: (had: boolean) =>
     pick(
       had ? "you did not need the money in the near term" : "you might need the money in the near term",
-      had ? "Anda tidak membutuhkan dana itu dalam waktu dekat" : "Anda mungkin membutuhkan dana itu dalam waktu dekat",
+      had ? "dana itu tidak Anda butuhkan dalam waktu dekat" : "dana itu mungkin Anda butuhkan dalam waktu dekat",
     ),
   single: (target: string, a: string, b?: string) =>
     pick(
       `The advice would be ${target} if ${a}.` + (b ? ` Also if ${b}.` : ""),
-      `Sarannya menjadi ${outcomeName(target)} jika ${a}.` + (b ? ` Juga jika ${b}.` : ""),
+      `Sarannya akan menjadi ${outcomeName(target)} jika ${a}.` + (b ? ` Bisa juga jika ${b}.` : ""),
     ),
   pair: (target: string, a: string, b: string) =>
     pick(
       `No single change would give ${target}. It would take two changes, for example if ${a} and ${b}.`,
-      `Tidak ada perubahan tunggal yang menghasilkan ${outcomeName(target)}. Dibutuhkan dua perubahan, misalnya jika ${a} dan ${b}.`,
+      `Tidak ada satu perubahan pun yang menghasilkan ${outcomeName(target)}. Perlu dua perubahan, misalnya jika ${a} dan ${b}.`,
     ),
   notFound: (target: string) =>
     pick(
       `No single change, and no pair of changes to tolerance, emergency fund, income, debt or near-term need, would give ${target} for a profile like yours. The inputs that keep you away from it are the ones with the largest contributions.`,
-      `Tidak ada perubahan tunggal, dan tidak ada pasangan perubahan pada toleransi, dana darurat, pendapatan, utang, atau kebutuhan jangka pendek, yang menghasilkan ${outcomeName(target)} untuk profil seperti milik Anda. Input yang menjauhkan Anda darinya adalah input dengan kontribusi terbesar.`,
+      `Untuk profil seperti milik Anda, tidak ada satu atau dua perubahan pada toleransi risiko, dana darurat, pendapatan, utang, atau kebutuhan dalam waktu dekat yang menghasilkan ${outcomeName(target)}. Yang paling menjauhkan Anda dari hasil itu adalah faktor dengan kontribusi terbesar.`,
     ),
 };

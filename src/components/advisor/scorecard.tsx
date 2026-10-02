@@ -7,7 +7,7 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { scorecard } from "@/lib/advisor/advisors";
-import { inputLabel, labelValue, outcomeName } from "@/lib/advisor/strings";
+import { inputLabel, labelValue, num, outcomeName } from "@/lib/advisor/strings";
 import { tr, useLang } from "@/lib/i18n";
 
 function rowLabel(label: string, locale: "en" | "id") {
@@ -34,21 +34,21 @@ export function ScorecardTable() {
         <AccordionTrigger className="text-sm font-medium">
           {t(
             "The whole scorecard: what every input is worth, in points, for every outcome",
-            "Scorecard lengkap: nilai setiap input, dalam poin, untuk setiap hasil",
+            "Tabel poin lengkap: nilai setiap faktor, dalam poin, untuk setiap hasil",
           )}
         </AccordionTrigger>
         <AccordionContent className="space-y-3">
           <p className="text-xs text-muted-foreground">
             {t(
               "These are the model's fitted weights, shown as they are. For any profile, exactly one row applies from each group. Add the applying rows, the age effect and the starting points in each column: the outcome with the largest total wins, and the totals are turned into the probabilities shown in the app. Points are log-odds, so a difference of about 1 point between two outcomes means roughly 3 to 1 odds.",
-              "Inilah bobot hasil pemasangan model, ditampilkan apa adanya. Untuk profil mana pun, tepat satu baris berlaku dari setiap kelompok. Jumlahkan baris yang berlaku, efek usia, dan poin awal di setiap kolom: hasil dengan total terbesar menang, dan total itu diubah menjadi probabilitas yang tampil di aplikasi. Poin adalah log-odds, jadi selisih sekitar 1 poin antara dua hasil berarti peluang kira-kira 3 banding 1.",
+              "Ini bobot model apa adanya. Untuk setiap profil, hanya satu baris yang berlaku di setiap kelompok. Jumlahkan baris yang berlaku, pengaruh usia, dan poin awal di setiap kolom: hasil dengan total terbesar yang dipilih, lalu totalnya diubah menjadi peluang yang tampil di aplikasi. Poinnya dalam skala log-odds, jadi selisih sekitar 1 poin antara dua hasil berarti peluangnya kira-kira 3 banding 1.",
             )}
           </p>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("Input", "Input")}</TableHead>
+                  <TableHead>{t("Input", "Faktor")}</TableHead>
                   {sc.outcomes.map((o) => (
                     <TableHead key={o} className="text-right text-xs">
                       {outcomeName(o)}
@@ -69,7 +69,7 @@ export function ScorecardTable() {
                           key={j}
                           className={`text-right tabular-nums ${p > 0 ? "text-primary" : p < 0 ? "text-destructive" : "text-muted-foreground"}`}
                         >
-                          {p > 0 ? `+${p}` : p}
+                          {p > 0 ? `+${num(p)}` : num(p)}
                         </TableCell>
                       ))}
                     </TableRow>

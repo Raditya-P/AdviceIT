@@ -159,7 +159,11 @@ export function systemPrompt(result: AdvisorResult, content: string[], locale: "
     "Use ONLY the facts below. Do not add products, numbers, market views or advice that are not in the facts.",
     "If asked something the facts do not cover, say that you do not have that information.",
     "Write plainly, in short sentences, for a non-expert. Never use em dashes or semicolons.",
-    ...(locale === "id" ? ["Always reply in Bahasa Indonesia, whatever language the facts are in."] : []),
+    ...(locale === "id"
+      ? [
+          "Always reply in Bahasa Indonesia, whatever language the facts are in. Use natural, everyday Indonesian, address the reader as Anda, and do not translate English terms word for word.",
+        ]
+      : []),
     "",
     "FACTS (JSON):",
     JSON.stringify(facts, null, 2),
@@ -170,7 +174,7 @@ export const OPENING_REQUEST =
   "In three or four sentences, explain to me why I received this recommendation, what mattered most, and how sure the model is. Then invite me to ask a follow-up question.";
 
 const OPENING_REQUEST_ID =
-  "Dalam tiga atau empat kalimat, jelaskan kepada saya mengapa saya menerima rekomendasi ini, apa yang paling berpengaruh, dan seberapa yakin modelnya. Lalu persilakan saya mengajukan pertanyaan lanjutan.";
+  "Dalam tiga atau empat kalimat, jelaskan mengapa saya mendapat rekomendasi ini, faktor apa yang paling berpengaruh, dan seberapa yakin modelnya. Setelah itu, persilakan saya bertanya lebih lanjut.";
 
 export function openingRequest(locale: "en" | "id" = "en") {
   return locale === "id" ? OPENING_REQUEST_ID : OPENING_REQUEST;

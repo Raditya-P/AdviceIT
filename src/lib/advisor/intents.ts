@@ -19,7 +19,7 @@
    out to be the bottleneck, this module is the only thing that has to change. */
 
 import { ASSET_CLASSES, OUTCOMES } from "./model";
-import { ASSET_ID, OUTCOME_ID, assetLabel, labelValue, outcomeName, escalationReason, inputLabel } from "./strings";
+import { ASSET_ID, OUTCOME_ID, assetLabel, labelReasonText, labelValue, outcomeName, escalationReason, inputLabel } from "./strings";
 import {
   confidenceExplanation,
   contrastiveExplanation,
@@ -50,15 +50,15 @@ const LEX: Lex = {
   },
   change: {
     en: ["what would change", "what changes", "how do i change", "how can i change", "what if", "flip", "different advice", "change the advice", "change it", "what could i do", "improve"],
-    id: ["apa yang mengubah", "bagaimana mengubah", "kalau saya", "bagaimana jika", "berubah", "ubah sarannya", "apa yang bisa saya lakukan", "memperbaiki"],
+    id: ["apa yang mengubah", "apa yang bisa mengubah", "bagaimana mengubah", "kalau saya", "bagaimana jika", "berubah", "ubah sarannya", "apa yang bisa saya lakukan", "memperbaiki"],
   },
   confidence: {
     en: ["how sure", "how confident", "confidence", "certain", "probability", "how likely", "how reliable"],
-    id: ["seberapa yakin", "keyakinan", "pasti", "probabilitas", "seberapa mungkin", "seberapa andal"],
+    id: ["seberapa yakin", "keyakinan", "pasti", "probabilitas", "peluang", "seberapa mungkin", "seberapa andal"],
   },
   whyNot: {
     en: ["why not", "instead of", "rather than", "what about"],
-    id: ["mengapa bukan", "kenapa bukan", "alih-alih", "bagaimana dengan"],
+    id: ["mengapa bukan", "kenapa bukan", "alih-alih", "daripada", "bagaimana dengan"],
   },
   how: {
     en: ["how do you work", "how does it work", "how were you trained", "what data", "training data", "how accurate", "accuracy", "what model", "who made"],
@@ -66,11 +66,11 @@ const LEX: Lex = {
   },
   input: {
     en: ["what does", "what is my", "what do you mean by", "define", "meaning of", "risk capacity", "risk tolerance", "liquidity"],
-    id: ["apa arti", "apa maksud", "definisi", "kapasitas risiko", "toleransi risiko", "likuiditas"],
+    id: ["apa arti", "apa maksud", "definisi", "kapasitas risiko", "kemampuan menanggung", "toleransi risiko", "likuiditas", "dana cepat"],
   },
   escalation: {
     en: ["human review", "why a human", "why not automate", "refer", "adviser instead", "escalate"],
-    id: ["tinjauan manusia", "kenapa manusia", "mengapa manusia", "dirujuk", "eskalasi"],
+    id: ["tinjauan manusia", "penasihat manusia", "kenapa manusia", "mengapa manusia", "dirujuk", "eskalasi"],
   },
   asset: {
     en: ["what are equities", "what are bonds", "what is cash", "real assets", "what are shares", "money market", "what is a bond"],
@@ -109,8 +109,8 @@ function findArg(text: string, intent: Intent, locale: "en" | "id"): string | un
     const keys = ["tolerance", "capacity", "liquidity"];
     const words: Record<string, string[]> = {
       tolerance: ["tolerance", "toleransi"],
-      capacity: ["capacity", "kapasitas"],
-      liquidity: ["liquidity", "likuiditas"],
+      capacity: ["capacity", "kapasitas", "kemampuan menanggung"],
+      liquidity: ["liquidity", "likuiditas", "dana cepat"],
     };
     for (const k of keys) if (words[k].some((w) => text.includes(w))) return k;
     for (const key of ["age", "horizon", "emergencyFund", "incomeStable", "debtObligations", "nearTermNeed"]) {
@@ -159,7 +159,7 @@ export function answerFor(
       const items = fx.items.filter((it) => it.points !== 0).slice(0, 3);
       if (!items.length) return null;
       return (
-        pick(locale, `Here is what drove ${outcome}, in order of size.`, `Berikut yang mendorong ${outcome}, berurutan menurut besarnya.`) +
+        pick(locale, `Here is what drove ${outcome}, in order of size.`, `Berikut faktor yang paling menentukan ${outcome}, dari yang terbesar.`) +
         "\n\n" +
         items.map((it) => "- " + it.sentence).join("\n") +
         "\n\n" +
@@ -187,7 +187,7 @@ export function answerFor(
         return pick(
           locale,
           `${outcome} is the recommendation, so there is nothing to contrast it with. Ask about a different outcome.`,
-          `${outcome} justru rekomendasinya, jadi tidak ada yang dibandingkan. Tanyakan hasil yang lain.`,
+          `${outcome} memang rekomendasinya, jadi tidak ada yang bisa dibandingkan. Coba tanyakan hasil yang lain.`,
         );
       }
       return contrastiveExplanation(result, match.arg).sentence;
@@ -195,10 +195,11 @@ export function answerFor(
     case "how": {
       const meta = result.advisor === "ml" ? mlMeta : logitMeta;
       const name = result.advisor === "ml" ? ADVISORS.ml.name : ADVISORS.logit.name;
+      const nameId = result.advisor === "ml" ? "penasihat AI" : "penasihat transparan berbasis aturan";
       return pick(
         locale,
         `I am the ${name.toLowerCase()}. I was trained on ILS-Bench, ${mlMeta.cases} investor cases whose labels were agreed by a panel of four financial experts, and I reach ${accuracyPhrase(meta.cvAccuracy as number, mlMeta.cases)} across six outcomes including Human review. That is a benchmark figure, not a real-world one. The Training data page shows the dataset, the results and every case.`,
-        `Saya adalah ${name.toLowerCase()}. Saya dilatih pada ILS-Bench, ${mlMeta.cases} kasus investor yang labelnya disepakati panel empat ahli keuangan, dan saya mencapai ${accuracyPhrase(meta.cvAccuracy as number, mlMeta.cases, "id")} pada enam hasil termasuk Tinjauan manusia. Itu angka benchmark, bukan angka dunia nyata. Halaman Data pelatihan menampilkan datasetnya, hasilnya, dan setiap kasus.`,
+        `Saya ${nameId}. Saya dilatih dengan ILS-Bench, yaitu ${mlMeta.cases} kasus investor yang labelnya disepakati panel empat ahli keuangan, dan saya mencapai ${accuracyPhrase(meta.cvAccuracy as number, mlMeta.cases, "id")} untuk enam hasil, termasuk Tinjauan penasihat manusia. Angka itu hasil uji pada data penelitian, bukan kinerja di dunia nyata. Halaman Data pelatihan menampilkan datanya, hasil ujinya, dan setiap kasusnya.`,
       );
     }
     case "input": {
@@ -207,21 +208,21 @@ export function answerFor(
         return pick(
           locale,
           `Risk tolerance is how much movement in value you say you can live with. Yours reads as ${labelValue(L.tolerance)}.`,
-          `Toleransi risiko adalah seberapa besar naik turun nilai yang Anda nyatakan sanggup Anda jalani. Milik Anda terbaca ${labelValue(L.tolerance)}.`,
+          `Toleransi risiko adalah seberapa besar naik turunnya nilai investasi yang menurut Anda masih bisa Anda terima. Toleransi risiko Anda: ${labelValue(L.tolerance).toLowerCase()}.`,
         );
       }
       if (match.arg === "capacity") {
         return pick(
           locale,
           `Risk capacity is how much loss your situation could absorb before you would be forced to sell. It counts an emergency fund, income stability and debt. Yours reads as ${labelValue(L.capacity)}, because of ${L.capacityReason}.`,
-          `Kapasitas risiko adalah seberapa besar kerugian yang bisa ditanggung situasi Anda sebelum Anda terpaksa menjual. Ini menghitung dana darurat, stabilitas pendapatan, dan utang. Milik Anda terbaca ${labelValue(L.capacity)}, karena ${L.capacityReason}.`,
+          `Kemampuan menanggung risiko adalah seberapa besar kerugian yang sanggup ditanggung kondisi keuangan Anda sebelum Anda terpaksa menjual investasi. Ini dilihat dari dana darurat, kestabilan pendapatan, dan utang. Kemampuan Anda: ${labelValue(L.capacity).toLowerCase()} (${labelReasonText(L.capacityReason)}).`,
         );
       }
       if (match.arg === "liquidity") {
         return pick(
           locale,
           `Liquidity need is how soon the money may be needed. Yours reads as ${labelValue(L.liquidity)}, from ${L.liquidityReason}.`,
-          `Kebutuhan likuiditas adalah seberapa cepat uangnya mungkin dibutuhkan. Milik Anda terbaca ${labelValue(L.liquidity)}, dari ${L.liquidityReason}.`,
+          `Kebutuhan dana cepat adalah seberapa cepat uang ini mungkin Anda butuhkan. Kebutuhan Anda: ${labelValue(L.liquidity).toLowerCase()} (${labelReasonText(L.liquidityReason)}).`,
         );
       }
       return null;
@@ -243,12 +244,12 @@ export function answerFor(
  *  Wording follows the XAI question bank categories. */
 export function suggestedQuestions(result: AdvisorResult, locale: "en" | "id"): string[] {
   const qs = [
-    pick(locale, "Why this recommendation?", "Mengapa rekomendasi ini?"),
-    pick(locale, "What would change it?", "Apa yang akan mengubahnya?"),
+    pick(locale, "Why this recommendation?", "Mengapa rekomendasinya ini?"),
+    pick(locale, "What would change it?", "Apa yang bisa mengubahnya?"),
     pick(locale, "How sure are you?", "Seberapa yakin Anda?"),
-    pick(locale, "What does risk capacity mean?", "Apa arti kapasitas risiko?"),
+    pick(locale, "What does risk capacity mean?", "Apa arti kemampuan menanggung risiko?"),
   ];
-  if (result.escalated) qs.push(pick(locale, "Why human review?", "Mengapa tinjauan manusia?"));
+  if (result.escalated) qs.push(pick(locale, "Why human review?", "Mengapa perlu penasihat manusia?"));
   else {
     const other = OUTCOMES.find((o) => o.name !== result.portfolio.name && o.allocation);
     if (other) qs.push(pick(locale, `Why not ${outcomeName(other.name)}?`, `Mengapa bukan ${outcomeName(other.name)}?`));

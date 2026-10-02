@@ -34,9 +34,9 @@ const noSubscription = () => () => {};
 function advisorDescription(advisorId: "ml" | "logit", locale: "en" | "id") {
   if (locale === "en") return ADVISORS[advisorId].description;
   if (advisorId === "ml") {
-    return `Neural network yang dilatih pada ILS-Bench: ${accuracyPhrase(mlMeta.cvAccuracy, mlMeta.cases, "id")}, pada enam hasil termasuk Tinjauan manusia. Bobotnya tidak terbaca, sehingga penjelasan dihitung setelah keputusan.`;
+    return `Jaringan saraf tiruan yang dilatih dengan ILS-Bench: ${accuracyPhrase(mlMeta.cvAccuracy, mlMeta.cases, "id")}, untuk enam hasil termasuk Tinjauan penasihat manusia. Cara kerjanya tidak bisa dibaca langsung, jadi penjelasannya dihitung setelah keputusan dibuat.`;
   }
-  return `Scorecard yang dipaskan pada data yang sama dengan regresi logistik multinomial: ${accuracyPhrase(logitMeta.cvAccuracy as number, mlMeta.cases, "id")}. Satu bobot per input dan hasil, semua bobot terbaca, penjelasan eksak.`;
+  return `Tabel poin yang dibuat dari data yang sama dengan regresi logistik multinomial: ${accuracyPhrase(logitMeta.cvAccuracy as number, mlMeta.cases, "id")}. Satu bobot untuk setiap faktor dan hasil, semua bobot bisa dibaca, dan penjelasannya eksak.`;
 }
 
 export function Playground({
@@ -114,7 +114,7 @@ export function Playground({
             className="rounded-full border border-border/80 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
           >
             {advisorId === "ml"
-              ? t("Switch to the interpretable advisor", "Beralih ke penasihat interpretable")
+              ? t("Switch to the interpretable advisor", "Beralih ke penasihat transparan")
               : t("Switch to the AI advisor", "Beralih ke penasihat AI")}
           </Link>
         </div>
@@ -123,7 +123,7 @@ export function Playground({
           <p className="rounded-xl border border-border/70 bg-muted/40 px-4 py-2.5 text-sm text-muted-foreground">
             {t(
               "Researcher controls are locked. Open the researcher dashboard, enter the key once, then return to this page.",
-              "Kontrol peneliti terkunci. Buka dasbor peneliti, masukkan kuncinya sekali, lalu kembali ke halaman ini.",
+              "Kontrol peneliti masih terkunci. Buka dasbor peneliti, masukkan kuncinya sekali, lalu kembali ke halaman ini.",
             )}{" "}
             <Link href="/researcher" className="font-medium text-primary underline underline-offset-4">
               {t("Researcher dashboard", "Dasbor peneliti")}
@@ -205,12 +205,12 @@ export function Playground({
           <div className="space-y-8">
             <div className="max-w-2xl space-y-2">
               <h2 className="text-2xl font-semibold tracking-tight">
-                {t("Tell the advisor about the investor", "Ceritakan tentang investornya kepada penasihat")}
+                {t("Tell the advisor about the investor", "Ceritakan profil investornya kepada penasihat")}
               </h2>
               <p className="text-muted-foreground">
                 {t(
                   "These are the questions a robo-advisor would ask before recommending anything. Everything here is hypothetical, and nothing is stored unless you send the optional response at the end.",
-                  "Ini pertanyaan yang akan diajukan robo-advisor sebelum merekomendasikan apa pun. Semuanya bersifat hipotetis, dan tidak ada yang disimpan kecuali Anda mengirim respons opsional di bagian akhir.",
+                  "Pertanyaan ini biasa ditanyakan robo-advisor sebelum memberi rekomendasi. Semuanya hanya contoh, dan tidak ada yang disimpan kecuali Anda mengirim tanggapan opsional di bagian akhir.",
                 )}
               </p>
             </div>
@@ -258,11 +258,11 @@ export function Playground({
                     {literacyLevel === "low"
                       ? t(
                           "Showing the plain-language version, because the profile rates its financial knowledge as beginner.",
-                          "Menampilkan versi bahasa sederhana, karena profil ini menilai pengetahuan keuangannya sebagai pemula.",
+                          "Menampilkan versi bahasa sederhana, karena pengetahuan keuangan di profil ini tercatat pemula.",
                         )
                       : t(
                           "Showing the detailed version, because the profile rates its financial knowledge as intermediate or advanced.",
-                          "Menampilkan versi rinci, karena profil ini menilai pengetahuan keuangannya menengah atau mahir.",
+                          "Menampilkan versi lengkap, karena pengetahuan keuangan di profil ini tercatat menengah atau mahir.",
                         )}
                   </p>
                   <Button
@@ -272,7 +272,7 @@ export function Playground({
                     onClick={() => setAdaptiveView(literacyLevel === "low" ? "high" : "low")}
                   >
                     {literacyLevel === "low"
-                      ? t("See the detailed version", "Lihat versi rinci")
+                      ? t("See the detailed version", "Lihat versi lengkap")
                       : t("See the plain version", "Lihat versi sederhana")}
                   </Button>
                 </div>
@@ -294,7 +294,7 @@ export function Playground({
             <section className="rounded-2xl border border-border/70 bg-muted/40 p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  {t("The profile behind this", "Profil di balik ini")}
+                  {t("The profile behind this", "Profil yang dipakai")}
                 </p>
                 <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setStep("profile")}>
                   <Pencil data-icon="inline-start" />
@@ -304,10 +304,10 @@ export function Playground({
               <ul className="mt-3 flex flex-wrap gap-2 text-sm">
                 {[
                   `${t("Age", "Usia")} ${profile.age}`,
-                  `${profile.horizon} ${t("year horizon", "tahun horizon")}`,
+                  t(`${profile.horizon} year horizon`, `Jangka waktu ${profile.horizon} tahun`),
                   `${t("Risk tolerance", "Toleransi risiko")}: ${labelValue(result.labels.tolerance)}`,
-                  `${t("Risk capacity", "Kapasitas risiko")}: ${labelValue(result.labels.capacity)}`,
-                  `${t("Liquidity need", "Kebutuhan likuiditas")}: ${labelValue(result.labels.liquidity)}`,
+                  `${t("Risk capacity", "Kemampuan menanggung risiko")}: ${labelValue(result.labels.capacity)}`,
+                  `${t("Liquidity need", "Kebutuhan dana cepat")}: ${labelValue(result.labels.liquidity)}`,
                 ].map((chip) => (
                   <li key={chip} className="rounded-full border border-border/80 bg-background px-3 py-1">
                     {chip}
@@ -340,17 +340,17 @@ export function Playground({
             {/* Study CTA */}
             <section className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
               <h2 className="text-2xl font-semibold tracking-tight">
-                {t("Now the research question", "Sekarang pertanyaan penelitiannya")}
+                {t("Now the research question", "Sekarang, pertanyaan penelitiannya")}
               </h2>
               <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
                 {t(
                   "Did that explanation help you judge the advice, or just make it feel convincing? About fifteen anonymous minutes with six cases is how we find out.",
-                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Sekitar lima belas menit anonim dengan enam kasus adalah cara kami mencari tahu.",
+                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Untuk mencari tahu, kami butuh sekitar lima belas menit Anda, secara anonim, untuk enam kasus.",
                 )}
               </p>
               <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">
                 <Link href="/participate">
-                  {t("Take part in the study", "Ikut serta dalam studi")}
+                  {t("Take part in the study", "Ikut penelitian")}
                   <ArrowRight />
                 </Link>
               </Button>

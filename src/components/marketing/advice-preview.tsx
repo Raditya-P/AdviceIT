@@ -43,7 +43,7 @@ export function AdvicePreview() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {t("Recommended outcome", "Hasil yang direkomendasikan")}
+              {t("Recommended outcome", "Hasil rekomendasi")}
             </p>
             <p className="mt-1 text-3xl font-semibold tracking-tight">{outcomeName(result.portfolio.name)}</p>
           </div>
@@ -51,7 +51,7 @@ export function AdvicePreview() {
             className="flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground"
             title={t(
               "The advisor's calibrated confidence in this outcome. Not an expected return.",
-              "Keyakinan terkalibrasi penasihat pada hasil ini. Bukan imbal hasil yang diharapkan.",
+              "Seberapa yakin penasihat pada hasil ini, setelah dikalibrasi. Ini bukan perkiraan imbal hasil.",
             )}
           >
             <ShieldCheck className="size-4" aria-hidden />
@@ -69,7 +69,7 @@ export function AdvicePreview() {
         <div className="mt-5 space-y-2 rounded-2xl border border-border/80 bg-background/70 p-4">
           <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             <Sparkles className="size-3.5 text-primary" aria-hidden />
-            {t("What drove this", "Apa yang mendorongnya")}
+            {t("What drove this", "Faktor penentunya")}
           </p>
           <ul className="space-y-1.5 text-sm">
             {drivers.map((d) => (
@@ -82,7 +82,7 @@ export function AdvicePreview() {
                     d.points >= 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {d.points >= 0 ? t("supports it", "mendukungnya") : t("weighs against it", "melawannya")}
+                  {d.points >= 0 ? t("supports it", "mendukung") : t("weighs against it", "memberatkan")}
                 </span>
               </li>
             ))}
@@ -97,7 +97,7 @@ export function AdvicePreview() {
         <p className="text-muted-foreground">
           {t(
             "Live output of the advisor computed in your browser.",
-            "Keluaran langsung dari penasihat yang dihitung di browser Anda.",
+            "Hasil langsung dari penasihat, dihitung di browser Anda.",
           )}
         </p>
       </div>

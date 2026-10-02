@@ -89,7 +89,7 @@ export function LlmChat({
       onOpening?.(text, modelId);
       setReady(true);
       setStatus(
-        t("Model ready. You can ask a follow-up question.", "Model siap. Anda bisa mengajukan pertanyaan lanjutan."),
+        t("Model ready. You can ask a follow-up question.", "Model siap. Silakan ajukan pertanyaan lanjutan."),
       );
     } catch {
       /* status already shows the error via onProgress */
@@ -104,7 +104,7 @@ export function LlmChat({
       setStatus(
         t(
           "Loading the language model. This can take a minute the first time.",
-          "Memuat model bahasa. Kali pertama bisa memakan waktu sekitar satu menit.",
+          "Memuat model bahasa. Pertama kali bisa butuh sekitar satu menit.",
         ),
       );
       void start();
@@ -137,7 +137,7 @@ export function LlmChat({
           role: "assistant",
           text: t(
             "I can answer that only with the language model, which is not loaded on this device. The suggested questions above are answered from the advisor's own numbers and work anywhere.",
-            "Pertanyaan itu hanya bisa saya jawab dengan model bahasa, yang tidak termuat di perangkat ini. Pertanyaan yang disarankan di atas dijawab dari angka milik penasihat sendiri dan berfungsi di mana saja.",
+            "Pertanyaan itu hanya bisa saya jawab dengan model bahasa, dan model itu belum dimuat di perangkat ini. Pertanyaan yang disarankan di atas dijawab langsung dari angka penasihat sendiri, jadi bisa dipakai di perangkat apa pun.",
           ),
         },
       ]);
@@ -206,11 +206,11 @@ export function LlmChat({
                 b.role === "assistant" ? "bg-muted" : "ml-auto bg-primary text-primary-foreground"
               }`}
             >
-              {b.text || <span className="italic text-muted-foreground">{t("Thinking", "Berpikir")}</span>}
+              {b.text || <span className="italic text-muted-foreground">{t("Thinking", "Sedang berpikir")}</span>}
               {b.computed && showSourceLabels && (
                 <span className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-primary">
                   <Calculator className="size-3" aria-hidden />
-                  {t("Computed by the advisor, not written by the model", "Dihitung oleh penasihat, bukan ditulis model")}
+                  {t("Computed by the advisor, not written by the model", "Dihitung oleh penasihat, bukan dikarang oleh model")}
                 </span>
               )}
 
@@ -254,8 +254,8 @@ export function LlmChat({
       )}
       <p className="text-xs text-muted-foreground">
         {t(
-          "The suggested questions are answered from the advisor's own computations, so those answers cannot be invented and they work on any device. Other questions go to a language model that only sees the computed facts. It downloads once (about 1 GB), is cached by your browser, needs WebGPU, and runs on your device. Nothing you type here leaves your device, and the text is recorded in the study log.",
-          "Pertanyaan yang disarankan dijawab dari hasil perhitungan penasihat sendiri, sehingga jawabannya tidak mungkin dikarang dan berfungsi di perangkat apa pun. Pertanyaan lain diteruskan ke model bahasa yang hanya melihat fakta yang telah dihitung. Model itu diunduh sekali (sekitar 1 GB), disimpan cache oleh browser Anda, membutuhkan WebGPU, dan berjalan di perangkat Anda. Tidak ada yang Anda ketik di sini yang meninggalkan perangkat Anda, dan teksnya direkam dalam log studi.",
+          "The suggested questions are answered from the advisor's own computations, so those answers cannot be invented and they work on any device. Other questions go to a language model that only sees the computed facts. It downloads once (about 1 GB), is cached by your browser, needs WebGPU, and runs on your device. Nothing you type here leaves your device: the study log keeps only the model's opening explanation, how many questions you asked, and which suggested topics they matched.",
+          "Pertanyaan yang disarankan dijawab dari hasil perhitungan penasihat sendiri, jadi jawabannya tidak mungkin dikarang dan bisa dipakai di perangkat apa pun. Pertanyaan lain diteruskan ke model bahasa yang hanya melihat fakta hasil perhitungan. Model ini diunduh sekali (sekitar 1 GB), disimpan oleh browser Anda, membutuhkan WebGPU, dan berjalan di perangkat Anda sendiri. Tidak ada yang Anda ketik di sini yang keluar dari perangkat Anda: log studi hanya menyimpan penjelasan pembuka dari model, jumlah pertanyaan yang Anda ajukan, dan topik pertanyaan yang dikenali.",
         )}
       </p>
     </ExplanationCard>

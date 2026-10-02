@@ -1,14 +1,16 @@
 import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
-import { pageLocale } from "@/lib/locale-server";
+import { localTitle, pageLocale } from "@/lib/locale-server";
 import { StudyEntry } from "./study-entry";
 
 /* The way in is /participate, which explains the session first, so the
    session itself stays out of search results. */
-export const metadata = {
-  title: "Study session",
-  robots: { index: false },
-};
+export async function generateMetadata() {
+  return {
+    title: await localTitle("Study session", "Sesi penelitian"),
+    robots: { index: false },
+  };
+}
 
 export default async function StudyPage() {
   const locale = await pageLocale();

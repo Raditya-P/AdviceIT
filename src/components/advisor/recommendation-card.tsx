@@ -9,7 +9,7 @@ import type { AdvisorResult } from "@/lib/advisor/types";
 import { tr, useLang } from "@/lib/i18n";
 
 export function advisorDisplayName(id: "ml" | "logit", locale: "en" | "id") {
-  if (locale === "id") return id === "ml" ? "Penasihat AI" : "Penasihat interpretable berbasis aturan";
+  if (locale === "id") return id === "ml" ? "Penasihat AI" : "Penasihat transparan berbasis aturan";
   return ADVISORS[id].name;
 }
 
@@ -38,7 +38,7 @@ export function RecommendationCard({
       <div className="relative space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-            {t("Recommended outcome", "Hasil yang direkomendasikan")}
+            {t("Recommended outcome", "Hasil rekomendasi")}
           </span>
           {researcher && (
             <Badge variant="secondary">
@@ -66,9 +66,9 @@ export function RecommendationCard({
 
         {researcher && (
           <p className="border-t border-border/70 pt-3 text-xs text-muted-foreground">
-            {t("Suitability labels: tolerance", "Label kesesuaian: toleransi")} {labelValue(result.labels.tolerance)},{" "}
-            {t("capacity", "kapasitas")} {labelValue(result.labels.capacity)},{" "}
-            {t("liquidity need", "kebutuhan likuiditas")} {labelValue(result.labels.liquidity)}.
+            {t("Suitability labels: tolerance", "Label kesesuaian: toleransi risiko")} {labelValue(result.labels.tolerance)},{" "}
+            {t("capacity", "kemampuan menanggung risiko")} {labelValue(result.labels.capacity)},{" "}
+            {t("liquidity need", "kebutuhan dana cepat")} {labelValue(result.labels.liquidity)}.
             {otherOutcome && (
               <>
                 {" "}
@@ -88,7 +88,7 @@ export function RecommendationCard({
             <p className="leading-relaxed">
               {t(
                 `Flawed advice scenario active: this recommendation was deliberately shifted in the wrong direction (sound outcome: ${result.soundPortfolio ? result.soundPortfolio.name : ""}). Logged rows are marked as flawed.`,
-                `Skenario saran keliru aktif: rekomendasi ini sengaja digeser ke arah yang salah (hasil yang tepat: ${result.soundPortfolio ? outcomeName(result.soundPortfolio.name) : ""}). Baris log ditandai sebagai keliru.`,
+                `Skenario saran keliru sedang aktif: rekomendasi ini sengaja digeser ke arah yang salah (hasil yang benar: ${result.soundPortfolio ? outcomeName(result.soundPortfolio.name) : ""}). Data yang tercatat ditandai keliru.`,
               )}
             </p>
           </div>

@@ -47,7 +47,7 @@ export function CasesBrowser() {
   return (
     <Card>
       <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <CardTitle className="text-base">{t("Browse the cases", "Jelajahi kasusnya")}</CardTitle>
+        <CardTitle className="text-base">{t("Browse the cases", "Lihat daftar kasus")}</CardTitle>
         <div className="flex flex-wrap items-center gap-2">
           <Input
             value={q}
@@ -55,9 +55,9 @@ export function CasesBrowser() {
               setQ(e.target.value);
               setShown(PAGE);
             }}
-            placeholder={t("word in the narrative or a case ID", "kata dalam narasi atau ID kasus")}
+            placeholder={t("word in the narrative or a case ID", "kata kunci atau ID kasus")}
             className="w-64"
-            aria-label={t("Search narratives", "Cari narasi")}
+            aria-label={t("Search narratives", "Cari dalam narasi")}
           />
           <Select
             value={outcome}
@@ -66,7 +66,7 @@ export function CasesBrowser() {
               setShown(PAGE);
             }}
           >
-            <SelectTrigger className="w-48" aria-label={t("Filter by outcome", "Saring menurut hasil")}>
+            <SelectTrigger className="w-48" aria-label={t("Filter by outcome", "Saring berdasarkan hasil")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -83,11 +83,11 @@ export function CasesBrowser() {
       <CardContent className="space-y-3">
         <p className="text-sm text-muted-foreground">
           {filtered.length === cases.length
-            ? t(`All ${cases.length} cases.`, `Semua ${cases.length} kasus.`)
+            ? t(`All ${cases.length} cases.`, `Menampilkan semua ${cases.length} kasus.`)
             : t(`${filtered.length} of ${cases.length} cases match.`, `${filtered.length} dari ${cases.length} kasus cocok.`)}{" "}
           {t(
             "Each row shows the expert consensus. The narratives are the dataset itself and stay in English.",
-            "Setiap baris menunjukkan konsensus ahli. Narasinya adalah dataset itu sendiri dan tetap berbahasa Inggris.",
+            "Setiap baris menunjukkan kesepakatan para ahli. Narasinya adalah isi dataset itu sendiri, jadi tetap dalam bahasa Inggris.",
           )}
         </p>
         <div className="space-y-3">
@@ -97,15 +97,15 @@ export function CasesBrowser() {
                 <p className="text-sm font-semibold">
                   {c.id}{" "}
                   <span className="ml-2 font-normal text-muted-foreground">
-                    {t("tolerance", "toleransi")} {labelValue(c.tolerance)} · {t("capacity", "kapasitas")}{" "}
-                    {labelValue(c.capacity)} · {t("liquidity", "likuiditas")} {labelValue(c.liquidity)}
+                    {t("tolerance", "toleransi risiko")} {labelValue(c.tolerance)} · {t("capacity", "kemampuan menanggung risiko")}{" "}
+                    {labelValue(c.capacity)} · {t("liquidity", "kebutuhan dana cepat")} {labelValue(c.liquidity)}
                   </span>
                 </p>
                 <p className="text-sm font-medium text-primary">{outcomeName(c.portfolio)}</p>
               </div>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{c.narrative}</p>
               <Button asChild variant="ghost" size="sm" className="mt-1 -ml-2">
-                <Link href="/advisor/ml?researcher=1">{t("Open the AI advisor to try it", "Buka penasihat AI untuk mencobanya")}</Link>
+                <Link href="/advisor/ml?researcher=1">{t("Open the AI advisor to try it", "Coba di penasihat AI")}</Link>
               </Button>
             </div>
           ))}

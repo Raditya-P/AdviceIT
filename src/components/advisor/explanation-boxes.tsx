@@ -9,7 +9,7 @@
 import { BarChart3, Gauge, Shuffle, Sparkles, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { OUTCOMES } from "@/lib/advisor/model";
-import { CF, FX, outcomeName } from "@/lib/advisor/strings";
+import { CF, FX, num, outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import type { Modality } from "@/lib/conditions";
 import {
@@ -19,7 +19,7 @@ import {
 } from "@/lib/advisor/explanations";
 import { tr, useLang } from "@/lib/i18n";
 
-const signed = (v: number) => (v > 0 ? `+${v}` : String(v));
+const signed = (v: number) => (v > 0 ? `+${num(v)}` : num(v));
 
 export function ExplanationCard({
   title,
@@ -57,7 +57,7 @@ export function FeatureBox({ result, modality = "visual" }: { result: AdvisorRes
       ? FX.totalMl(result.baselineScore, result.rawScore, name)
       : FX.totalLogit(result.baselineScore, result.rawScore, name, Math.round(result.topProbability * 100));
   return (
-    <ExplanationCard icon={BarChart3} title={tr(locale, { en: "Why this recommendation", id: "Mengapa rekomendasi ini" })}>
+    <ExplanationCard icon={BarChart3} title={tr(locale, { en: "Why this recommendation", id: "Mengapa rekomendasinya ini" })}>
       <p className="text-muted-foreground">{intro}</p>
       {showBars && (
       <ul className="space-y-1.5">
@@ -100,12 +100,12 @@ export function FeatureBox({ result, modality = "visual" }: { result: AdvisorRes
    change values are English canonical, translated here for display. */
 const CF_INPUT_ID: Record<string, string> = {
   age: "usia",
-  horizon: "horizon",
+  horizon: "jangka waktu",
   "risk tolerance": "toleransi risiko",
   "emergency fund": "dana darurat",
   income: "pendapatan",
   debt: "utang",
-  "near-term need": "kebutuhan jangka pendek",
+  "near-term need": "kebutuhan dalam waktu dekat",
 };
 const CF_VALUE_ID: Record<string, string> = {
   yes: "ya",
@@ -129,7 +129,7 @@ export function CounterfactualBox({ result }: { result: AdvisorResult }) {
   return (
     <ExplanationCard
       icon={Shuffle}
-      title={tr(locale, { en: "What would change this recommendation", id: "Apa yang akan mengubah rekomendasi ini" })}
+      title={tr(locale, { en: "What would change this recommendation", id: "Apa yang bisa mengubah rekomendasi ini" })}
     >
       <p className="text-muted-foreground">{cf.intro}</p>
       {cf.sentences.length > 0 && (
@@ -156,7 +156,7 @@ export function CounterfactualBox({ result }: { result: AdvisorResult }) {
 export function ProbabilityBars({ probabilities, topIndex }: { probabilities: number[]; topIndex: number }) {
   const { locale } = useLang();
   return (
-    <ul className="space-y-1" aria-label={tr(locale, { en: "Probability of each outcome", id: "Probabilitas setiap hasil" })}>
+    <ul className="space-y-1" aria-label={tr(locale, { en: "Probability of each outcome", id: "Peluang setiap hasil" })}>
       {probabilities.map((p, i) => {
         const pct = Math.round(p * 100);
         const top = i === topIndex;
@@ -194,7 +194,7 @@ export function ConfidenceBox({ result }: { result: AdvisorResult }) {
       <p className="text-xs text-muted-foreground">
         {tr(locale, {
           en: "Note: confidence displays can increase or decrease reliance depending on how people read them. That effect is exactly what this study measures.",
-          id: "Catatan: tampilan keyakinan dapat menaikkan atau menurunkan reliance tergantung cara orang membacanya. Efek itulah yang persis diukur studi ini.",
+          id: "Catatan: angka keyakinan bisa membuat orang lebih atau kurang mengandalkan saran, tergantung cara membacanya. Efek inilah yang diukur dalam penelitian ini.",
         })}
       </p>
     </ExplanationCard>
@@ -235,10 +235,10 @@ export function AdaptiveBox({
   const name = result.portfolio.name;
   const sure =
     cx.label === "high"
-      ? tr(locale, { en: "The advisor is quite sure about this.", id: "Penasihat cukup yakin tentang ini." })
+      ? tr(locale, { en: "The advisor is quite sure about this.", id: "Penasihat cukup yakin dengan saran ini." })
       : cx.label === "moderate"
-        ? tr(locale, { en: "The advisor is fairly sure, but not certain.", id: "Penasihat lumayan yakin, tetapi tidak pasti." })
-        : tr(locale, { en: "The advisor is not very sure about this.", id: "Penasihat tidak terlalu yakin tentang ini." });
+        ? tr(locale, { en: "The advisor is fairly sure, but not certain.", id: "Penasihat lumayan yakin, tetapi tidak sepenuhnya." })
+        : tr(locale, { en: "The advisor is not very sure about this.", id: "Penasihat tidak terlalu yakin dengan saran ini." });
   return (
     <ExplanationCard icon={Sparkles} title={tr(locale, { en: "In short", id: "Singkatnya" })}>
       <div className="space-y-2 text-[0.95rem] leading-relaxed">
@@ -246,8 +246,8 @@ export function AdaptiveBox({
           <>
             <p>
               {locale === "id"
-                ? `Alasan utama saran ini adalah ${items[0].label.toLowerCase()} Anda (${items[0].valueText}). Itu terhitung ${
-                    items[0].points > 0 ? `mendukung ${outcomeName(name)}` : `melawan ${outcomeName(name)}`
+                ? `Alasan utama saran ini adalah ${items[0].label.toLowerCase()} Anda (${items[0].valueText}). Faktor ini ${
+                    items[0].points > 0 ? `mendukung pilihan ${outcomeName(name)}` : `justru mengurangi peluang ${outcomeName(name)}`
                   }.`
                 : `The main reason for this advice is your ${items[0].label.toLowerCase()} (${items[0].valueText}). It counted ${
                     items[0].points > 0 ? `in favour of ${name}` : `against ${name}`
@@ -257,7 +257,7 @@ export function AdaptiveBox({
               <p>
                 {locale === "id"
                   ? `${items[1].label} Anda (${items[1].valueText}) juga berpengaruh, ${
-                      items[1].points > 0 ? "mendukung." : "melawannya."
+                      items[1].points > 0 ? "dan ikut mendukungnya." : "tetapi justru mengurangi peluangnya."
                     }`
                   : `Your ${items[1].label.toLowerCase()} (${items[1].valueText}) also mattered, ${
                       items[1].points > 0 ? "in favour." : "against it."
@@ -271,7 +271,7 @@ export function AdaptiveBox({
         <p>
           {tr(locale, {
             en: "You can also choose to ask a human adviser.",
-            id: "Anda juga bisa memilih bertanya kepada penasihat manusia.",
+            id: "Anda juga bisa memilih untuk bertanya ke penasihat manusia.",
           })}
         </p>
       </div>

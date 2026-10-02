@@ -65,12 +65,12 @@ export function TryResponse({
       return;
     }
     if (decision === "adjust" && !adjustedTo) {
-      setError(t("Please choose which portfolio you would adjust to.", "Silakan pilih portofolio tujuan penyesuaian Anda."));
+      setError(t("Please choose which portfolio you would adjust to.", "Silakan pilih portofolio pengganti yang Anda inginkan."));
       return;
     }
     if (trust === null || understanding === null || decisionConfidence === null || mentalDemand === null) {
       setMissing(true);
-      setError(t("Please answer all four rating questions.", "Mohon jawab keempat pertanyaan penilaian."));
+      setError(t("Please answer all four rating questions.", "Mohon isi keempat penilaian."));
       return;
     }
     setMissing(false);
@@ -135,22 +135,22 @@ export function TryResponse({
             <Check className="size-4" aria-hidden />
           </span>
           <div className="space-y-3">
-            <h2 className="font-semibold tracking-tight">{t("Thank you, that is recorded", "Terima kasih, jawaban Anda tercatat")}</h2>
+            <h2 className="font-semibold tracking-tight">{t("Thank you, that is recorded", "Terima kasih, jawaban Anda sudah tercatat")}</h2>
             <p className="text-sm leading-relaxed text-muted-foreground">
               {done === "local"
                 ? t(
                     "The network was unavailable, so your answer is held in this browser and sent with the next one.",
-                    "Jaringan tidak tersedia, jadi jawaban Anda disimpan di browser ini dan dikirim bersama jawaban berikutnya.",
+                    "Koneksi internet sedang terputus, jadi jawaban Anda disimpan dulu di browser ini dan akan dikirim bersama jawaban berikutnya.",
                   )
                 : t(
                     "It is stored anonymously as a tryout, separately from the study sessions. The real experiment assigns the explanation style at random and uses fixed cases, which is what makes the results comparable.",
-                    "Jawaban disimpan secara anonim sebagai uji coba, terpisah dari sesi studi. Eksperimen sesungguhnya menetapkan gaya penjelasan secara acak dan memakai kasus yang tetap, dan itulah yang membuat hasilnya dapat dibandingkan.",
+                    "Jawaban ini disimpan secara anonim sebagai uji coba, terpisah dari sesi penelitian. Pada eksperimen yang sebenarnya, gaya penjelasan diundi secara acak dan kasusnya sudah ditentukan, sehingga hasilnya bisa dibandingkan.",
                   )}
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild className="rounded-full">
                 <Link href="/participate">
-                  {t("Take part in the real study", "Ikut serta dalam studi sesungguhnya")}
+                  {t("Take part in the real study", "Ikut penelitian yang sebenarnya")}
                   <ArrowRight data-icon="inline-end" />
                 </Link>
               </Button>
@@ -167,26 +167,26 @@ export function TryResponse({
   return (
     <section className="panel overflow-hidden">
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 px-5 py-4 sm:px-6">
-        <h2 className="font-semibold tracking-tight">{t("Your response", "Respons Anda")}</h2>
+        <h2 className="font-semibold tracking-tight">{t("Your response", "Tanggapan Anda")}</h2>
         <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Database className="size-3.5" aria-hidden />
-          {t("Optional, anonymous, kept apart from the study", "Opsional, anonim, dipisahkan dari studi")}
+          {t("Optional, anonymous, kept apart from the study", "Tidak wajib, anonim, dan terpisah dari penelitian")}
         </span>
       </header>
       <div className="space-y-5 p-5 sm:p-6">
         <p className="text-sm leading-relaxed text-muted-foreground">
           {t(
             "You picked this explanation style and this profile yourself, so these answers cannot serve as experimental data. They still tell us how the styles land, so if you have a minute they are welcome.",
-            "Anda sendiri yang memilih gaya penjelasan dan profil ini, sehingga jawaban ini tidak bisa menjadi data eksperimen. Tetap saja jawaban ini memberi tahu kami bagaimana tiap gaya terasa, jadi jika Anda punya waktu sebentar, kami menerimanya dengan senang hati.",
+            "Anda sendiri yang memilih gaya penjelasan dan profil ini, jadi jawaban ini tidak bisa dipakai sebagai data eksperimen. Meski begitu, jawaban ini tetap membantu kami melihat bagaimana setiap gaya diterima, jadi kalau Anda punya waktu sebentar, silakan diisi.",
           )}
         </p>
 
         <div className="space-y-5">
           <RatingScale
-            label={t("How much do you trust this recommendation?", "Seberapa besar Anda memercayai rekomendasi ini?")}
+            label={t("How much do you trust this recommendation?", "Seberapa percaya Anda pada rekomendasi ini?")}
             value={trust}
             onChange={setTrust}
-            low={t("1, not at all", "1, tidak sama sekali")}
+            low={t("1, not at all", "1, sama sekali tidak")}
             high={t("7, completely", "7, sepenuhnya")}
             invalid={missing && trust === null}
           />
@@ -207,7 +207,7 @@ export function TryResponse({
           />
           {decision === "adjust" && (
             <div className="mt-2 space-y-1.5 rounded-xl bg-muted/60 p-3">
-              <Label>{t("Adjust to which portfolio?", "Menyesuaikan ke portofolio yang mana?")}</Label>
+              <Label>{t("Adjust to which portfolio?", "Ingin disesuaikan ke portofolio apa?")}</Label>
               <Select value={adjustedTo || undefined} onValueChange={setAdjustedTo}>
                 <SelectTrigger className="w-full max-w-64">
                   <SelectValue placeholder={t("Choose a portfolio", "Pilih portofolio")} />
@@ -229,46 +229,46 @@ export function TryResponse({
             {t("About this decision", "Tentang keputusan ini")}
           </p>
           <RatingScale
-            label={t("How well do you understand why this advice was given?", "Seberapa baik Anda memahami mengapa saran ini diberikan?")}
+            label={t("How well do you understand why this advice was given?", "Seberapa paham Anda alasan saran ini diberikan?")}
             value={understanding}
             onChange={setUnderstanding}
-            low={t("1, not at all", "1, tidak sama sekali")}
+            low={t("1, not at all", "1, sama sekali tidak")}
             high={t("7, completely", "7, sepenuhnya")}
             invalid={missing && understanding === null}
           />
           <RatingScale
-            label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan Anda?")}
+            label={t("How confident are you in your decision?", "Seberapa yakin Anda dengan keputusan ini?")}
             value={decisionConfidence}
             onChange={setDecisionConfidence}
-            low={t("1, not at all", "1, tidak sama sekali")}
+            low={t("1, not at all", "1, sama sekali tidak")}
             high={t("7, completely", "7, sepenuhnya")}
             invalid={missing && decisionConfidence === null}
           />
           <RatingScale
-            label={t("How mentally demanding was this decision?", "Seberapa menuntut secara mental keputusan ini?")}
+            label={t("How mentally demanding was this decision?", "Seberapa besar usaha berpikir yang dibutuhkan untuk keputusan ini?")}
             value={mentalDemand}
             onChange={setMentalDemand}
-            low={t("1, very low", "1, sangat rendah")}
-            high={t("7, very high", "7, sangat tinggi")}
+            low={t("1, very low", "1, sangat kecil")}
+            high={t("7, very high", "7, sangat besar")}
             invalid={missing && mentalDemand === null}
           />
           <div className="space-y-1.5">
             <Label htmlFor="try-reason">
-              {t("Why did you decide this? (optional)", "Mengapa Anda memutuskan demikian? (opsional)")}
+              {t("Why did you decide this? (optional)", "Apa alasan keputusan Anda? (opsional)")}
             </Label>
             <Textarea
               id="try-reason"
               rows={2}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder={t("In your own words", "Dengan kata-kata Anda sendiri")}
+              placeholder={t("In your own words", "Tulis dengan kata-kata Anda sendiri")}
             />
           </div>
         </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button onClick={submit} disabled={busy} size="lg" className="h-11 rounded-full px-6">
-          {t("Send my response", "Kirim respons saya")}
+          {t("Send my response", "Kirim jawaban saya")}
         </Button>
       </div>
     </section>

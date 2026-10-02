@@ -10,6 +10,6 @@ export function pct1(fraction: number): string {
 /** The full, honest form: "88.8% cross-validated accuracy on 400 expert-reviewed synthetic cases". */
 export function accuracyPhrase(fraction: number, cases: number, locale: "en" | "id" = "en"): string {
   return locale === "id"
-    ? `akurasi validasi silang ${pct1(fraction)} pada ${cases} kasus sintetis yang ditinjau ahli`
+    ? `akurasi validasi silang ${pct1(fraction).replace(".", ",")} pada ${cases} kasus rekaan yang sudah ditinjau ahli`
     : `${pct1(fraction)} cross-validated accuracy on ${cases} expert-reviewed synthetic cases`;
 }

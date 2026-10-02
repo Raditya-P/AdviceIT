@@ -15,15 +15,15 @@ export function SiteFooter() {
       links: [
         { href: "/participate", label: t("Take part", "Ikut serta") },
         { href: "/advisor/ml", label: t("Try the AI advisor", "Coba penasihat AI") },
-        { href: "/advisor/logit", label: t("Try the interpretable advisor", "Coba penasihat interpretable") },
+        { href: "/advisor/logit", label: t("Try the interpretable advisor", "Coba penasihat transparan") },
         { href: "/privacy", label: t("Privacy and consent", "Privasi dan persetujuan") },
       ],
     },
     {
       title: t("For researchers", "Untuk peneliti"),
       links: [
-        { href: "/about", label: t("About and team", "Tentang dan tim") },
-        { href: "/design", label: t("Study design", "Rancangan studi") },
+        { href: "/about", label: t("About and team", "Tentang kami dan tim") },
+        { href: "/design", label: t("Study design", "Desain penelitian") },
         { href: "/training-data", label: t("Training data and models", "Data pelatihan dan model") },
         { href: "/references", label: t("References", "Referensi") },
       ],
@@ -38,7 +38,7 @@ export function SiteFooter() {
             <p className="max-w-xs text-sm text-muted-foreground">
               {t(
                 "A research simulation about explaining AI investment advice, built by a team of three. Nothing here is real financial advice.",
-                "Simulasi penelitian tentang menjelaskan saran investasi AI, dibangun tim beranggotakan tiga orang. Tidak ada saran keuangan sungguhan di sini.",
+                "Simulasi penelitian tentang cara menjelaskan saran investasi dari AI, dibuat oleh tim tiga orang. Tidak ada saran keuangan sungguhan di sini.",
               )}
             </p>
           </div>

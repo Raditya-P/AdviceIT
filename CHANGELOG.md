@@ -3,6 +3,47 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.13.0 (2026-10-02)
+
+Plain Indonesian throughout, and the site now opens in the language the visitor chose.
+
+### Fixed
+
+- **The language choice survives a page load.** The server read the language cookie with a name
+  imported from `src/lib/i18n.tsx`, which is a client module. A server component that imports a value
+  from a `"use client"` file gets a client reference, not the value, so the cookie was never found:
+  every full page load rendered in English, Indonesian appeared only after pressing the toggle, and the
+  pages rendered on the server (Training data, References) never showed Indonesian at all. The cookie
+  name and the `Locale` type now live in `src/lib/locale.ts`, which both sides import. In the data,
+  a participant who reloaded during an Indonesian session continued in English, and the rows after the
+  reload record `language` as `en`. A participant whose rows mix `id` and `en` is that case.
+- Indonesian numbers use a decimal comma everywhere: the explanation bars, the scorecard, the what-if
+  panel, the points table on the home page and the figures on the Training data page.
+
+### Changed
+
+- **Indonesian rewritten.** All of the roughly nine hundred Indonesian strings on the site were rewritten
+  in everyday Indonesian. The old text was a literal translation that kept English word order and
+  borrowed terms most readers do not use, such as *horizon*, *kapasitas*, *likuiditas*, *atensi* and
+  *respons*. The terms are now one set used everywhere: *jangka waktu investasi* for horizon,
+  *kemampuan menanggung risiko* for risk capacity, *kebutuhan dana cepat* for liquidity need, *peluang*
+  for probability, *peserta* for participant and *Tinjauan penasihat manusia* for Human review.
+  Decimals use a comma (81,6 poin). The English text is unchanged, byte for byte, and the logged values
+  stay English, so the data keeps its shape.
+- **The Indonesian study wording changed.** In Indonesian the consent, the eight case descriptions, the
+  per-case questions and literacy question 1 now read differently, with the same meaning and the same
+  options. Indonesian sessions before and after this release saw different wording, and the `language`
+  and `timestamp` columns separate them. The need-for-cognition and explanation-perception items only
+  got a light touch (nfc2 and two perception items) and still need a back-translation before formal
+  data collection.
+- In Indonesian sessions the chat's language model is asked for natural, everyday Indonesian. In both
+  languages the chat notice now says what the study log keeps (the model's opening explanation, how many
+  questions were asked and which suggested topics they matched). Before, it said "the text is
+  recorded", which read as if the participant's own questions were stored. They are not.
+- Browser tab titles follow the site language. Link previews stay English, because crawlers carry no
+  language cookie.
+- `scripts/intent-smoke.ts` checks that the new Indonesian suggested questions reach the computed answers.
+
 ## 2.12.0 (2026-10-01)
 
 An audit pass, balanced assignment and a new mark. Most of it protects the data the study collects.
