@@ -7,30 +7,19 @@
 
 import Link from "next/link";
 import { useMemo, type CSSProperties } from "react";
-import {
-  ArrowRight,
-  BarChart3,
-  Clock3,
-  Cpu,
-  Gauge,
-  Lock,
-  MessageSquareText,
-  Shuffle,
-  UserRound,
-  Wallet,
-} from "lucide-react";
-import { ASSET_COLOR, AllocationBar } from "@/components/allocation-bar";
+import { ArrowRight, BarChart3, Clock3, Cpu, Gauge, Lock, MessageSquareText, Shuffle, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { PageTransition } from "@/components/page-transition";
 import { AdvicePreview } from "@/components/marketing/advice-preview";
+import { OutcomeShowcase } from "@/components/marketing/outcome-showcase";
 import { Reveal, Spotlight } from "@/components/motion";
 import { mlRecommend, scorecard } from "@/lib/advisor/advisors";
 import { featureExplanation } from "@/lib/advisor/explanations";
-import { ASSET_CLASSES, PORTFOLIOS } from "@/lib/advisor/model";
-import { assetLabel, labelValue, num, outcomeName, outcomeSummary } from "@/lib/advisor/strings";
+import { labelValue, num, outcomeName } from "@/lib/advisor/strings";
 import { tr, useLang } from "@/lib/i18n";
+import { FRAME } from "@/lib/layout";
 
 const EXAMPLE = {
   age: 38,
@@ -123,13 +112,13 @@ export default function HomePage() {
           <div aria-hidden className="surface-glow drift" />
           <div aria-hidden className="surface-grid" />
           <Spotlight />
-          <div className="relative mx-auto grid max-w-6xl items-start gap-10 px-4 pb-16 pt-10 sm:px-6 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14 lg:pb-20 lg:pt-16">
-            <div className="space-y-5">
+          <div className={`${FRAME} relative grid items-start gap-10 pb-16 pt-10 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14 lg:pb-20 lg:pt-16 xl:gap-20`}>
+            <div className="@container space-y-5">
               <span className="rise inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-3.5 py-1.5 text-sm text-muted-foreground backdrop-blur">
                 <span className="inline-block size-1.5 rounded-full bg-primary" />
                 {t("A research simulation. Not a financial service", "Simulasi penelitian. Bukan layanan keuangan")}
               </span>
-              <h1 className="rise rise-1 text-balance text-4xl font-semibold leading-[1.06] tracking-tight sm:text-5xl lg:text-6xl">
+              <h1 className="rise rise-1 text-balance text-4xl font-semibold leading-[1.06] tracking-tight sm:text-5xl lg:text-[length:min(3.75rem,10.4cqi)]">
                 {t("Know when to trust", "Tahu kapan bisa memercayai")}{" "}
                 <span className="text-gradient">{t("AI investment advice", "saran investasi AI")}</span>
               </h1>
@@ -173,7 +162,7 @@ export default function HomePage() {
 
         {/* What the advisor does */}
         <section className="border-y border-border/70 bg-muted/40">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className={`${FRAME} py-20`}>
             <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("What the advisor does", "Cara kerja penasihat")}
@@ -198,7 +187,7 @@ export default function HomePage() {
 
         {/* Two advisors */}
         <section>
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className={`${FRAME} py-20`}>
             <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Two advisors", "Dua penasihat")}
@@ -305,7 +294,7 @@ export default function HomePage() {
 
         {/* How it explains itself */}
         <section className="border-y border-border/70 bg-muted/40">
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className={`${FRAME} py-20`}>
             <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Explanations", "Penjelasan")}
@@ -333,7 +322,7 @@ export default function HomePage() {
 
         {/* What it can recommend */}
         <section>
-          <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className={`${FRAME} py-20`}>
             <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Outcomes", "Pilihan hasil")}
@@ -348,45 +337,15 @@ export default function HomePage() {
                 )}
               </p>
             </Reveal>
-            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              {ASSET_CLASSES.map((ac) => (
-                <li key={ac.key} className="flex items-center gap-2">
-                  <span aria-hidden className="inline-block size-3 rounded-full" style={{ background: ASSET_COLOR[ac.key] }} />
-                  <span className="font-medium">{assetLabel(ac.label)}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 grid gap-3">
-              {PORTFOLIOS.map((pf, i) => (
-                <Reveal key={pf.id} delay={i * 70} className="panel grid items-center gap-3 p-4 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-6 sm:p-5">
-                  <div>
-                    <p className="font-semibold tracking-tight">{outcomeName(pf.name)}</p>
-                    <p className="text-xs text-muted-foreground">{outcomeSummary(pf.id, pf.summary)}</p>
-                  </div>
-                  {pf.allocation && <AllocationBar allocation={pf.allocation} height="h-8" animate="reveal" />}
-                </Reveal>
-              ))}
-              <Reveal delay={PORTFOLIOS.length * 70} className="flex items-start gap-3 rounded-2xl border border-dashed border-border px-4 py-4 sm:px-5">
-                <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <UserRound className="size-4" aria-hidden />
-                </span>
-                <div>
-                  <p className="font-semibold tracking-tight">{outcomeName("Human review")}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {t(
-                      "The advisor says so and refers the case to a person when a model should not be the one deciding. The experts did the same with almost half the cases.",
-                      "Jika sebuah kasus tidak layak diputuskan oleh model, penasihat akan mengatakannya dan merujuk kasus itu ke penasihat manusia. Para ahli melakukan hal yang sama pada hampir separuh kasus.",
-                    )}
-                  </p>
-                </div>
-              </Reveal>
-            </div>
+            <Reveal className="mt-8">
+              <OutcomeShowcase />
+            </Reveal>
           </div>
         </section>
 
         {/* Why this matters */}
         <section className="border-y border-border/70 bg-muted/40">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
+          <div className={`${FRAME} grid gap-10 py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20`}>
             <Reveal className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Why this matters", "Mengapa ini penting")}
@@ -419,8 +378,8 @@ export default function HomePage() {
         </section>
 
         {/* The study */}
-        <section className="px-4 pb-24 sm:px-6">
-          <Reveal className="cta-panel relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-14 sm:px-10">
+        <section className={`${FRAME} pb-24`}>
+          <Reveal className="cta-panel relative overflow-hidden rounded-[2rem] border border-border/70 px-6 py-14 sm:px-10">
             <div aria-hidden className="surface-grid opacity-60" />
             <div className="relative grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center">
               <div className="space-y-4">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand";
 import { tr, useLang } from "@/lib/i18n";
+import { FRAME } from "@/lib/layout";
 import { VERSION } from "@/lib/version";
 
 export function SiteFooter() {
@@ -23,7 +24,7 @@ export function SiteFooter() {
       title: t("For researchers", "Untuk peneliti"),
       links: [
         { href: "/about", label: t("About and team", "Tentang kami dan tim") },
-        { href: "/design", label: t("Study design", "Desain penelitian") },
+        { href: "/design", label: t("Study design", "Rancangan studi") },
         { href: "/training-data", label: t("Training data and models", "Data pelatihan dan model") },
         { href: "/references", label: t("References", "Referensi") },
       ],
@@ -31,7 +32,7 @@ export function SiteFooter() {
   ];
   return (
     <footer className="mt-auto border-t border-border/70 bg-muted/40">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <div className={`${FRAME} py-14`}>
         <div className="grid gap-10 md:grid-cols-[minmax(0,2fr)_1fr_1fr_auto]">
           <div className="space-y-3">
             <Logo size={32} wordmarkClass="text-[17px]" />

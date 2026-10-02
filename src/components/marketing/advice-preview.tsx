@@ -6,14 +6,15 @@
 
    The timing lives in CSS. The active dot fills over DWELL_MS and the end of
    that animation moves to the next example, so pausing (hover, keyboard
-   focus or the pause button) is just pausing the animation, and under
+   focus, the pause button, or the card being off screen) is just pausing
+   the animation, and under
    prefers-reduced-motion, where the fill does not run, the card stays on
    the first example until someone picks another. */
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { Pause, Play, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 import { AllocationBar, AllocationLegend } from "@/components/allocation-bar";
-import { AnimatedNumber } from "@/components/motion";
+import { AnimatedNumber, useInView } from "@/components/motion";
 import { mlRecommend } from "@/lib/advisor/advisors";
 import { featureExplanation } from "@/lib/advisor/explanations";
 import { labelValue, outcomeName } from "@/lib/advisor/strings";
@@ -59,12 +60,15 @@ export function AdvicePreview() {
   const [index, setIndex] = useState(0);
   const [stopped, setStopped] = useState(false);
   const [holding, setHolding] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, true);
   const { profile, result, drivers } = runs[index];
   const pct = Math.round(result.topProbability * 100);
   const next = () => setIndex((i) => (i + 1) % runs.length);
 
   return (
     <div
+      ref={rootRef}
       className="relative"
       onMouseEnter={() => setHolding(true)}
       onMouseLeave={() => setHolding(false)}
@@ -162,7 +166,7 @@ export function AdvicePreview() {
                         aria-hidden
                         className="dot-fill absolute inset-0 rounded-full bg-primary"
                         style={{ "--dot-ms": `${DWELL_MS}ms` } as CSSProperties}
-                        data-paused={stopped || holding ? "" : undefined}
+                        data-paused={stopped || holding || !inView ? "" : undefined}
                         onAnimationEnd={next}
                       />
                     )}

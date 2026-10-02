@@ -55,7 +55,7 @@ export function AllocationBar({
             className="flex items-center justify-center overflow-hidden text-xs font-semibold whitespace-nowrap text-white/95"
             style={{ width: `${pct}%`, background: ASSET_COLOR[ac.key], opacity: pct > 0 ? 1 : 0 }}
           >
-            {pct >= 12 ? `${pct}%` : ""}
+            {pct >= 12 ? smooth ? <><AnimatedNumber value={pct} />%</> : `${pct}%` : ""}
           </div>
         );
       })}

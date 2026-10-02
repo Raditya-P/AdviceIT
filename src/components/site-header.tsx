@@ -7,12 +7,13 @@ import { Languages, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand";
 import { tr, useLang } from "@/lib/i18n";
+import { FRAME } from "@/lib/layout";
 
 /* The needle swings into place on the first page of a visit only. Every page
    renders its own header, so without this it would replay on each click. */
 let introPlayed = false;
 
-export function SiteHeader({ progress = true }: { progress?: boolean }) {
+export function SiteHeader() {
   const { locale, setLocale } = useLang();
   const headerRef = useRef<HTMLElement>(null);
   const [intro] = useState(() => !introPlayed);
@@ -42,7 +43,6 @@ export function SiteHeader({ progress = true }: { progress?: boolean }) {
     { href: "/advisor/ml", label: t("AI advisor", "Penasihat AI") },
     { href: "/advisor/logit", label: t("Interpretable advisor", "Penasihat transparan") },
     { href: "/about", label: t("About", "Tentang") },
-    { href: "/about#researchers", label: t("For researchers", "Untuk peneliti") },
   ];
   const toggle = () => {
     setLocale(locale === "en" ? "id" : "en");
@@ -54,12 +54,11 @@ export function SiteHeader({ progress = true }: { progress?: boolean }) {
       className="site-header sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 backdrop-blur-md"
       style={{ viewTransitionName: "site-header" }}
     >
-      {progress && <div aria-hidden className="scroll-progress" />}
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
+      <div className={`${FRAME} flex h-16 items-center justify-between gap-2`}>
         <Logo size={34} wordmarkClass="text-[19px]" intro={intro} />
         <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((item) => {
-            const active = pathname === item.href.split("#")[0] && !item.href.includes("#");
+            const active = pathname === item.href;
             return (
               <Link
                 key={item.href}

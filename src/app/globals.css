@@ -432,9 +432,7 @@ a:focus-visible .logo-needle {
   }
 }
 
-/* The header firms up once the page scrolls, and a thin line tracks how far
-   down the page the reader is (only where scroll-driven animations exist;
-   elsewhere the line never shows). */
+/* The header firms up once the page scrolls. */
 .site-header {
   transition:
     background-color 0.3s ease,
@@ -444,35 +442,27 @@ a:focus-visible .logo-needle {
   background-color: color-mix(in oklab, var(--background) 90%, transparent);
   box-shadow: 0 10px 30px -22px color-mix(in oklab, var(--foreground) 45%, transparent);
 }
-.scroll-progress {
+
+/* The highlight that glides to the active tab in the outcome showcase. It
+   appears once it has a first position, then moves with the selection. */
+.tab-mark {
   position: absolute;
-  inset-inline: 0;
-  bottom: -1px;
-  height: 2px;
-  transform-origin: left center;
-  transform: scaleX(0);
+  top: 0;
+  left: 0;
+  border-radius: 0.75rem;
+  background: var(--background);
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--foreground) 6%, transparent),
+    0 10px 24px -16px color-mix(in oklab, var(--foreground) 30%, transparent);
   opacity: 0;
   pointer-events: none;
-  background: linear-gradient(90deg, var(--primary), var(--bonds));
 }
-@supports (animation-timeline: scroll()) {
-  .scroll-progress {
-    animation: scroll-progress linear both;
-    animation-timeline: scroll(root block);
-  }
-}
-@keyframes scroll-progress {
-  0% {
-    transform: scaleX(0);
-    opacity: 0;
-  }
-  3% {
-    opacity: 1;
-  }
-  100% {
-    transform: scaleX(1);
-    opacity: 1;
-  }
+.tab-mark[data-placed] {
+  opacity: 1;
+  transition:
+    transform 0.55s var(--ease-out-expo),
+    width 0.55s var(--ease-out-expo),
+    height 0.55s var(--ease-out-expo);
 }
 
 /* A soft light that follows the pointer over the hero grid. */
@@ -590,13 +580,13 @@ a:focus-visible .logo-needle {
   .swap-in,
   .drift,
   .dot-fill,
-  .scroll-progress,
   .needle-intro .logo-needle,
   a:hover .logo-needle,
   a:focus-visible .logo-needle {
     animation: none !important;
   }
   .alloc-smooth > div,
+  .tab-mark[data-placed],
   [data-slot="button"] > svg:last-child:not(:first-child) {
     transition: none;
   }

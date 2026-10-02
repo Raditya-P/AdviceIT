@@ -13,12 +13,34 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
   type CSSProperties,
   type ElementType,
   type ReactNode,
+  type RefObject,
 } from "react";
 
 const REDUCED = "(prefers-reduced-motion: reduce)";
+
+/** Smooth, unless the visitor asked for less motion. For scrollTo calls. */
+export function scrollBehavior(): ScrollBehavior {
+  return window.matchMedia(REDUCED).matches ? "auto" : "smooth";
+}
+
+/** Whether an element is at least a quarter on screen, so things that play
+ *  on their own (the hero examples, the outcome showcase) can wait while
+ *  nobody is looking. `initial` is the answer before the first report. */
+export function useInView(ref: RefObject<Element | null>, initial = false) {
+  const [inView, setInView] = useState(initial);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref]);
+  return inView;
+}
 
 /* If the first page took longer than the CSS failsafe to become interactive,
    everything is already visible, and hiding it again to animate it in would

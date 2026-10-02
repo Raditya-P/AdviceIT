@@ -3,6 +3,39 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.15.0 (2026-10-02)
+
+A wider home page, a rotating outcome showcase, and one moving part fewer.
+
+### Changed
+
+- **More room.** The home page, the header and the footer share a wider frame: up to 1440 pixels across
+  instead of 1152, with a side gutter that grows from 20 to 48 pixels. On a typical laptop screen the
+  hero headline now takes two lines instead of three or four, and between 1024 and about 1300 pixels it
+  scales with its column so that it stays on two lines in English there too. Reading pages keep their
+  narrower columns.
+- **The five mixes rotate.** The static list of five bars and the Human review note became one showcase
+  that steps through the five mixes and Human review. The bar slides from one mix to the next, the
+  percentages glide, and the description crossfades, using the plain-language text of the outcome
+  guide. A list beside it (a scrolling row of tabs on a phone) shows all six, each mix with a small bar,
+  under a highlight that moves to the current one. It pauses on hover, on keyboard focus, with its pause
+  button and while it is off screen, answers the arrow keys like any tab list, and under reduced motion
+  moves only when someone picks an outcome. For Human review the bar empties and says the case goes to
+  a human adviser.
+- The hero examples also wait while the hero is off screen, and the percentages inside a moving bar
+  glide with its bands.
+- The header navigation drops "For researchers", which led to the same About page as "About". The link
+  for researchers under the hero stays.
+
+### Removed
+
+- The reading-progress line under the header.
+
+### Fixed
+
+- The footer called the design page "Desain penelitian" in Indonesian; it is "Rancangan studi" there too,
+  as on the rest of the site.
+
 ## 2.14.0 (2026-10-02)
 
 Motion, used with restraint, and none of it inside a study trial.

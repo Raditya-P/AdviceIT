@@ -16,7 +16,7 @@ export default async function StudyPage() {
   const locale = await pageLocale();
   return (
     <>
-      <SiteHeader progress={false} />
+      <SiteHeader />
       <main className="flex-1" data-motion="still">
         <Suspense
           fallback={
