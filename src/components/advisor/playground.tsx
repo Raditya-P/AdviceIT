@@ -6,7 +6,7 @@
    unlocks the scenario toggle and the labels and comparison line. The
    ILS-Bench case loader and the example dropdown are open to everyone. */
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, GraduationCap, Pencil, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,17 @@ export function Playground({
   const researcherAccess = useSyncExternalStore(noSubscription, hasResearcherAccess, () => false);
   const researcher = researcherRequested && researcherAccess;
   const [step, setStep] = useState<Step>("style");
+  /* A new step starts at the top of the page, not where the button that led
+     to it was, and keyboard focus moves to it, since that button is gone. A
+     layout effect, so the new step is never painted at the old position. */
+  const stepsRef = useRef<HTMLDivElement>(null);
+  const shownStep = useRef(step);
+  useLayoutEffect(() => {
+    if (shownStep.current === step) return;
+    shownStep.current = step;
+    window.scrollTo({ top: 0, behavior: "instant" });
+    stepsRef.current?.focus({ preventScroll: true });
+  }, [step]);
   const [profile, setProfile] = useState<FormProfile>(DEFAULT_PROFILE);
   const [preset, setPreset] = useState<string>("feature");
   const [content, setContent] = useState<ContentPart[]>(["feature"]);
@@ -173,7 +184,7 @@ export function Playground({
         })}
       </ol>
 
-      <div className="mt-9">
+      <div ref={stepsRef} tabIndex={-1} className="mt-9 outline-none">
         {step === "style" && (
           <div className="rise space-y-8">
             <StylePicker

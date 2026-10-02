@@ -3,6 +3,16 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.15.1 (2026-10-02)
+
+### Fixed
+
+- In the advisor, every step now opens at the top of the page. Choosing an explanation style and
+  pressing Continue used to leave the profile form scrolled to where that button had been, at the
+  bottom; the same happened going on to the recommendation and going back. Keyboard focus moves to the
+  new step too, instead of falling back to the start of the document when the button that had it
+  disappears. The study already did this between screens and is unchanged.
+
 ## 2.15.0 (2026-10-02)
 
 A wider home page, a rotating outcome showcase, and one moving part fewer.
