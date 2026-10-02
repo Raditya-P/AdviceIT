@@ -26,8 +26,11 @@ export function LogoMark({ size = 34, className = "" }: { size?: number; classNa
       <path d={DIAL.low} stroke="var(--cash)" strokeWidth="4.5" />
       <path d={DIAL.mid} stroke="var(--primary)" strokeWidth="4.5" />
       <path d={DIAL.high} stroke="var(--real-assets)" strokeWidth="4.5" />
-      <path d={DIAL.needle} stroke="var(--foreground)" strokeWidth="2.8" strokeLinecap="round" />
-      <circle cx="16" cy="21.75" r="3" fill="var(--foreground)" />
+      {/* Grouped so the needle can turn about its hub (see .logo-needle). */}
+      <g className="logo-needle">
+        <path d={DIAL.needle} stroke="var(--foreground)" strokeWidth="2.8" strokeLinecap="round" />
+        <circle cx="16" cy="21.75" r="3" fill="var(--foreground)" />
+      </g>
     </svg>
   );
 }
@@ -46,14 +49,21 @@ export function Logo({
   wordmarkClass = "text-[19px]",
   href = "/",
   className = "",
+  intro = false,
 }: {
   size?: number;
   wordmarkClass?: string;
   href?: string;
   className?: string;
+  /** Swing the needle into place once, on the first page of a visit. */
+  intro?: boolean;
 }) {
   return (
-    <Link href={href} className={`inline-flex items-center gap-1 transition-opacity hover:opacity-85 ${className}`} aria-label="AdviceIT">
+    <Link
+      href={href}
+      className={`inline-flex items-center gap-1 transition-opacity hover:opacity-85 ${intro ? "needle-intro" : ""} ${className}`}
+      aria-label="AdviceIT"
+    >
       <LogoMark size={size} />
       <Wordmark className={wordmarkClass} />
     </Link>

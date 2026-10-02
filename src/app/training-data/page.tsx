@@ -1,9 +1,12 @@
 import { SiteFooter } from "@/components/site-footer";
+import { CountUp, Reveal } from "@/components/motion";
 import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import bench from "@/data/ils_bench_cases.json";
+import type { CSSProperties } from "react";
 import { classes, logitMeta, logitTemperature, mlMeta, mlTemperature } from "@/lib/advisor/advisors";
 import { localTitle, pageLocale } from "@/lib/locale-server";
 import { CasesBrowser } from "./cases-browser";
@@ -68,6 +71,7 @@ export default async function TrainingDataPage() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <PageHero
           eyebrow={t("Training data", "Data pelatihan")}
@@ -97,7 +101,8 @@ export default async function TrainingDataPage() {
 
         <div className="mx-auto max-w-6xl space-y-6 px-4 py-12 sm:px-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
+            <Reveal>
+            <Card className="h-full">
               <CardHeader>
                 <CardTitle className="text-base">{t("The 400 cases in numbers", "400 kasus dalam angka")}</CardTitle>
               </CardHeader>
@@ -105,27 +110,29 @@ export default async function TrainingDataPage() {
                 <p>
                   {locale === "id" ? (
                     <>
-                      <strong>{total}</strong> kasus, <strong>{hr}</strong> diteruskan ke penasihat manusia (
-                      {Math.round((hr / total) * 100)} persen), <strong>{combos}</strong> kombinasi label berbeda. Label
+                      <strong><CountUp value={total} locale="id" /></strong> kasus, <strong><CountUp value={hr} locale="id" /></strong> diteruskan ke penasihat manusia (
+                      <CountUp value={Math.round((hr / total) * 100)} locale="id" /> persen), <strong><CountUp value={combos} locale="id" /></strong> kombinasi label berbeda. Label
                       awal dari penulis dataset sama dengan kesepakatan ahli pada {pct(authorAgree / total)} kasus.
                     </>
                   ) : (
                     <>
-                      <strong>{total}</strong> cases, <strong>{hr}</strong> sent to human review (
-                      {Math.round((hr / total) * 100)} percent), <strong>{combos}</strong> distinct label combinations.
+                      <strong><CountUp value={total} /></strong> cases, <strong><CountUp value={hr} /></strong> sent to human review (
+                      <CountUp value={Math.round((hr / total) * 100)} /> percent), <strong><CountUp value={combos} /></strong> distinct label combinations.
                       The dataset author&apos;s own draft label equals the consensus in {pct(authorAgree / total)} of
                       cases.
                     </>
                   )}
                 </p>
-                <Bars title={t("Recommended outcome (consensus)", "Hasil yang direkomendasikan (kesepakatan ahli)")} items={count(cases, "portfolio", OUTCOME_ORDER)} total={total} keyLabel={keyLabel} />
-                <Bars title={t("Risk tolerance", "Toleransi risiko")} items={count(cases, "tolerance", ["Low", "Moderate", "High", "Inconsistent"])} total={total} keyLabel={keyLabel} />
-                <Bars title={t("Risk capacity", "Kemampuan menanggung risiko")} items={count(cases, "capacity", ["Low", "Moderate", "High"])} total={total} keyLabel={keyLabel} />
-                <Bars title={t("Liquidity need", "Kebutuhan dana cepat")} items={count(cases, "liquidity", ["Low", "Moderate", "High", "Urgent"])} total={total} keyLabel={keyLabel} />
+                <Bars title={t("Recommended outcome (consensus)", "Hasil yang direkomendasikan (kesepakatan ahli)")} items={count(cases, "portfolio", OUTCOME_ORDER)} total={total} keyLabel={keyLabel} dec={dec} />
+                <Bars title={t("Risk tolerance", "Toleransi risiko")} items={count(cases, "tolerance", ["Low", "Moderate", "High", "Inconsistent"])} total={total} keyLabel={keyLabel} dec={dec} />
+                <Bars title={t("Risk capacity", "Kemampuan menanggung risiko")} items={count(cases, "capacity", ["Low", "Moderate", "High"])} total={total} keyLabel={keyLabel} dec={dec} />
+                <Bars title={t("Liquidity need", "Kebutuhan dana cepat")} items={count(cases, "liquidity", ["Low", "Moderate", "High", "Urgent"])} total={total} keyLabel={keyLabel} dec={dec} />
               </CardContent>
             </Card>
+            </Reveal>
 
-            <Card>
+            <Reveal delay={120}>
+            <Card className="h-full">
               <CardHeader>
                 <CardTitle className="text-base">
                   {t("The two advisors, trained by the same script", "Dua penasihat, dilatih dengan skrip yang sama")}
@@ -251,6 +258,7 @@ export default async function TrainingDataPage() {
                 </p>
               </CardContent>
             </Card>
+            </Reveal>
           </div>
 
           <details className="group rounded-[1.5rem] border border-border/70 bg-muted/30 p-5 sm:p-6">
@@ -267,6 +275,7 @@ export default async function TrainingDataPage() {
         </div>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }
@@ -276,24 +285,29 @@ function Bars({
   items,
   total,
   keyLabel,
+  dec,
 }: {
   title: string;
   items: { key: string; n: number }[];
   total: number;
   keyLabel: (k: string) => string;
+  dec: (n: number) => string;
 }) {
   const max = items.reduce((m, it) => Math.max(m, it.n), 0);
   return (
     <div className="space-y-1.5">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
-      {items.map((it) => (
-        <div key={it.key} className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)_5rem] items-center gap-2">
+      {items.map((it, i) => (
+        <div key={it.key} className="grid grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)_6.5rem] items-center gap-2">
           <span className="truncate">{keyLabel(it.key)}</span>
           <span aria-hidden className="h-2.5 overflow-hidden rounded-full bg-muted">
-            <span className="block h-full rounded-full bg-primary" style={{ width: `${max ? (it.n / max) * 100 : 0}%` }} />
+            <span
+              className="reveal-grow block h-full rounded-full bg-primary"
+              style={{ width: `${max ? (it.n / max) * 100 : 0}%`, "--grow-delay": `${260 + i * 70}ms` } as CSSProperties}
+            />
           </span>
-          <span className="text-right tabular-nums text-muted-foreground">
-            {it.n} ({Math.round((it.n / total) * 1000) / 10}%)
+          <span className="whitespace-nowrap text-right tabular-nums text-muted-foreground">
+            {it.n} ({dec(Math.round((it.n / total) * 1000) / 10)}%)
           </span>
         </div>
       ))}

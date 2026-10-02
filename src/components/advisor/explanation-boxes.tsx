@@ -6,6 +6,7 @@
    them from the advisor's actual behaviour and renders in the current
    site language. */
 
+import type { CSSProperties } from "react";
 import { BarChart3, Gauge, Shuffle, Sparkles, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { OUTCOMES } from "@/lib/advisor/model";
@@ -61,7 +62,7 @@ export function FeatureBox({ result, modality = "visual" }: { result: AdvisorRes
       <p className="text-muted-foreground">{intro}</p>
       {showBars && (
       <ul className="space-y-1.5">
-        {fx.items.map((it) => (
+        {fx.items.map((it, i) => (
           <li key={it.key} className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,2fr)_3.5rem] items-center gap-3">
             <div className="min-w-0">
               <div className="truncate font-medium">{it.label}</div>
@@ -71,8 +72,8 @@ export function FeatureBox({ result, modality = "visual" }: { result: AdvisorRes
               <div className="absolute inset-y-0 left-1/2 w-px bg-border" />
               {it.points !== 0 && (
                 <div
-                  className={`absolute inset-y-0.5 rounded-full ${it.points > 0 ? "left-1/2 bg-primary" : "right-1/2 bg-destructive"}`}
-                  style={{ width: `${fx.maxAbs ? (Math.abs(it.points) / fx.maxAbs) * 50 : 0}%` }}
+                  className={`bar-in absolute inset-y-0.5 rounded-full ${it.points > 0 ? "left-1/2 bg-primary" : "origin-right right-1/2 bg-destructive"}`}
+                  style={{ width: `${fx.maxAbs ? (Math.abs(it.points) / fx.maxAbs) * 50 : 0}%`, "--bar-delay": `${150 + i * 70}ms` } as CSSProperties}
                 />
               )}
             </div>
@@ -164,7 +165,10 @@ export function ProbabilityBars({ probabilities, topIndex }: { probabilities: nu
           <li key={i} className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)_2.75rem] items-center gap-3 text-sm">
             <span className={`truncate ${top ? "font-semibold" : ""}`}>{outcomeName(OUTCOMES[i].name)}</span>
             <span aria-hidden className="h-3 overflow-hidden rounded-full bg-muted">
-              <span className={`block h-full rounded-full transition-[width] duration-500 ${top ? "bg-primary" : "bg-primary/35"}`} style={{ width: `${pct}%` }} />
+              <span
+                className={`bar-in block h-full rounded-full transition-[width] duration-500 ${top ? "bg-primary" : "bg-primary/35"}`}
+                style={{ width: `${pct}%`, "--bar-delay": `${150 + i * 60}ms` } as CSSProperties}
+              />
             </span>
             <span className={`text-right tabular-nums ${top ? "font-semibold" : "text-muted-foreground"}`}>{pct}%</span>
           </li>

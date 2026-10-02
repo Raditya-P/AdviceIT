@@ -8,9 +8,11 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Code2, Database, FlaskConical, Scale, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { tr, useLang } from "@/lib/i18n";
 import { VERSION } from "@/lib/version";
 
@@ -87,6 +89,7 @@ export function AboutContent() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <PageHero
           eyebrow={t("About", "Tentang")}
@@ -99,7 +102,7 @@ export function AboutContent() {
         />
 
         <div className="mx-auto max-w-4xl space-y-14 px-4 py-14 sm:px-6">
-          <section className="space-y-4">
+          <Reveal as="section" className="space-y-4">
             <h2 className="text-2xl font-semibold tracking-tight">{t("What AdviceIT is", "Apa itu AdviceIT")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
@@ -113,9 +116,9 @@ export function AboutContent() {
                 "Penasihat ini belajar dari 400 kasus yang sudah ditinjau oleh empat ahli keuangan. Semuanya berjalan di browser Anda, tidak ada data pribadi Anda yang dikumpulkan, dan seluruh kodenya terbuka (open source).",
               )}
             </p>
-          </section>
+          </Reveal>
 
-          <section className="space-y-5">
+          <Reveal as="section" className="space-y-5">
             <h2 className="text-2xl font-semibold tracking-tight">{t("The team", "Tim kami")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
@@ -124,12 +127,12 @@ export function AboutContent() {
               )}
             </p>
             <div className="grid gap-4 md:grid-cols-3">
-              {TEAM.map((m) => (
-                <article key={m.name} className="panel p-5">
+              {TEAM.map((m, i) => (
+                <Reveal as="article" key={m.name} delay={i * 100} className="panel p-5">
                   <h3 className="font-semibold tracking-tight">{m.name}</h3>
                   <p className="mt-1 text-xs font-semibold uppercase tracking-widest text-primary">{m.role}</p>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{m.text}</p>
-                </article>
+                </Reveal>
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
@@ -138,9 +141,9 @@ export function AboutContent() {
                 "Pembagian peran sesuai kesepakatan tim. Urutan penulis ditentukan terpisah untuk setiap makalah.",
               )}
             </p>
-          </section>
+          </Reveal>
 
-          <section id="researchers" className="scroll-mt-24 space-y-5">
+          <Reveal as="section" id="researchers" className="scroll-mt-24 space-y-5">
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("For researchers and reviewers", "Untuk peneliti dan reviewer")}
@@ -156,8 +159,10 @@ export function AboutContent() {
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              {RESEARCH_LINKS.map((l) => (
-                <Link
+              {RESEARCH_LINKS.map((l, i) => (
+                <Reveal
+                  as={Link}
+                  delay={i * 70}
                   key={l.href}
                   href={l.href}
                   target={l.href.startsWith("http") ? "_blank" : undefined}
@@ -171,15 +176,15 @@ export function AboutContent() {
                     <span className="block font-semibold tracking-tight">{l.title}</span>
                     <span className="mt-1 block text-sm text-muted-foreground">{l.text}</span>
                   </span>
-                </Link>
+                </Reveal>
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
               {t(`Version ${VERSION}. To cite the instrument, use the citation file in the repository.`, `Versi ${VERSION}. Untuk mengutip alat penelitian ini, gunakan berkas sitasi di repositori.`)}
             </p>
-          </section>
+          </Reveal>
 
-          <section className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
+          <Reveal as="section" className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
             <h2 className="text-2xl font-semibold tracking-tight">{t("Take part in the study", "Ikut penelitian")}</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               {t("About fifteen minutes, anonymous, and no real money involved.", "Sekitar lima belas menit, anonim, dan tanpa uang sungguhan.")}
@@ -190,10 +195,11 @@ export function AboutContent() {
                 <ArrowRight />
               </Link>
             </Button>
-          </section>
+          </Reveal>
         </div>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

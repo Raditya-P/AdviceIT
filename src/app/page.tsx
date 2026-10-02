@@ -6,7 +6,7 @@
    numbers. The study comes last, once a visitor knows what is being judged. */
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -23,7 +23,9 @@ import { ASSET_COLOR, AllocationBar } from "@/components/allocation-bar";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { AdvicePreview } from "@/components/marketing/advice-preview";
+import { Reveal, Spotlight } from "@/components/motion";
 import { mlRecommend, scorecard } from "@/lib/advisor/advisors";
 import { featureExplanation } from "@/lib/advisor/explanations";
 import { ASSET_CLASSES, PORTFOLIOS } from "@/lib/advisor/model";
@@ -114,11 +116,13 @@ export default function HomePage() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <div aria-hidden className="surface-glow" />
+          <div aria-hidden className="surface-glow drift" />
           <div aria-hidden className="surface-grid" />
+          <Spotlight />
           <div className="relative mx-auto grid max-w-6xl items-start gap-10 px-4 pb-16 pt-10 sm:px-6 sm:pt-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-14 lg:pb-20 lg:pt-16">
             <div className="space-y-5">
               <span className="rise inline-flex items-center gap-2 rounded-full border border-border/80 bg-background/70 px-3.5 py-1.5 text-sm text-muted-foreground backdrop-blur">
@@ -161,7 +165,7 @@ export default function HomePage() {
                 </Link>
               </p>
             </div>
-            <div className="lg:pt-4">
+            <div className="min-w-0 lg:pt-4">
               <AdvicePreview />
             </div>
           </div>
@@ -170,23 +174,23 @@ export default function HomePage() {
         {/* What the advisor does */}
         <section className="border-y border-border/70 bg-muted/40">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <div className="max-w-2xl space-y-3">
+            <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("What the advisor does", "Cara kerja penasihat")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                 {t("Three steps from a person to a recommendation", "Tiga langkah dari profil sampai rekomendasi")}
               </h2>
-            </div>
+            </Reveal>
             <ol className="mt-10 grid gap-5 md:grid-cols-3">
               {STEPS.map((s, i) => (
-                <li key={s.title} className="panel lift p-6">
+                <Reveal as="li" key={s.title} delay={i * 90} className="panel lift p-6">
                   <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                     {i + 1}
                   </span>
                   <h3 className="mt-4 text-lg font-semibold tracking-tight">{s.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-                </li>
+                </Reveal>
               ))}
             </ol>
           </div>
@@ -195,7 +199,7 @@ export default function HomePage() {
         {/* Two advisors */}
         <section>
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <div className="max-w-2xl space-y-3">
+            <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Two advisors", "Dua penasihat")}
               </p>
@@ -208,11 +212,11 @@ export default function HomePage() {
                   "Keduanya belajar dari 400 kasus yang sama, yang sudah ditinjau panel ahli keuangan. Yang satu bekerja seperti jaringan saraf, yang lain seperti daftar periksa.",
                 )}
               </p>
-            </div>
+            </Reveal>
 
             <div className="mt-10 grid gap-6 lg:grid-cols-2">
               {/* AI advisor */}
-              <article className="panel lift flex flex-col p-6 sm:p-7">
+              <Reveal as="article" className="panel lift flex flex-col p-6 sm:p-7">
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("Neural network", "Jaringan saraf tiruan")}</p>
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight">{t("The AI advisor", "Penasihat AI")}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -225,7 +229,7 @@ export default function HomePage() {
                   <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                     {t("What counted for one example investor", "Faktor yang berpengaruh pada satu contoh investor")}
                   </p>
-                  {bars.map((b) => (
+                  {bars.map((b, i) => (
                     <div key={b.key} className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)] items-center gap-3 text-sm">
                       <span className="truncate">
                         {b.label} <span className="text-muted-foreground">{b.valueText}</span>
@@ -233,8 +237,8 @@ export default function HomePage() {
                       <span aria-hidden className="relative h-2.5 overflow-hidden rounded-full bg-muted">
                         <span className="absolute inset-y-0 left-1/2 w-px bg-border" />
                         <span
-                          className={`absolute inset-y-0.5 rounded-full ${b.points > 0 ? "left-1/2 bg-primary" : "right-1/2 bg-cash"}`}
-                          style={{ width: `${(Math.abs(b.points) / maxAbs) * 50}%` }}
+                          className={`reveal-grow absolute inset-y-0.5 rounded-full ${b.points > 0 ? "left-1/2 bg-primary" : "origin-right right-1/2 bg-cash"}`}
+                          style={{ width: `${(Math.abs(b.points) / maxAbs) * 50}%`, "--grow-delay": `${320 + i * 110}ms` } as CSSProperties}
                         />
                       </span>
                     </div>
@@ -246,10 +250,10 @@ export default function HomePage() {
                     <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
-              </article>
+              </Reveal>
 
               {/* Interpretable advisor */}
-              <article className="panel lift flex flex-col p-6 sm:p-7">
+              <Reveal as="article" delay={120} className="panel lift flex flex-col p-6 sm:p-7">
                 <p className="text-xs font-semibold uppercase tracking-widest text-bonds">{t("Scorecard", "Tabel poin")}</p>
                 <h3 className="mt-2 text-2xl font-semibold tracking-tight">{t("The interpretable advisor", "Penasihat transparan")}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -294,7 +298,7 @@ export default function HomePage() {
                     <ArrowRight data-icon="inline-end" />
                   </Link>
                 </Button>
-              </article>
+              </Reveal>
             </div>
           </div>
         </section>
@@ -302,7 +306,7 @@ export default function HomePage() {
         {/* How it explains itself */}
         <section className="border-y border-border/70 bg-muted/40">
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <div className="max-w-2xl space-y-3">
+            <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Explanations", "Penjelasan")}
               </p>
@@ -312,16 +316,16 @@ export default function HomePage() {
               <p className="text-muted-foreground">
                 {t("Pick any of them on the advisor page. Each is computed from the advisor's own numbers.", "Pilih salah satunya di halaman penasihat. Semuanya dihitung dari angka milik penasihat itu sendiri.")}
               </p>
-            </div>
+            </Reveal>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {STYLES.map((s) => (
-                <article key={s.title} className="panel lift p-6">
+              {STYLES.map((s, i) => (
+                <Reveal as="article" key={s.title} delay={i * 80} className="panel lift p-6">
                   <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <s.icon className="size-5" aria-hidden />
                   </span>
                   <h3 className="mt-4 font-semibold tracking-tight">{s.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-                </article>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -330,7 +334,7 @@ export default function HomePage() {
         {/* What it can recommend */}
         <section>
           <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-            <div className="max-w-2xl space-y-3">
+            <Reveal className="max-w-2xl space-y-3">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Outcomes", "Pilihan hasil")}
               </p>
@@ -343,7 +347,7 @@ export default function HomePage() {
                   "Setiap batang menunjukkan cara satu komposisi membagi uang ke empat jenis aset.",
                 )}
               </p>
-            </div>
+            </Reveal>
             <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
               {ASSET_CLASSES.map((ac) => (
                 <li key={ac.key} className="flex items-center gap-2">
@@ -353,16 +357,16 @@ export default function HomePage() {
               ))}
             </ul>
             <div className="mt-5 grid gap-3">
-              {PORTFOLIOS.map((pf) => (
-                <div key={pf.id} className="panel grid items-center gap-3 p-4 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-6 sm:p-5">
+              {PORTFOLIOS.map((pf, i) => (
+                <Reveal key={pf.id} delay={i * 70} className="panel grid items-center gap-3 p-4 sm:grid-cols-[13rem_minmax(0,1fr)] sm:gap-6 sm:p-5">
                   <div>
                     <p className="font-semibold tracking-tight">{outcomeName(pf.name)}</p>
                     <p className="text-xs text-muted-foreground">{outcomeSummary(pf.id, pf.summary)}</p>
                   </div>
-                  {pf.allocation && <AllocationBar allocation={pf.allocation} height="h-8" animate={false} />}
-                </div>
+                  {pf.allocation && <AllocationBar allocation={pf.allocation} height="h-8" animate="reveal" />}
+                </Reveal>
               ))}
-              <div className="flex items-start gap-3 rounded-2xl border border-dashed border-border px-4 py-4 sm:px-5">
+              <Reveal delay={PORTFOLIOS.length * 70} className="flex items-start gap-3 rounded-2xl border border-dashed border-border px-4 py-4 sm:px-5">
                 <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <UserRound className="size-4" aria-hidden />
                 </span>
@@ -375,7 +379,7 @@ export default function HomePage() {
                     )}
                   </p>
                 </div>
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>
@@ -383,7 +387,7 @@ export default function HomePage() {
         {/* Why this matters */}
         <section className="border-y border-border/70 bg-muted/40">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-20">
-            <div className="space-y-4">
+            <Reveal className="space-y-4">
               <p className="text-xs font-semibold uppercase tracking-widest text-primary">
                 {t("Why this matters", "Mengapa ini penting")}
               </p>
@@ -396,8 +400,8 @@ export default function HomePage() {
                   "Belum ada yang tahu penjelasan mana yang berdampak seperti apa. Penasihat ini dibuat untuk menjawab pertanyaan itu.",
                 )}
               </p>
-            </div>
-            <div className="space-y-5 leading-relaxed text-muted-foreground lg:pt-9">
+            </Reveal>
+            <Reveal delay={140} className="space-y-5 leading-relaxed text-muted-foreground lg:pt-9">
               <p>
                 {t(
                   "Investment apps increasingly recommend what to do with your money and the recommendation comes from a model. Following it helps when the model is right. Following it costs real money when the model is wrong. Most people cannot tell which is which from the recommendation alone.",
@@ -410,13 +414,13 @@ export default function HomePage() {
                   "Penjelasan seharusnya membantu menutup celah itu. Namun penjelasan juga bisa membuat saran yang keliru terdengar meyakinkan. Penjelasan mana yang membantu orang menilai, bukan sekadar membujuk, masih belum diketahui.",
                 )}
               </p>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* The study */}
         <section className="px-4 pb-24 sm:px-6">
-          <div className="cta-panel relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-14 sm:px-10">
+          <Reveal className="cta-panel relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-border/70 px-6 py-14 sm:px-10">
             <div aria-hidden className="surface-grid opacity-60" />
             <div className="relative grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center">
               <div className="space-y-4">
@@ -445,10 +449,11 @@ export default function HomePage() {
                 </Button>
               </div>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

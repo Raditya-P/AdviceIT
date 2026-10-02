@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { pageLocale } from "@/lib/locale-server";
 
 /* Unknown addresses get the site's own chrome and the usual ways in,
@@ -15,6 +16,7 @@ export default async function NotFound() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <PageHero
           eyebrow="404"
@@ -42,6 +44,7 @@ export default async function NotFound() {
         </PageHero>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

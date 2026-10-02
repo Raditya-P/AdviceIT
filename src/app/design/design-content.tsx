@@ -9,9 +9,11 @@
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { tr, useLang } from "@/lib/i18n";
 
 type L = { en: string; id: string };
@@ -110,6 +112,7 @@ export function DesignContent() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <PageHero
           eyebrow={t("Method", "Metode")}
@@ -125,14 +128,14 @@ export function DesignContent() {
           <p className="rounded-2xl border border-border/70 bg-muted/40 px-5 py-4 text-sm text-muted-foreground">
             {t(
               "This page is written for researchers and reviewers. If you are taking part in the study, you do not need any of it: the participate page tells you everything you need.",
-              "Halaman ini ditulis untuk peneliti dan reviewer. Jika Anda peserta penelitian, Anda tidak perlu membaca ini: semua yang perlu Anda ketahui ada di halaman Ikut penelitian.",
+              "Halaman ini ditulis untuk peneliti dan reviewer. Jika Anda peserta penelitian, Anda tidak perlu membaca ini: semua yang perlu Anda ketahui ada di halaman Ikut serta.",
             )}{" "}
             <Link href="/participate" className="font-medium text-primary underline underline-offset-4">
               {t("Take part", "Ikut penelitian")}
             </Link>
           </p>
           {/* 1. Two factors */}
-          <section className="space-y-5">
+          <Reveal as="section" className="space-y-5">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("1. Two factors, not one list", "1. Dua faktor, bukan satu daftar")}
             </h2>
@@ -182,10 +185,10 @@ export function DesignContent() {
                 "Ada faktor ketiga di samping keduanya, yaitu penasihatnya sendiri: jaringan saraf yang penjelasannya dihitung setelah keputusan dibuat, atau scorecard transparan yang penjelasannya eksak. Faktor ini diundi secara acak dan dicatat, sehingga kesetiaan penjelasan (faithfulness) menjadi variabel yang diukur, bukan sekadar asumsi.",
               )}
             </p>
-          </section>
+          </Reveal>
 
           {/* 2. The cells */}
-          <section className="space-y-5">
+          <Reveal as="section" className="space-y-5">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("2. The cells this pilot fills", "2. Sel yang diisi studi pilot ini")}
             </h2>
@@ -246,10 +249,10 @@ export function DesignContent() {
                 "Sembilan sel. Delapan di antaranya diundi secara acak. Sel percakapan hanya bisa dipilih sendiri, karena membutuhkan browser dengan WebGPU dan harus mengunduh model, sehingga jika diundi akan gagal untuk sebagian peserta. Di antara sel yang diundi, setiap peserta baru ditempatkan pada pasangan kondisi dan penasihat yang pesertanya paling sedikit sejauh ini (jika sama banyak, dipilih acak), sehingga keenam belas pasangan terisi merata dan tidak timpang seperti pada pengacakan sederhana.",
               )}
             </p>
-          </section>
+          </Reveal>
 
           {/* 3. Contrasts */}
-          <section className="space-y-5">
+          <Reveal as="section" className="space-y-5">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("3. Which comparisons are interpretable", "3. Perbandingan yang bisa ditafsirkan")}
             </h2>
@@ -301,10 +304,10 @@ export function DesignContent() {
                 </ul>
               </div>
             </div>
-          </section>
+          </Reveal>
 
           {/* 4. Outcome */}
-          <section className="space-y-4">
+          <Reveal as="section" className="space-y-4">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("4. The outcome is an interaction", "4. Hasil utamanya adalah sebuah interaksi")}
             </h2>
@@ -336,10 +339,10 @@ export function DesignContent() {
                 )}
               </p>
             </div>
-          </section>
+          </Reveal>
 
           {/* 5. Mixed methods */}
-          <section className="space-y-4">
+          <Reveal as="section" className="space-y-4">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("5. How the two strands fit together", "5. Cara kedua jenis data digabungkan")}
             </h2>
@@ -379,10 +382,10 @@ export function DesignContent() {
                 </div>
               ))}
             </div>
-          </section>
+          </Reveal>
 
           {/* 6. Analysis and exclusions */}
-          <section className="space-y-4">
+          <Reveal as="section" className="space-y-4">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("6. Analysis plan and what gets excluded", "6. Rencana analisis dan data yang dikecualikan")}
             </h2>
@@ -418,9 +421,9 @@ export function DesignContent() {
                 )}
               </li>
             </ul>
-          </section>
+          </Reveal>
 
-          <section className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
+          <Reveal as="section" className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
             <h2 className="text-2xl font-semibold tracking-tight">
               {t("See it from the inside", "Coba sendiri")}
             </h2>
@@ -441,10 +444,11 @@ export function DesignContent() {
                 <Link href="/references">{t("References and tools", "Referensi dan alat bantu")}</Link>
               </Button>
             </div>
-          </section>
+          </Reveal>
         </div>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

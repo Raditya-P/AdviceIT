@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { CARDS } from "@/lib/conditions";
 import { tr, useLang } from "@/lib/i18n";
 import { useWebGpu } from "@/lib/use-webgpu";
@@ -100,23 +101,24 @@ export default function ParticipatePage() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <section className="relative overflow-hidden border-b border-border/70">
-          <div aria-hidden className="surface-glow" />
+          <div aria-hidden className="surface-glow drift" />
           <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+            <p className="rise text-xs font-semibold uppercase tracking-widest text-primary">
               {t("Take part", "Ikut serta")}
             </p>
-            <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="rise rise-1 mt-3 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
               {t("Help us find out what makes AI advice trustworthy", "Bantu kami mencari tahu kapan saran AI layak dipercaya")}
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            <p className="rise rise-2 mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {t(
                 "You read six short cases about made-up people. For each one, the advisor recommends something and explains why, and you tell us what you would do. A few short questions before and after, and that is the session.",
                 "Anda akan membaca enam kasus singkat tentang orang rekaan. Di setiap kasus, penasihat memberi rekomendasi beserta alasannya, lalu Anda memberi tahu kami apa yang akan Anda lakukan. Ditambah beberapa pertanyaan singkat di awal dan di akhir, dan selesai.",
               )}
             </p>
-            <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <ul className="rise rise-3 mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               {FACTS.map((f) => (
                 <li key={f.text} className="flex items-center gap-2">
                   <f.icon className="size-4 text-primary" aria-hidden />
@@ -124,7 +126,7 @@ export default function ParticipatePage() {
                 </li>
               ))}
             </ul>
-            <div className="mt-9 flex flex-col items-center gap-3">
+            <div className="rise rise-4 mt-9 flex flex-col items-center gap-3">
               <Button
                 size="lg"
                 className="h-12 rounded-full px-8 text-base"
@@ -236,6 +238,7 @@ export default function ParticipatePage() {
         </section>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

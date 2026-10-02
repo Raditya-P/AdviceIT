@@ -60,6 +60,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html
       lang={locale}
       className={`${sans.variable} ${heading.variable} ${mono.variable} h-full antialiased`}
+      /* globals.css scrolls smoothly for in-page links. This tells Next to
+         jump, not glide, to the top of a new page (Next 16 no longer does
+         that by itself). */
+      data-scroll-behavior="smooth"
     >
       <body className="min-h-full flex flex-col">
         <LanguageProvider initialLocale={locale}>{children}</LanguageProvider>

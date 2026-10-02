@@ -166,7 +166,7 @@ export function Playground({
                 <span className={`hidden sm:inline ${state === "active" ? "font-medium" : ""}`}>{s.label}</span>
               </button>
               {i < STEPS.length - 1 && (
-                <span aria-hidden className={`h-px flex-1 ${i < activeIndex ? "bg-primary/40" : "bg-border"}`} />
+                <span aria-hidden className={`h-px flex-1 transition-colors duration-500 ${i < activeIndex ? "bg-primary/40" : "bg-border"}`} />
               )}
             </li>
           );
@@ -175,7 +175,7 @@ export function Playground({
 
       <div className="mt-9">
         {step === "style" && (
-          <div className="space-y-8">
+          <div className="rise space-y-8">
             <StylePicker
               preset={preset}
               onPreset={choosePreset}
@@ -202,7 +202,7 @@ export function Playground({
         )}
 
         {step === "profile" && (
-          <div className="space-y-8">
+          <div className="rise space-y-8">
             <div className="max-w-2xl space-y-2">
               <h2 className="text-2xl font-semibold tracking-tight">
                 {t("Tell the advisor about the investor", "Ceritakan profil investornya kepada penasihat")}

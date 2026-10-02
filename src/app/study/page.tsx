@@ -16,8 +16,8 @@ export default async function StudyPage() {
   const locale = await pageLocale();
   return (
     <>
-      <SiteHeader />
-      <main className="flex-1">
+      <SiteHeader progress={false} />
+      <main className="flex-1" data-motion="still">
         <Suspense
           fallback={
             <div className="mx-auto max-w-2xl px-4 py-10 text-muted-foreground">

@@ -1,14 +1,40 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Languages, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand";
 import { tr, useLang } from "@/lib/i18n";
 
-export function SiteHeader() {
+/* The needle swings into place on the first page of a visit only. Every page
+   renders its own header, so without this it would replay on each click. */
+let introPlayed = false;
+
+export function SiteHeader({ progress = true }: { progress?: boolean }) {
   const { locale, setLocale } = useLang();
+  const headerRef = useRef<HTMLElement>(null);
+  const [intro] = useState(() => !introPlayed);
+  useEffect(() => {
+    introPlayed = true;
+    const header = headerRef.current;
+    if (!header) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      header.toggleAttribute("data-scrolled", window.scrollY > 8);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
   const router = useRouter();
   const pathname = usePathname();
   const t = (en: string, id: string) => tr(locale, { en, id });
@@ -23,9 +49,14 @@ export function SiteHeader() {
     router.refresh();
   };
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 backdrop-blur-md">
+    <header
+      ref={headerRef}
+      className="site-header sticky top-0 z-40 w-full border-b border-border/70 bg-background/75 backdrop-blur-md"
+      style={{ viewTransitionName: "site-header" }}
+    >
+      {progress && <div aria-hidden className="scroll-progress" />}
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
-        <Logo size={34} wordmarkClass="text-[19px]" />
+        <Logo size={34} wordmarkClass="text-[19px]" intro={intro} />
         <nav className="hidden items-center gap-0.5 md:flex">
           {NAV.map((item) => {
             const active = pathname === item.href.split("#")[0] && !item.href.includes("#");

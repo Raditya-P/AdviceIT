@@ -19,12 +19,12 @@ export function PageHero({
 }) {
   return (
     <section className="relative overflow-hidden border-b border-border/70">
-      <div aria-hidden className="surface-glow" />
+      <div aria-hidden className="surface-glow drift" />
       <div className={`relative mx-auto ${width} px-4 py-14 sm:px-6 sm:py-16`}>
-        {eyebrow && <p className="text-xs font-semibold uppercase tracking-widest text-primary">{eyebrow}</p>}
-        <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
-        {lead && <div className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">{lead}</div>}
-        {children}
+        {eyebrow && <p className="rise text-xs font-semibold uppercase tracking-widest text-primary">{eyebrow}</p>}
+        <h1 className="rise rise-1 mt-3 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+        {lead && <div className="rise rise-2 mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">{lead}</div>}
+        {children && <div className="rise rise-3">{children}</div>}
       </div>
     </section>
   );

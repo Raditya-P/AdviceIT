@@ -313,17 +313,309 @@
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 12%, transparent);
 }
 
+/* ---------------- Motion ----------------
+   One vocabulary for the whole site: content arrives by rising and fading
+   in, bars grow from their baseline, numbers count, the logo needle settles
+   in the middle of its dial. The helpers live in src/components/motion.tsx.
+   Three rules hold for every line below:
+   - nothing is hidden when scripts do not run, because the hidden states
+     sit behind @media (scripting: enabled);
+   - everything is still under prefers-reduced-motion;
+   - nothing moves inside a study trial ([data-motion="still"]): there the
+     screen must look the same in every condition, so that reading and
+     decision times stay comparable. */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+/* Scroll reveal. Hidden until the observer marks it shown. If the page
+   never becomes interactive, the failsafe shows everything after a few
+   seconds. Individual translate and scale properties, not transform, so a
+   reveal never fights the hover lift on the same element. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .reveal:not([data-shown]) {
+    opacity: 0;
+  }
+  html:not([data-motion-ready]) .reveal:not([data-shown]) {
+    animation: reveal-failsafe 0.01s 3.5s forwards;
+  }
+  .reveal:not([data-shown]) .reveal-grow {
+    scale: 0 1;
+  }
+}
+.reveal[data-shown] {
+  animation: reveal-in 0.8s var(--ease-out-expo) var(--reveal-delay, 0ms) backwards;
+}
+.reveal[data-shown] .reveal-grow {
+  animation: grow-x 1s var(--ease-out-expo) calc(var(--reveal-delay, 0ms) + var(--grow-delay, 180ms)) backwards;
+}
+.reveal-grow,
+.bar-in {
+  transform-origin: left center;
+}
+.reveal-grow.origin-right,
+.bar-in.origin-right {
+  transform-origin: right center;
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    translate: 0 22px;
+    scale: 0.985;
+  }
+}
+@keyframes reveal-failsafe {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes grow-x {
+  from {
+    scale: 0 1;
+  }
+}
+
+/* Bars inside the advisor's explanations grow in, one after another. */
+.bar-in {
+  animation: grow-x 0.9s var(--ease-out-expo) var(--bar-delay, 0ms) backwards;
+}
+
+/* Content that is swapped in place (the hero example, a new answer). */
+.swap-in {
+  animation: swap-in 0.55s var(--ease-out-expo) var(--swap-delay, 0ms) backwards;
+}
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+    filter: blur(3px);
+  }
+}
+
+/* Allocation bars that move between mixes instead of redrawing. */
+.alloc-smooth > div {
+  transition:
+    width 0.9s var(--ease-out-expo),
+    opacity 0.4s ease;
+}
+
+/* The logo needle settles into the middle zone on the first page load and
+   wobbles back to it on hover: calibration, in one gesture. */
+.logo-needle {
+  transform-box: view-box;
+  transform-origin: 16px 21.75px;
+}
+.needle-intro .logo-needle {
+  animation: needle-settle 1.3s var(--ease-spring) 0.2s backwards;
+}
+a:hover .logo-needle,
+a:focus-visible .logo-needle {
+  animation: needle-wobble 0.9s ease-in-out;
+}
+@keyframes needle-settle {
+  from {
+    transform: rotate(-64deg);
+  }
+}
+@keyframes needle-wobble {
+  25% {
+    transform: rotate(-16deg);
+  }
+  55% {
+    transform: rotate(11deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* The header firms up once the page scrolls, and a thin line tracks how far
+   down the page the reader is (only where scroll-driven animations exist;
+   elsewhere the line never shows). */
+.site-header {
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.site-header[data-scrolled] {
+  background-color: color-mix(in oklab, var(--background) 90%, transparent);
+  box-shadow: 0 10px 30px -22px color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+.scroll-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--primary), var(--bonds));
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scroll-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+@keyframes scroll-progress {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* A soft light that follows the pointer over the hero grid. */
+.spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 30%),
+    color-mix(in oklab, var(--primary) 10%, transparent),
+    transparent 70%
+  );
+}
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--primary) 26%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--primary) 26%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(240px circle at var(--mx, 50%) var(--my, 30%), #000, transparent 72%);
+}
+.spotlight[data-on] {
+  opacity: 1;
+}
+
+/* The glow behind the hero drifts slowly. */
+.drift {
+  animation: drift 22s ease-in-out infinite alternate;
+}
+@keyframes drift {
+  from {
+    translate: -2% -1%;
+    scale: 1;
+  }
+  to {
+    translate: 3% 2%;
+    scale: 1.08;
+  }
+}
+
+/* Arrows at the end of a button lean forward on hover. */
+[data-slot="button"] > svg:last-child:not(:first-child) {
+  transition: translate 0.25s var(--ease-out-expo);
+}
+[data-slot="button"]:hover > svg:last-child:not(:first-child) {
+  translate: 3px 0;
+}
+
+/* The example dots under the hero card: the active one fills as it plays. */
+.dot-fill {
+  transform-origin: left center;
+  animation: grow-x var(--dot-ms, 6000ms) linear both;
+}
+.dot-fill[data-paused] {
+  animation-play-state: paused;
+}
+
+/* Inside a study trial nothing moves. */
+[data-motion="still"] .reveal,
+[data-motion="still"] .reveal-grow,
+[data-motion="still"] .bar-in,
+[data-motion="still"] .swap-in {
+  animation: none !important;
+  opacity: 1;
+  scale: none;
+}
+
+/* Page changes cross-fade where the browser supports view transitions. The
+   header is named so it holds still while the page under it changes. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 50;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+::view-transition-old(.page) {
+  animation: 0.16s ease-in both page-out;
+}
+::view-transition-new(.page) {
+  animation: 0.38s var(--ease-out-expo) 0.08s both page-in;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rise,
   .float-slow,
   .sheen,
-  .grow-bar {
-    animation: none;
+  .grow-bar,
+  .reveal,
+  .reveal[data-shown],
+  .reveal-grow,
+  .reveal[data-shown] .reveal-grow,
+  .bar-in,
+  .swap-in,
+  .drift,
+  .dot-fill,
+  .scroll-progress,
+  .needle-intro .logo-needle,
+  a:hover .logo-needle,
+  a:focus-visible .logo-needle {
+    animation: none !important;
+  }
+  .alloc-smooth > div,
+  [data-slot="button"] > svg:last-child:not(:first-child) {
+    transition: none;
+  }
+  [data-slot="button"]:hover > svg:last-child:not(:first-child) {
+    translate: none;
+  }
+  .spotlight {
+    display: none;
   }
   .lift:hover {
     transform: none;
   }
   html {
     scroll-behavior: auto;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }

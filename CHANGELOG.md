@@ -3,6 +3,52 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 2.14.0 (2026-10-02)
+
+Motion, used with restraint, and none of it inside a study trial.
+
+### Added
+
+- **The hero card plays.** It runs the real AI advisor on four example investors (Growth, Aggressive
+  growth, Balanced and Conservative) and moves between them: the allocation bands slide to the new mix,
+  the percentages and the confidence glide to their new values, and the drivers fade in. It pauses on
+  hover and on keyboard focus, and has a pause button and one dot per example. The timing is a CSS
+  animation, so under reduced motion the card stays on the first example until someone picks another.
+  On a phone the outcome name and the confidence badge stack, and the card keeps one height for every
+  example.
+- **Scroll reveal.** Sections and cards rise in as they come into view, staggered, on the home, About,
+  Study design, References and Training data pages. Bars grow from their baseline once their card
+  arrives (the contribution bars and the five mixes on the home page, the label distributions on
+  Training data), and the headline numbers on Training data count up. Nothing is hidden from a browser
+  without scripts, and a failsafe shows everything if a page has not become interactive after a few
+  seconds.
+- **The logo needle** swings into the middle zone on the first page load and wobbles back to it on hover.
+- **The header** firms up with a shadow once the page scrolls, and a thin line under it shows how far
+  down the page the reader is (in browsers with scroll-driven animations).
+- **Page changes cross-fade** where the browser supports view transitions (React's `ViewTransition`, built
+  into Next 16), with the header held still. A language switch or a change inside a page never animates.
+- A soft light follows the pointer over the home page grid, and the glow behind the page heroes drifts
+  slowly. Arrows in buttons lean forward on hover. In the advisor, each step rises in and the explanation
+  bars grow in one after another.
+
+### Kept still
+
+- Everything above is off under `prefers-reduced-motion`.
+- The study page is marked `data-motion="still"`, which switches all of these animations off inside it,
+  and it has no progress line and no page fade. A trial screen looks the same in every condition, so
+  reading and decision times stay comparable. The motion that was already there (the allocation bar
+  growing in, the analysis pause) is unchanged and identical across conditions.
+
+### Fixed
+
+- Next 16 no longer turns smooth scrolling off during a navigation, so a link followed from far down a
+  page glided to the top of the next one. `<html data-scroll-behavior="smooth">` makes it jump again;
+  links within a page still scroll smoothly.
+- The "Live output" bubble on the hero card no longer covers the card's text, and between 768 and 1023
+  pixels it no longer pokes past the edge of the screen.
+- The Training data distribution counts no longer wrap onto two lines.
+- In Indonesian the participate page is called *Ikut serta* everywhere, matching the header button.
+
 ## 2.13.0 (2026-10-02)
 
 Plain Indonesian throughout, and the site now opens in the language the visitor chose.

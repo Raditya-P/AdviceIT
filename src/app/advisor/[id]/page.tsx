@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { Playground } from "@/components/advisor/playground";
 import { localTitle } from "@/lib/locale-server";
 
@@ -36,10 +37,12 @@ export default async function AdvisorPage({
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <Playground advisorId={id} researcher={sp.researcher === "1"} />
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

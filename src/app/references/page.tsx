@@ -1,6 +1,8 @@
 import { SiteFooter } from "@/components/site-footer";
+import { Reveal } from "@/components/motion";
 import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { localTitle, pageLocale } from "@/lib/locale-server";
@@ -258,6 +260,7 @@ export default async function ReferencesPage() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <PageHero
           eyebrow={pick({ en: "Credits", id: "Kredit" })}
@@ -269,7 +272,8 @@ export default async function ReferencesPage() {
         />
         <div className="mx-auto max-w-4xl space-y-6 px-4 py-12 sm:px-6">
           {SECTIONS.map((s) => (
-            <Card key={s.title.en}>
+            <Reveal key={s.title.en}>
+            <Card>
               <CardHeader>
                 <CardTitle className="text-base">{pick(s.title)}</CardTitle>
               </CardHeader>
@@ -289,7 +293,9 @@ export default async function ReferencesPage() {
                 ))}
               </CardContent>
             </Card>
+            </Reveal>
           ))}
+          <Reveal>
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
@@ -323,9 +329,11 @@ export default async function ReferencesPage() {
               </p>
             </CardContent>
           </Card>
+          </Reveal>
         </div>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }

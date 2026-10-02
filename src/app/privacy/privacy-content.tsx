@@ -3,6 +3,7 @@
 import { SiteFooter } from "@/components/site-footer";
 import { PageHero } from "@/components/page-hero";
 import { SiteHeader } from "@/components/site-header";
+import { PageTransition } from "@/components/page-transition";
 import { tr, useLang } from "@/lib/i18n";
 import { CONTACT } from "@/lib/study";
 
@@ -12,6 +13,7 @@ export function PrivacyContent() {
   return (
     <>
       <SiteHeader />
+      <PageTransition>
       <main className="flex-1">
         <PageHero
           eyebrow={t("Transparency", "Transparansi")}
@@ -43,7 +45,7 @@ export function PrivacyContent() {
           <p className="text-muted-foreground">
             {t(
               "A study session is saved in this browser as you go, so that leaving part way through does not lose your answers. It holds your participant ID, the condition you were assigned, the answers you have given and how many cases you have finished. It never leaves your device, it is deleted the moment you finish the session, and it expires after a week on its own. Starting a new session from the participate page discards it. The site also remembers your language choice, and buffers answers here if the network is down so they can be sent on your next visit.",
-              "Sesi penelitian disimpan di browser ini selama Anda mengerjakannya, jadi jawaban Anda tidak hilang jika Anda berhenti di tengah jalan. Yang disimpan adalah ID peserta Anda, kelompok tempat Anda ditempatkan, jawaban yang sudah Anda berikan, dan jumlah kasus yang sudah selesai. Data ini tidak pernah keluar dari perangkat Anda, langsung dihapus begitu sesi selesai, dan otomatis kedaluwarsa setelah satu minggu. Jika Anda memulai sesi baru dari halaman Ikut penelitian, data ini dibuang. Situs ini juga mengingat pilihan bahasa Anda, dan menyimpan jawaban sementara di sini jika internet terputus supaya bisa dikirim saat Anda berkunjung lagi.",
+              "Sesi penelitian disimpan di browser ini selama Anda mengerjakannya, jadi jawaban Anda tidak hilang jika Anda berhenti di tengah jalan. Yang disimpan adalah ID peserta Anda, kelompok tempat Anda ditempatkan, jawaban yang sudah Anda berikan, dan jumlah kasus yang sudah selesai. Data ini tidak pernah keluar dari perangkat Anda, langsung dihapus begitu sesi selesai, dan otomatis kedaluwarsa setelah satu minggu. Jika Anda memulai sesi baru dari halaman Ikut serta, data ini dibuang. Situs ini juga mengingat pilihan bahasa Anda, dan menyimpan jawaban sementara di sini jika internet terputus supaya bisa dikirim saat Anda berkunjung lagi.",
             )}
           </p>
           <h2 className="text-xl font-semibold">{t("Your rights", "Hak Anda")}</h2>
@@ -63,6 +65,7 @@ export function PrivacyContent() {
         </div>
       </main>
       <SiteFooter />
+      </PageTransition>
     </>
   );
 }
