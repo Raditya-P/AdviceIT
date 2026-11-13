@@ -43,12 +43,12 @@ export const PRESETS: Record<string, ConditionSpec> = {
 
 export const PRESET_LABELS: Record<string, string> = {
   none: "No explanation",
-  feature: "Why (visual)",
-  "feature-textual": "Why (textual)",
-  "feature-hybrid": "Why (hybrid)",
-  counterfactual: "What would change it (counterfactual)",
-  confidence: "How sure (confidence)",
-  hybrid: "All three (hybrid)",
+  feature: "Why",
+  "feature-textual": "Why, in words",
+  "feature-hybrid": "Why, in bars and words",
+  counterfactual: "What would change it",
+  confidence: "How sure",
+  hybrid: "All three",
   interactive: "Interactive only",
   "interactive-hybrid": "Interactive with all three",
   adaptive: "Adaptive to literacy",
@@ -58,9 +58,9 @@ export const PRESET_LABELS: Record<string, string> = {
 
 const PRESET_LABELS_ID: Record<string, string> = {
   none: "Tanpa penjelasan",
-  feature: "Mengapa (grafik)",
-  "feature-textual": "Mengapa (teks)",
-  "feature-hybrid": "Mengapa (grafik dan teks)",
+  feature: "Mengapa",
+  "feature-textual": "Mengapa, dalam kalimat",
+  "feature-hybrid": "Mengapa, dalam grafik dan kalimat",
   counterfactual: "Apa yang bisa mengubahnya",
   confidence: "Seberapa yakin",
   hybrid: "Ketiganya sekaligus",

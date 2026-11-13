@@ -59,7 +59,7 @@ export function FeatureBox({ result, modality = "visual", plain }: { result: Adv
       ? FX.totalMl(result.baselineScore, result.rawScore, name)
       : FX.totalLogit(result.baselineScore, result.rawScore, name, Math.round(result.topProbability * 100));
   return (
-    <ExplanationCard icon={BarChart3} title={tr(locale, { en: "Why this recommendation", id: "Mengapa rekomendasinya ini" })}>
+    <ExplanationCard icon={BarChart3} title={tr(locale, { en: "Why this advice", id: "Mengapa saran ini" })}>
       <p className="text-muted-foreground">{intro}</p>
       {showBars && (
       <ul className="space-y-1.5">
@@ -131,7 +131,7 @@ export function CounterfactualBox({ result, plain }: { result: AdvisorResult; pl
   return (
     <ExplanationCard
       icon={Shuffle}
-      title={tr(locale, { en: "What would change this recommendation", id: "Apa yang bisa mengubah rekomendasi ini" })}
+      title={tr(locale, { en: "What would change this advice", id: "Apa yang bisa mengubah saran ini" })}
     >
       <p className="text-muted-foreground">{cf.intro}</p>
       {cf.sentences.length > 0 && (
@@ -189,7 +189,7 @@ export function ConfidenceBox({ result, plain }: { result: AdvisorResult; plain?
         ? "bg-amber-100 text-amber-800"
         : "bg-red-100 text-red-800";
   return (
-    <ExplanationCard icon={Gauge} title={tr(locale, { en: "How sure is the model", id: "Seberapa yakin modelnya" })}>
+    <ExplanationCard icon={Gauge} title={tr(locale, { en: "How sure the advisor is", id: "Seberapa yakin penasihat" })}>
       <div className="flex flex-wrap items-center gap-3">
         <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${tone}`}>{cx.labelText}</span>
         <span className="text-xs tabular-nums text-muted-foreground">{cx.detail}</span>

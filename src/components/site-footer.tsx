@@ -16,7 +16,7 @@ export function SiteFooter() {
       links: [
         { href: "/participate", label: t("Take part", "Ikut serta") },
         { href: "/advisor/ml", label: t("Try the AI advisor", "Coba penasihat AI") },
-        { href: "/advisor/logit", label: t("Try the interpretable advisor", "Coba penasihat transparan") },
+        { href: "/advisor/logit", label: t("Try the transparent advisor", "Coba penasihat transparan") },
         { href: "/privacy", label: t("Privacy and consent", "Privasi dan persetujuan") },
       ],
     },

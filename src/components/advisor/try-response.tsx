@@ -245,7 +245,7 @@ export function TryResponse({
             invalid={missing && decisionConfidence === null}
           />
           <RatingScale
-            label={t("How mentally demanding was this decision?", "Seberapa besar usaha berpikir yang dibutuhkan untuk keputusan ini?")}
+            label={t("How much mental effort did this decision take?", "Seberapa besar usaha berpikir yang dibutuhkan untuk keputusan ini?")}
             value={mentalDemand}
             onChange={setMentalDemand}
             low={t("1, very low", "1, sangat kecil")}

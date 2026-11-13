@@ -3,6 +3,64 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 3.1.0 (2026-11-13)
+
+Plainer words for people who are new to investing. The site is meant for retail investors, many of whom
+have never read a probability or a model description, so the home page, the advisor pages and the study
+screens now say what the advisor does in everyday language, and the technical detail is one click away
+instead of up front. Nothing about how the advice is computed or how the study is scored changes.
+3.0.0 has not collected any sessions, so the study keeps the design name `content5-ml-misread8`; every
+row still carries the app version.
+
+### Changed: the explanations
+
+- **Chances, not probabilities.** "Why" now reads "How much each fact about you pushed the chance of
+  Balanced up or down, compared with a reference investor (45 years old, a 10-year time frame, a medium attitude to risk, ...)",
+  and closes with "For the reference investor the chance of Balanced is B percent. With all of these
+  facts together, it is F percent for you." The figures are the same Shapley values and the same
+  totals as before. The scorecard advisor's log-odds wording is unchanged.
+- **"What would change it"** opens with "The advice is Balanced. It would change if just one of these
+  were different:". The sentences that follow keep their exact format.
+- **"How sure"** says "The advisor gives Balanced a N percent chance, against M percent for Growth",
+  with "N percent chance, D points ahead of the next option" as the detail.
+- The panel titles are "Why this advice", "What would change this advice" and "How sure the advisor
+  is". The method notes under each panel are hidden in the study, where they only added reading.
+- The analysing steps say what is happening: reading the facts, judging how much risk suits this
+  person, comparing the possible mixes, preparing the advice.
+- Indonesian follows the same wording throughout.
+
+### Changed: the advisor pages
+
+- The header describes the advisor in one plain sentence (where it learned from and how often it gave
+  the experts' answer on cases it had not seen). The previous technical description is under
+  "Technical details".
+- Choosing a style starts with four options (Why, What would change it, How sure, All three). The other
+  ways of delivering an explanation, no explanation at all, and building your own combination are under
+  "More ways to explain".
+- The profile form asks "When will the money be needed?" and "How do you feel about the value going up
+  and down?", with answers such as "Low: I prefer it steady". The free-text description, which
+  downloads a large language model, is folded away.
+- The second advisor is called the transparent advisor in English too (it was already "penasihat
+  transparan" in Indonesian).
+
+### Changed: the home page and navigation
+
+- The section comparing the two advisors (network bars and the log-odds points table) is gone. A short
+  "Where it comes from" block says the advice is built from expert judgement, runs on your device and is
+  a research tool, with links to the data and to the transparent advisor.
+- "Three ways it explains itself" replaces "Four ways to ask why": the conversational explainer is no
+  longer advertised on the home page, though it stays on the advisor pages.
+- The steps are in everyday words ("Tell it about a person", "Get advice", "See why").
+- The navigation has two links: "Try the advisor" and "About".
+
+### Changed: the study screens
+
+- The fact chips under each story are labelled the way the explanations label the same facts
+  ("Investment horizon: 12 years", "Risk tolerance: Medium"), so a participant can compare a misread
+  fact with the story directly.
+- "Read about this person"; the line before the advice says an automated advisor will suggest how the
+  person could invest, and asks the participant to judge it as if they were that person.
+- The effort item reads "How much mental effort did this decision take?" (the Indonesian is unchanged).
 ## 3.0.0 (2026-11-13)
 
 The main-study instrument. The pilot's wide design is narrowed to the comparison one study can power,

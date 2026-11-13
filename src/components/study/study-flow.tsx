@@ -866,9 +866,11 @@ function TrialStage({
   const p0 = trial.profile;
   const facts = [
     `${t("Age", "Usia")} ${p0.age}`,
-    t(`${p0.horizon} year horizon`, `Jangka waktu ${p0.horizon} tahun`),
-    `${t("Stated risk tolerance", "Toleransi risiko yang dinyatakan")}: ${
-      p0.tolerance === "low" ? t("Low", "Rendah") : p0.tolerance === "high" ? t("High", "Tinggi") : t("Medium", "Sedang")
+    /* Labelled the way the explanations label the same facts, so a fact
+       the advisor misread can be compared directly. */
+    t(`Investment horizon: ${p0.horizon} years`, `Jangka waktu investasi: ${p0.horizon} tahun`),
+    `${t("Risk tolerance", "Toleransi risiko")}: ${
+      p0.tolerance === "low" ? t("Low", "rendah") : p0.tolerance === "high" ? t("High", "tinggi") : t("Medium", "sedang")
     }`,
     p0.emergencyFund ? t("Has an emergency fund", "Punya dana darurat") : t("No emergency fund", "Tidak punya dana darurat"),
     p0.incomeStable ? t("Stable income", "Pendapatan stabil") : t("Variable income", "Pendapatan tidak tetap"),
@@ -914,14 +916,14 @@ function TrialStage({
               {shown.label}
             </p>
             <h2 className="mt-3 text-xl font-semibold tracking-tight sm:text-2xl">
-              {t("Read this person's situation", "Baca situasi orang ini")}
+              {t("Read about this person", "Baca tentang orang ini")}
             </h2>
             <p className="mt-3 text-[1.05rem] leading-relaxed">{shown.text}</p>
             {caseFacts}
             <p className="mt-5 text-sm text-muted-foreground">
               {t(
-                "In a moment the advisor will recommend something for this person, and you will judge that advice as if it were being given to them.",
-                "Sebentar lagi penasihat akan memberi rekomendasi untuk orang ini. Nilailah saran itu seolah-olah saran itu ditujukan kepadanya.",
+                "Next, an automated advisor will suggest how this person could invest. Judge the advice as if you were this person.",
+                "Selanjutnya, penasihat otomatis akan menyarankan cara orang ini berinvestasi. Nilailah saran itu seolah-olah Anda adalah orang ini.",
               )}
             </p>
           </section>
@@ -1024,7 +1026,7 @@ function TrialStage({
               invalid={missing && decisionConfidence === null}
             />
             <RatingScale
-              label={t("How mentally demanding was this decision?", "Seberapa besar usaha berpikir yang dibutuhkan untuk keputusan ini?")}
+              label={t("How much mental effort did this decision take?", "Seberapa besar usaha berpikir yang dibutuhkan untuk keputusan ini?")}
               value={mentalDemand}
               onChange={setMentalDemand}
               low={t("1, very low", "1, sangat kecil")}

@@ -18,9 +18,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
           "Try the AI advisor, a neural network trained on 400 expert-reviewed investor cases that explains every recommendation it makes.",
       }
     : {
-        title: await localTitle("Interpretable rule-based advisor", "Penasihat transparan berbasis aturan"),
+        title: await localTitle("Transparent advisor", "Penasihat transparan"),
         description:
-          "Try the interpretable advisor, a points scorecard fitted on the same 400 expert-reviewed cases, with every weight open to read.",
+          "Try the transparent advisor, a points table built from the same 400 expert-reviewed cases, with every rule open to read.",
       };
 }
 

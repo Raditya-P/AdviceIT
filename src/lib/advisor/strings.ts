@@ -99,7 +99,7 @@ export const V = {
 
 /* ---------------- Feature explanation ---------------- */
 export const FX = {
-  targetProbability: (name: string) => pick(`the probability of ${name}`, `peluang ${outcomeName(name)}`),
+  targetProbability: (name: string) => pick(`the chance of ${name}`, `peluang ${outcomeName(name)}`),
   targetEvidence: (name: string) => pick(`the evidence for ${name}`, `skor ${outcomeName(name)}`),
   unitPct: () => pick("percentage points", "poin persentase"),
   unitLogOdds: () => pick("log-odds points", "poin log-odds"),
@@ -110,8 +110,8 @@ export const FX = {
     ),
   sentenceUnchanged: (label: string, valueText: string, target: string) =>
     pick(
-      `${label} (${valueText}) did not change ${target} relative to the baseline.`,
-      `${label} (${valueText}) tidak mengubah ${target} dibandingkan profil acuan.`,
+      `${label} (${valueText}) did not change ${target} compared with the reference investor.`,
+      `${label} (${valueText}) tidak mengubah ${target} dibandingkan investor acuan.`,
     ),
   points: (v: number) => {
     const n = Math.round(Math.abs(v) * 10) / 10;
@@ -134,13 +134,13 @@ export const FX = {
     ),
   introMl: (name: string) =>
     pick(
-      `Compared with a neutral baseline profile, each of your inputs moved the probability of ${name} as follows (largest effect first, in percentage points):`,
-      `Dibandingkan dengan profil acuan yang netral, setiap faktor dalam profil Anda menggeser peluang ${outcomeName(name)} seperti berikut (pengaruh terbesar lebih dulu, dalam poin persentase):`,
+      `How much each fact about you pushed the chance of ${name} up or down, compared with a reference investor (45 years old, a 10-year time frame, a medium attitude to risk, an emergency fund, a stable income, no large debts, no money needed soon). Biggest effect first, in percentage points:`,
+      `Seberapa besar setiap fakta tentang Anda menaikkan atau menurunkan peluang ${outcomeName(name)}, dibandingkan dengan investor acuan (usia 45 tahun, jangka waktu 10 tahun, sikap terhadap risiko sedang, punya dana darurat, pendapatan stabil, tanpa utang besar, tidak butuh dana dalam waktu dekat). Pengaruh terbesar lebih dulu, dalam poin persentase:`,
     ),
   totalMl: (base: number, full: number, name: string) =>
     pick(
-      `Baseline profile ${base} percent plus contributions = ${full} percent probability of ${name} for your profile.`,
-      `Profil acuan ${num(base)} persen, ditambah semua kontribusi, menjadi peluang ${num(full)} persen untuk ${outcomeName(name)} pada profil Anda.`,
+      `For the reference investor the chance of ${name} is ${base} percent. With all of these facts together, it is ${full} percent for you.`,
+      `Untuk investor acuan, peluang ${outcomeName(name)} adalah ${num(base)} persen. Dengan semua fakta ini, peluangnya untuk Anda menjadi ${num(full)} persen.`,
     ),
   introLogit: (name: string) =>
     pick(
@@ -158,13 +158,13 @@ export const FX = {
 export const CF = {
   intro: (current: string) =>
     pick(
-      `The recommendation is ${current}. The smallest single changes that would alter it:`,
-      `Rekomendasinya: ${outcomeName(current)}. Perubahan terkecil pada satu faktor yang akan mengubahnya:`,
+      `The advice is ${current}. It would change if just one of these were different:`,
+      `Sarannya: ${outcomeName(current)}. Saran itu akan berubah jika salah satu hal berikut berbeda:`,
     ),
   none: (current: string) =>
     pick(
-      `No single change to one input would alter this recommendation. It would take changes to more than one input to move away from ${current}.`,
-      `Tidak ada satu perubahan pun pada satu faktor yang akan mengubah rekomendasi ini. Perlu perubahan pada lebih dari satu faktor agar hasilnya bukan lagi ${outcomeName(current)}.`,
+      `Changing just one fact would not change this advice. It would take changes to more than one fact to move away from ${current}.`,
+      `Mengubah satu fakta saja tidak akan mengubah saran ini. Perlu perubahan pada lebih dari satu fakta agar sarannya bukan lagi ${outcomeName(current)}.`,
     ),
   numeric: (label: "age" | "horizon", value: number, old: number, outcome: string) => {
     if (L === "id") {
@@ -231,28 +231,28 @@ export const CX = {
     ),
   sentence: (who: "ml" | "logit", label: "high" | "moderate" | "low", name: string, pTop: number, neighbour: string | null, pSecond: number | null) => {
     if (L === "id") {
-      const subj = who === "logit" ? "Model" : "Jaringan saraf";
+      const subj = "Penasihat";
       const n = outcomeName(name);
       const nb = neighbour ? outcomeName(neighbour) : null;
       const top = num(pTop);
       const second = pSecond === null ? "" : num(pSecond);
       if (label === "low")
-        return `${subj} hanya memberi peluang ${top} persen untuk ${n}${nb ? `, dengan ${nb} tidak jauh di belakang (${second} persen)` : ""}. Perubahan kecil pada profil Anda bisa mengubahnya.`;
+        return `${subj} hanya memberi peluang ${top} persen untuk ${n}${nb ? `, dengan ${nb} tidak jauh di belakang (${second} persen)` : ""}. Perubahan kecil pada situasi Anda bisa mengubah sarannya.`;
       if (label === "moderate")
-        return `${subj} memberi peluang ${top} persen untuk ${n}${nb ? `, dibandingkan ${second} persen untuk ${nb}` : ""}. Perubahan yang tidak terlalu besar pada profil Anda bisa mengubahnya.`;
-      return `${subj} memberi peluang ${top} persen untuk ${n}${nb ? `, jauh di atas ${nb} (${second} persen)` : ""}. Perlu perubahan besar pada profil Anda untuk mengubahnya.`;
+        return `${subj} memberi peluang ${top} persen untuk ${n}${nb ? `, dibandingkan ${second} persen untuk ${nb}` : ""}. Perubahan yang tidak terlalu besar pada situasi Anda bisa mengubah sarannya.`;
+      return `${subj} memberi peluang ${top} persen untuk ${n}${nb ? `, jauh di atas ${nb} (${second} persen)` : ""}. Perlu perubahan besar pada situasi Anda untuk mengubah sarannya.`;
     }
-    const subj = who === "logit" ? "The model" : "The network";
+    const subj = "The advisor";
     if (label === "low")
-      return `${subj} gives ${name} only ${pTop} percent probability${neighbour ? `, with ${neighbour} close behind at ${pSecond} percent` : ""}. Small changes in your profile could shift it.`;
+      return `${subj} gives ${name} only a ${pTop} percent chance${neighbour ? `, with ${neighbour} close behind at ${pSecond} percent` : ""}. A small change in your situation could change the advice.`;
     if (label === "moderate")
-      return `${subj} gives ${name} ${pTop} percent probability${neighbour ? `, against ${pSecond} percent for ${neighbour}` : ""}. Moderate changes in your profile could shift it.`;
-    return `${subj} gives ${name} ${pTop} percent probability${neighbour ? `, well ahead of ${neighbour} at ${pSecond} percent` : ""}. It would take a substantial change in your profile to move it.`;
+      return `${subj} gives ${name} a ${pTop} percent chance${neighbour ? `, against ${pSecond} percent for ${neighbour}` : ""}. A moderate change in your situation could change the advice.`;
+    return `${subj} gives ${name} a ${pTop} percent chance${neighbour ? `, well ahead of ${neighbour} at ${pSecond} percent` : ""}. It would take a big change in your situation to change the advice.`;
   },
   detail: (pTop: number, margin: number) =>
     pick(
-      `${pTop} percent calibrated probability, ${margin} points ahead of the next outcome.`,
-      `Peluang terkalibrasi ${num(pTop)} persen, ${num(margin)} poin di atas hasil berikutnya.`,
+      `A ${pTop} percent chance, ${margin} points ahead of the next option.`,
+      `Peluang ${num(pTop)} persen, ${num(margin)} poin di atas pilihan berikutnya.`,
     ),
 };
 

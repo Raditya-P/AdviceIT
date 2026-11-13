@@ -16,10 +16,10 @@ export function Analyzing({ onDone, advisorName }: { onDone: () => void; advisor
   const [stage, setStage] = useState(0);
 
   const stages = [
-    t("Reading your answers", "Membaca jawaban Anda"),
-    t("Deriving your suitability labels", "Menentukan label kesesuaian Anda"),
-    t("Running the advisor over the six outcomes", "Menimbang keenam kemungkinan hasil"),
-    t("Computing the explanation", "Menyusun penjelasannya"),
+    t("Reading the facts", "Membaca fakta-faktanya"),
+    t("Judging how much risk suits this person", "Menilai seberapa besar risiko yang cocok"),
+    t("Comparing the possible mixes", "Membandingkan komposisi yang mungkin"),
+    t("Preparing the advice", "Menyiapkan sarannya"),
   ];
 
   useEffect(() => {

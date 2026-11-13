@@ -251,23 +251,33 @@ export function ProfileForm({
 
       <div className="space-y-1.5">
         <Label>
-          {t("Investment horizon:", "Jangka waktu investasi:")} <span className="tabular-nums text-primary">{profile.horizon}</span>{" "}
-          {t("years", "tahun")}
+          {t("When will the money be needed?", "Kapan uangnya dibutuhkan?")}{" "}
+          <span className="tabular-nums text-primary">
+            {t(`In ${profile.horizon} ${profile.horizon === 1 ? "year" : "years"}`, `${profile.horizon} tahun lagi`)}
+          </span>
         </Label>
         <Slider min={1} max={40} step={1} value={[profile.horizon]} onValueChange={(v: number[]) => set({ horizon: v[0] })} aria-label={t("Investment horizon", "Jangka waktu investasi")} />
         <p className="text-xs text-muted-foreground">
-          {t("How many years until you expect to need this money.", "Kira-kira berapa tahun lagi uang ini akan Anda butuhkan.")}
+          {t(
+            "The investment time frame: roughly how many years until this money will be used.",
+            "Jangka waktu investasi: kira-kira berapa tahun lagi uang ini akan dipakai.",
+          )}
         </p>
       </div>
 
       <div className="space-y-1.5">
-        <Label>{t("Risk tolerance", "Toleransi risiko")}</Label>
+        <Label>
+          {t(
+            "How do you feel about the value going up and down?",
+            "Bagaimana perasaan Anda jika nilai investasi naik turun?",
+          )}
+        </Label>
         <Seg
           name={t("Risk tolerance", "Toleransi risiko")}
           options={[
-            { value: "low", label: t("Low", "Rendah") },
-            { value: "medium", label: t("Medium", "Sedang") },
-            { value: "high", label: t("High", "Tinggi") },
+            { value: "low", label: t("Low: I prefer it steady", "Rendah: saya lebih suka stabil") },
+            { value: "medium", label: t("Medium: some ups and downs are fine", "Sedang: naik turun sedikit tidak apa-apa") },
+            { value: "high", label: t("High: big swings are fine", "Tinggi: naik turun besar tidak masalah") },
           ]}
           value={profile.tolerance}
           onChange={(v) => set({ tolerance: v as FormProfile["tolerance"], toleranceInconsistent: false })}
@@ -375,10 +385,19 @@ export function ProfileForm({
         </p>
       </div>
 
+      {/* Reading a description needs a 1 GB in-browser model, so it is
+          offered folded away rather than as part of the form. */}
       {showNarrative && (
-        <div className="space-y-2 rounded-xl border bg-muted/30 p-4">
-          <Label htmlFor="narrative">
-            {t("Or describe your situation in your own words", "Atau ceritakan situasinya dengan kata-kata sendiri")}
+        <details className="rounded-xl border bg-muted/30 p-4">
+          <summary className="cursor-pointer text-sm font-medium text-primary">
+            {t(
+              "Or describe the situation in your own words (uses an AI model, large download)",
+              "Atau ceritakan situasinya dengan kata-kata sendiri (memakai model AI, unduhan besar)",
+            )}
+          </summary>
+          <div className="mt-3 space-y-2">
+          <Label htmlFor="narrative" className="sr-only">
+            {t("Describe the situation", "Ceritakan situasinya")}
           </Label>
           <Textarea
             id="narrative"
@@ -428,7 +447,8 @@ export function ProfileForm({
               "Model bahasa di browser Anda membaca deskripsinya lalu mengisi formulir di atas, mengikuti prosedur ILS-Bench untuk menilai kesesuaian dari teks. Periksa hasilnya sebelum lanjut. Fitur ini paling akurat untuk deskripsi berbahasa Inggris.",
             )}
           </p>
-        </div>
+          </div>
+        </details>
       )}
     </div>
   );

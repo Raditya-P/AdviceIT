@@ -230,12 +230,12 @@ export function mlRecommend(raw: RawProfile): AdvisorResult {
   return {
     ...base,
     contributions,
-    targetLabel: `the probability of ${name}`,
+    targetLabel: `the chance of ${name}`,
     targetUnit: "percentage points",
     baselineScore: round1(sh.baseline),
     rawScore: round1(sh.full),
-    contribIntro: `Compared with a neutral baseline profile, each of your inputs moved the probability of ${name} as follows (largest effect first, in percentage points):`,
-    contribTotal: `Baseline profile ${round1(sh.baseline)} percent plus contributions = ${round1(sh.full)} percent probability of ${name} for your profile.`,
+    contribIntro: `How much each fact about you pushed the chance of ${name} up or down, compared with a reference investor (45 years old, a 10-year time frame, a medium attitude to risk, an emergency fund, a stable income, no large debts, no money needed soon). Biggest effect first, in percentage points:`,
+    contribTotal: `For the reference investor the chance of ${name} is ${round1(sh.baseline)} percent. With all of these facts together, it is ${round1(sh.full)} percent for you.`,
   };
 }
 
@@ -342,7 +342,7 @@ export const ADVISORS: Record<"ml" | "logit", Advisor> = {
   },
   logit: {
     id: "logit",
-    name: "Interpretable rule-based advisor",
+    name: "Transparent advisor",
     description: `A scorecard fitted on the same data by multinomial logistic regression: ${(W.logit.meta.cvAccuracy * 100).toFixed(1)}% cross-validated accuracy on the same ${(W.meta as { cases?: number }).cases} cases. One weight per input and outcome, every weight readable, explanations exact.`,
     recommend: logitRecommend,
   },

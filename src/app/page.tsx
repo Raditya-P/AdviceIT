@@ -1,13 +1,13 @@
 "use client";
 
-/* The home page is about the two advisors. Every visual below is computed
-   from the real models at render time, not drawn: the contribution bars,
-   the scorecard rows and the allocation bands are the advisors' own
-   numbers. The study comes last, once a visitor knows what is being judged. */
+/* The home page, written for people who are new to investing: what the
+   advisor does, how it explains itself, what it can recommend, and the
+   study. Every visual is computed from the real advisor at render time,
+   not drawn. Technical detail (the second, fully transparent advisor, the
+   training results) is one link away, for those who want it. */
 
 import Link from "next/link";
-import { useMemo, type CSSProperties } from "react";
-import { ArrowRight, BarChart3, Clock3, Cpu, Gauge, Lock, MessageSquareText, Shuffle, Wallet } from "lucide-react";
+import { ArrowRight, BarChart3, Clock3, Cpu, Gauge, Lock, ShieldCheck, Shuffle, Users, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -15,38 +15,12 @@ import { PageTransition } from "@/components/page-transition";
 import { AdvicePreview } from "@/components/marketing/advice-preview";
 import { OutcomeShowcase } from "@/components/marketing/outcome-showcase";
 import { Reveal, Spotlight } from "@/components/motion";
-import { mlRecommend, scorecard } from "@/lib/advisor/advisors";
-import { featureExplanation } from "@/lib/advisor/explanations";
-import { labelValue, num, outcomeName } from "@/lib/advisor/strings";
 import { tr, useLang } from "@/lib/i18n";
 import { FRAME } from "@/lib/layout";
-
-const EXAMPLE = {
-  age: 38,
-  horizon: 18,
-  tolerance: "medium" as const,
-  emergencyFund: true,
-  incomeStable: true,
-  debtObligations: false,
-  nearTermNeed: false,
-  knowledge: "intermediate",
-};
 
 export default function HomePage() {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
-
-  /* Real numbers for the two advisor cards. */
-  const { bars, rows, columns } = useMemo(() => {
-    const fx = featureExplanation(mlRecommend(EXAMPLE));
-    const bars = fx.items.filter((i) => i.points !== 0).slice(0, 4);
-    const sc = scorecard();
-    const group = sc.groups.find((g) => /capacity/i.test(g.label)) ?? sc.groups[0];
-    const wanted = ["Conservative", "Balanced", "Growth"];
-    const columns = wanted.map((w) => ({ name: w, index: sc.outcomes.indexOf(w) })).filter((c) => c.index >= 0);
-    return { bars, rows: group.rows, columns };
-  }, []);
-  const maxAbs = Math.max(...bars.map((b) => Math.abs(b.points)), 1);
 
   const FACTS = [
     { icon: Cpu, text: t("Runs entirely in your browser", "Berjalan sepenuhnya di browser Anda") },
@@ -57,24 +31,24 @@ export default function HomePage() {
 
   const STEPS = [
     {
-      title: t("Describe an investor", "Isi profil seorang investor"),
+      title: t("Tell it about a person", "Ceritakan tentang seseorang"),
       text: t(
-        "Age, investment horizon, risk tolerance and a few facts about their finances. Made up is fine.",
-        "Usia, jangka waktu investasi, toleransi risiko, dan sedikit gambaran keuangannya. Profil rekaan juga boleh.",
+        "Their age, when they need the money, how they feel about risk, and a few facts about their savings and income. A made-up person is fine.",
+        "Usianya, kapan uangnya dibutuhkan, bagaimana sikapnya terhadap risiko, dan sedikit gambaran tabungan serta pendapatannya. Orang rekaan juga boleh.",
       ),
     },
     {
-      title: t("Get a recommendation", "Dapatkan rekomendasi"),
+      title: t("Get advice", "Dapatkan saran"),
       text: t(
-        "One of five investment mixes ranging from capital preservation to aggressive growth. When the case calls for it the advisor refers you to a human adviser instead.",
-        "Salah satu dari lima komposisi portofolio, dari perlindungan modal sampai pertumbuhan agresif. Bila perlu, penasihat akan merujuk Anda ke penasihat manusia.",
+        "One of five ways to split the money, from very safe to very adventurous. When a situation is too delicate for a computer, it says to see a human adviser instead.",
+        "Salah satu dari lima cara membagi uang, dari yang sangat aman sampai yang sangat berani. Jika situasinya terlalu rumit untuk komputer, penasihat menyarankan Anda menemui penasihat manusia.",
       ),
     },
     {
-      title: t("See why in the style you choose", "Lihat alasannya dengan cara yang Anda pilih"),
+      title: t("See why", "Lihat alasannya"),
       text: t(
-        "Pick one of four explanation styles. Then decide whether you would trust what you were told.",
-        "Pilih satu dari empat gaya penjelasan, lalu putuskan apakah Anda percaya pada saran itu.",
+        "Choose how it explains its advice, then decide whether you would trust it.",
+        "Pilih cara penasihat menjelaskan sarannya, lalu putuskan apakah Anda memercayainya.",
       ),
     },
   ];
@@ -83,22 +57,17 @@ export default function HomePage() {
     {
       icon: BarChart3,
       title: t("Why", "Mengapa"),
-      text: t("Which of your answers pushed the advice and by how much.", "Jawaban mana yang paling memengaruhi saran, dan seberapa besar pengaruhnya."),
+      text: t("Which facts about the person mattered most, and how much.", "Fakta mana tentang orang itu yang paling berpengaruh, dan seberapa besar."),
     },
     {
       icon: Shuffle,
       title: t("What would change it", "Apa yang bisa mengubahnya"),
-      text: t("The smallest change to the situation that flips the advice.", "Perubahan terkecil pada situasi Anda yang akan mengubah sarannya."),
+      text: t("What would have to be different for the advice to change.", "Apa yang harus berbeda agar sarannya berubah."),
     },
     {
       icon: Gauge,
       title: t("How sure", "Seberapa yakin"),
-      text: t("The advisor's confidence with every other outcome shown beside it.", "Seberapa yakin penasihat, dibandingkan dengan semua kemungkinan hasil lainnya."),
-    },
-    {
-      icon: MessageSquareText,
-      title: t("Ask it", "Tanya langsung"),
-      text: t("A conversation about the recommendation grounded in the same numbers.", "Tanya jawab tentang rekomendasinya, berdasarkan angka yang sama."),
+      text: t("How sure the advisor is, next to the other options it considered.", "Seberapa yakin penasihat, di samping pilihan lain yang ia pertimbangkan."),
     },
   ];
 
@@ -185,113 +154,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Two advisors */}
-        <section>
-          <div className={`${FRAME} py-20`}>
-            <Reveal className="max-w-2xl space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                {t("Two advisors", "Dua penasihat")}
-              </p>
-              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("Two ways of thinking about the same data", "Dua cara membaca data yang sama")}
-              </h2>
-              <p className="text-muted-foreground">
-                {t(
-                  "Both learned from the same 400 cases reviewed by a panel of financial experts. One reasons like a network and the other like a checklist.",
-                  "Keduanya belajar dari 400 kasus yang sama, yang sudah ditinjau panel ahli keuangan. Yang satu bekerja seperti jaringan saraf, yang lain seperti daftar periksa.",
-                )}
-              </p>
-            </Reveal>
-
-            <div className="mt-10 grid gap-6 lg:grid-cols-2">
-              {/* AI advisor */}
-              <Reveal as="article" className="panel lift flex flex-col p-6 sm:p-7">
-                <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("Neural network", "Jaringan saraf tiruan")}</p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight">{t("The AI advisor", "Penasihat AI")}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {t(
-                    "Learns the pattern in the cases and explains each recommendation afterwards by working out how much every answer counted.",
-                    "Belajar mengenali pola dari kasus-kasus itu. Setelah memberi rekomendasi, ia menghitung seberapa besar pengaruh setiap jawaban.",
-                  )}
-                </p>
-                <div className="mt-5 flex-1 space-y-2.5 rounded-2xl border border-border/80 bg-background/70 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    {t("What counted for one example investor", "Faktor yang berpengaruh pada satu contoh investor")}
-                  </p>
-                  {bars.map((b, i) => (
-                    <div key={b.key} className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)] items-center gap-3 text-sm">
-                      <span className="truncate">
-                        {b.label} <span className="text-muted-foreground">{b.valueText}</span>
-                      </span>
-                      <span aria-hidden className="relative h-2.5 overflow-hidden rounded-full bg-muted">
-                        <span className="absolute inset-y-0 left-1/2 w-px bg-border" />
-                        <span
-                          className={`reveal-grow absolute inset-y-0.5 rounded-full ${b.points > 0 ? "left-1/2 bg-primary" : "origin-right right-1/2 bg-cash"}`}
-                          style={{ width: `${(Math.abs(b.points) / maxAbs) * 50}%`, "--grow-delay": `${320 + i * 110}ms` } as CSSProperties}
-                        />
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <Button asChild className="mt-5 self-start rounded-full">
-                  <Link href="/advisor/ml">
-                    {t("Try the AI advisor", "Coba penasihat AI")}
-                    <ArrowRight data-icon="inline-end" />
-                  </Link>
-                </Button>
-              </Reveal>
-
-              {/* Interpretable advisor */}
-              <Reveal as="article" delay={120} className="panel lift flex flex-col p-6 sm:p-7">
-                <p className="text-xs font-semibold uppercase tracking-widest text-bonds">{t("Scorecard", "Tabel poin")}</p>
-                <h3 className="mt-2 text-2xl font-semibold tracking-tight">{t("The interpretable advisor", "Penasihat transparan")}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {t(
-                    "A points table you can read in full. Every answer adds or removes points for each outcome and the highest total wins. No step is hidden.",
-                    "Tabel poin yang bisa Anda baca seluruhnya. Setiap jawaban menambah atau mengurangi poin untuk tiap hasil, dan hasil dengan total tertinggi yang dipilih. Tidak ada langkah yang disembunyikan.",
-                  )}
-                </p>
-                <div className="mt-5 flex-1 rounded-2xl border border-border/80 bg-background/70 p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    {t("Three rows of the real table: risk capacity", "Tiga baris dari tabel aslinya: kemampuan menanggung risiko")}
-                  </p>
-                  <table className="mt-2.5 w-full text-sm">
-                    <thead>
-                      <tr className="text-xs text-muted-foreground">
-                        <th className="pb-1.5 text-left font-medium" />
-                        {columns.map((c) => (
-                          <th key={c.name} className="pb-1.5 text-right font-medium">{outcomeName(c.name)}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((r) => (
-                        <tr key={r.label} className="border-t border-border/60">
-                          <td className="py-1.5 pr-2">{labelValue(r.label)}</td>
-                          {columns.map((c) => {
-                            const v = r.points[c.index];
-                            return (
-                              <td key={c.name} className={`py-1.5 text-right tabular-nums ${v > 0 ? "text-primary" : v < 0 ? "text-destructive" : "text-muted-foreground"}`}>
-                                {v > 0 ? `+${num(v)}` : num(v)}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <Button asChild variant="outline" className="mt-5 self-start rounded-full">
-                  <Link href="/advisor/logit">
-                    {t("Try the interpretable advisor", "Coba penasihat transparan")}
-                    <ArrowRight data-icon="inline-end" />
-                  </Link>
-                </Button>
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
         {/* How it explains itself */}
         <section className="border-y border-border/70 bg-muted/40">
           <div className={`${FRAME} py-20`}>
@@ -300,13 +162,13 @@ export default function HomePage() {
                 {t("Explanations", "Penjelasan")}
               </p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                {t("Four ways to ask why", "Empat cara menjelaskan saran")}
+                {t("Three ways it explains itself", "Tiga cara penasihat menjelaskan dirinya")}
               </h2>
               <p className="text-muted-foreground">
-                {t("Pick any of them on the advisor page. Each is computed from the advisor's own numbers.", "Pilih salah satunya di halaman penasihat. Semuanya dihitung dari angka milik penasihat itu sendiri.")}
+                {t("Every explanation comes from the advisor's own working, not from a script.", "Setiap penjelasan berasal dari perhitungan penasihat itu sendiri, bukan dari naskah yang sudah disiapkan.")}
               </p>
             </Reveal>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
               {STYLES.map((s, i) => (
                 <Reveal as="article" key={s.title} delay={i * 80} className="panel lift p-6">
                   <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -340,6 +202,58 @@ export default function HomePage() {
             <Reveal className="mt-8">
               <OutcomeShowcase />
             </Reveal>
+          </div>
+        </section>
+
+        {/* Where it comes from */}
+        <section className="border-t border-border/70">
+          <div className={`${FRAME} grid gap-6 py-16 md:grid-cols-3`}>
+            {[
+              {
+                icon: Users,
+                title: t("Built from expert judgement", "Dibangun dari penilaian ahli"),
+                text: t(
+                  "The advisor learned from 400 investor cases that four financial experts reviewed and agreed on.",
+                  "Penasihat ini belajar dari 400 kasus investor yang sudah ditinjau dan disepakati oleh empat ahli keuangan.",
+                ),
+              },
+              {
+                icon: Cpu,
+                title: t("Runs on your device", "Berjalan di perangkat Anda"),
+                text: t(
+                  "The advice is worked out in your browser. What you type on the advisor page is not sent anywhere.",
+                  "Saran dihitung di browser Anda. Apa yang Anda ketik di halaman penasihat tidak dikirim ke mana pun.",
+                ),
+              },
+              {
+                icon: ShieldCheck,
+                title: t("A research tool, not a service", "Alat penelitian, bukan layanan"),
+                text: t(
+                  "Nothing here is real financial advice. It exists to study how people judge advice from an AI.",
+                  "Tidak ada saran keuangan sungguhan di sini. Situs ini dibuat untuk meneliti cara orang menilai saran dari AI.",
+                ),
+              },
+            ].map((b, i) => (
+              <Reveal key={b.title} delay={i * 80} className="flex items-start gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <b.icon className="size-5" aria-hidden />
+                </span>
+                <div>
+                  <h3 className="font-semibold tracking-tight">{b.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{b.text}</p>
+                </div>
+              </Reveal>
+            ))}
+            <p className="text-sm text-muted-foreground md:col-span-3">
+              {t("Curious how it was built?", "Ingin tahu cara pembuatannya?")}{" "}
+              <Link href="/training-data" className="font-medium text-primary underline underline-offset-4">
+                {t("The data and the results", "Data dan hasilnya")}
+              </Link>
+              {" · "}
+              <Link href="/advisor/logit" className="font-medium text-primary underline underline-offset-4">
+                {t("A second advisor whose every rule you can read", "Penasihat kedua yang semua aturannya bisa Anda baca")}
+              </Link>
+            </p>
           </div>
         </section>
 

@@ -1,8 +1,10 @@
 "use client";
 
 /* Step one of the advisor flow: how should the advice be explained. The
-   researcher disclosure keeps the exact content x delivery controls, so a
-   custom combination is still one click away. */
+   four plain choices the study uses come first; the other ways of
+   delivering an explanation, the modality variants and the custom
+   combination sit under "More ways to explain", so a first-time visitor
+   meets four options instead of eleven. */
 
 import {
   AlignLeft,
@@ -45,8 +47,8 @@ const TAGLINES: Record<string, { en: string; id: string }> = {
     id: "Hanya rekomendasinya. Ini kondisi pembanding (kontrol) dalam penelitian.",
   },
   feature: {
-    en: "See which of your answers pushed the advice, and by how much, as bars.",
-    id: "Lihat faktor mana yang paling memengaruhi saran dan seberapa besar, dalam bentuk grafik batang.",
+    en: "Which facts about the person mattered most, and how much, shown as bars.",
+    id: "Fakta mana tentang orang itu yang paling berpengaruh dan seberapa besar, dalam bentuk grafik batang.",
   },
   "feature-textual": {
     en: "The same reasoning, written out as sentences instead of bars.",
@@ -57,12 +59,12 @@ const TAGLINES: Record<string, { en: string; id: string }> = {
     id: "Grafik dan kalimat sekaligus, saling melengkapi.",
   },
   counterfactual: {
-    en: "The smallest change to your situation that would flip the advice.",
-    id: "Perubahan terkecil pada situasi Anda yang akan mengubah sarannya.",
+    en: "What would have to be different for the advice to change.",
+    id: "Apa yang harus berbeda agar sarannya berubah.",
   },
   confidence: {
-    en: "The advisor's calibrated confidence, with the full probability picture.",
-    id: "Seberapa yakin penasihat, lengkap dengan peluang setiap hasil.",
+    en: "How sure the advisor is, next to the other options it considered.",
+    id: "Seberapa yakin penasihat, di samping pilihan lain yang ia pertimbangkan.",
   },
   hybrid: {
     en: "Why, what would change it, and how sure, together.",
@@ -93,21 +95,21 @@ const TAGLINES: Record<string, { en: string; id: string }> = {
 const GROUPS: { key: string; title: { en: string; id: string }; note: { en: string; id: string }; items: string[] }[] = [
   {
     key: "content",
-    title: { en: "What is explained", id: "Apa yang dijelaskan" },
+    title: { en: "Choose one", id: "Pilih salah satu" },
     note: {
-      en: "Different material about the same recommendation, shown as a static panel.",
-      id: "Isi penjelasan yang berbeda untuk rekomendasi yang sama, ditampilkan sebagai panel biasa.",
+      en: "The same advice each time, explained in a different way.",
+      id: "Sarannya sama, hanya cara menjelaskannya yang berbeda.",
     },
-    items: ["feature", "counterfactual", "confidence", "hybrid", "none"],
+    items: ["feature", "counterfactual", "confidence", "hybrid"],
   },
   {
     key: "delivery",
-    title: { en: "How it is delivered", id: "Cara penyajiannya" },
+    title: { en: "Other ways to deliver it", id: "Cara penyajian lain" },
     note: {
-      en: "The same three contents, handed over in a different way. The last one drops the written explanation entirely.",
-      id: "Isi yang sama, disajikan dengan cara berbeda. Yang terakhir sama sekali tanpa penjelasan tertulis.",
+      en: "The same three explanations, handed over differently, or no explanation at all.",
+      id: "Tiga penjelasan yang sama, disajikan dengan cara berbeda, atau tanpa penjelasan sama sekali.",
     },
-    items: ["interactive-hybrid", "adaptive", "llm", "interactive"],
+    items: ["interactive-hybrid", "adaptive", "llm", "interactive", "none"],
   },
   {
     key: "modality",
@@ -163,7 +165,8 @@ export function StylePicker({
         </p>
       </div>
 
-      {GROUPS.map((group) => (
+      {GROUPS.map((group, gi) => {
+        const block = (
         <div key={group.key} className="space-y-4">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">{tr(locale, group.title)}</h3>
@@ -214,13 +217,55 @@ export function StylePicker({
         })}
           </div>
         </div>
-      ))}
+        );
+        return gi === 0 ? block : null;
+      })}
 
       <details className="rounded-2xl border border-border/70 bg-muted/40 p-5 text-sm">
           <summary className="cursor-pointer font-medium text-primary">
-            {t("Build your own combination", "Susun kombinasi sendiri")}
+            {t("More ways to explain", "Cara menjelaskan lainnya")}
           </summary>
-          <div className="mt-4 space-y-4">
+          <div className="mt-5 space-y-8">
+            {GROUPS.slice(1).map((group) => (
+              <div key={group.key} className="space-y-4">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">{tr(locale, group.title)}</h3>
+                  <p className="text-sm text-muted-foreground">{tr(locale, group.note)}</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.items.map((name) => {
+                    const blocked = name === "llm" && gpuMissing;
+                    const selected = preset === name;
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        disabled={blocked}
+                        aria-pressed={selected}
+                        onClick={() => onPreset(name)}
+                        className={`rounded-xl border bg-background p-4 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-55 ${
+                          selected ? "border-primary ring-2 ring-primary/30" : "hover:border-primary/50"
+                        }`}
+                      >
+                        <span className="block font-semibold">{presetLabel(name, locale)}</span>
+                        <span className="mt-1 block text-sm text-muted-foreground">{tr(locale, TAGLINES[name])}</span>
+                        {name === "llm" && (
+                          <span className="mt-2 block text-xs text-muted-foreground">
+                            {blocked
+                              ? t("Needs a WebGPU browser.", "Perlu browser dengan WebGPU.")
+                              : t("Downloads a model on first use.", "Mengunduh model saat pertama kali dipakai.")}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          <div className="space-y-4 border-t border-border/70 pt-5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+              {t("Build your own combination", "Susun kombinasi sendiri")}
+            </p>
             <div className="flex flex-wrap items-center gap-4">
               <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {t("Content", "Isi")}
@@ -294,6 +339,7 @@ export function StylePicker({
                 "Isi adalah apa yang dijelaskan: mengapa, apa yang bisa mengubahnya, dan seberapa yakin. Penyajian adalah cara penjelasan itu sampai kepada Anda: biasa, interaktif, disesuaikan dengan literasi, atau lewat percakapan. Setiap gaya adalah satu kombinasi keduanya, dan keduanya dicatat.",
               )}
             </p>
+          </div>
           </div>
         </details>
     </div>

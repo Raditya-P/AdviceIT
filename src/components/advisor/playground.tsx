@@ -31,6 +31,21 @@ type Step = "style" | "profile" | "analyzing" | "result";
 
 const noSubscription = () => () => {};
 
+/* What a first-time visitor reads about the advisor: where it comes from
+   and how often it agreed with the experts on cases it had not seen. The
+   technical description follows under "Technical details". */
+function plainDescription(advisorId: "ml" | "logit", locale: "en" | "id") {
+  const pct = Math.round((advisorId === "ml" ? mlMeta.cvAccuracy : (logitMeta.cvAccuracy as number)) * 100);
+  if (advisorId === "ml") {
+    return locale === "id"
+      ? `AI yang belajar dari 400 kasus investor yang sudah ditinjau ahli keuangan. Dalam uji pada kasus yang belum pernah dilihatnya, jawabannya sama dengan jawaban para ahli sekitar ${pct} dari 100 kali.`
+      : `An AI that learned from 400 investor cases reviewed by financial experts. Tested on cases it had not seen, it gave the experts' answer about ${pct} times out of 100.`;
+  }
+  return locale === "id"
+    ? `Tabel poin yang dibuat dari 400 kasus yang sama. Setiap aturannya bisa Anda baca. Dalam uji pada kasus yang belum pernah dilihatnya, jawabannya sama dengan jawaban para ahli sekitar ${pct} dari 100 kali.`
+    : `A points table built from the same 400 expert-reviewed cases. Every rule it uses can be read. Tested on cases it had not seen, it gave the experts' answer about ${pct} times out of 100.`;
+}
+
 function advisorDescription(advisorId: "ml" | "logit", locale: "en" | "id") {
   if (locale === "en") return ADVISORS[advisorId].description;
   if (advisorId === "ml") {
@@ -131,11 +146,15 @@ export function Playground({
             className="rounded-full border border-border/80 px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
           >
             {advisorId === "ml"
-              ? t("Switch to the interpretable advisor", "Beralih ke penasihat transparan")
+              ? t("Switch to the transparent advisor", "Beralih ke penasihat transparan")
               : t("Switch to the AI advisor", "Beralih ke penasihat AI")}
           </Link>
         </div>
-        <p className="max-w-3xl leading-relaxed text-muted-foreground">{advisorDescription(advisorId, locale)}</p>
+        <p className="max-w-3xl leading-relaxed text-muted-foreground">{plainDescription(advisorId, locale)}</p>
+        <details className="max-w-3xl text-sm text-muted-foreground">
+          <summary className="cursor-pointer text-primary">{t("Technical details", "Detail teknis")}</summary>
+          <p className="mt-2 leading-relaxed">{advisorDescription(advisorId, locale)}</p>
+        </details>
         {researcherRequested && !researcher && (
           <p className="rounded-xl border border-border/70 bg-muted/40 px-4 py-2.5 text-sm text-muted-foreground">
             {t(
@@ -321,7 +340,7 @@ export function Playground({
               <ul className="mt-3 flex flex-wrap gap-2 text-sm">
                 {[
                   `${t("Age", "Usia")} ${profile.age}`,
-                  t(`${profile.horizon} year horizon`, `Jangka waktu ${profile.horizon} tahun`),
+                  t(`Investment horizon: ${profile.horizon} years`, `Jangka waktu investasi: ${profile.horizon} tahun`),
                   `${t("Risk tolerance", "Toleransi risiko")}: ${labelValue(result.labels.tolerance)}`,
                   `${t("Risk capacity", "Kemampuan menanggung risiko")}: ${labelValue(result.labels.capacity)}`,
                   `${t("Liquidity need", "Kebutuhan dana cepat")}: ${labelValue(result.labels.liquidity)}`,

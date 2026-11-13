@@ -9,7 +9,7 @@ import type { AdvisorResult } from "@/lib/advisor/types";
 import { tr, useLang } from "@/lib/i18n";
 
 export function advisorDisplayName(id: "ml" | "logit", locale: "en" | "id") {
-  if (locale === "id") return id === "ml" ? "Penasihat AI" : "Penasihat transparan berbasis aturan";
+  if (locale === "id") return id === "ml" ? "Penasihat AI" : "Penasihat transparan";
   return ADVISORS[id].name;
 }
 
