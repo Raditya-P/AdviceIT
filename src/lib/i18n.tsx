@@ -8,7 +8,7 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 import { setStringsLocale } from "@/lib/advisor/strings";
-import { COOKIE, type Locale } from "@/lib/locale";
+import { COOKIE, COOKIE_MAX_AGE, type Locale } from "@/lib/locale";
 
 export type { Locale };
 
@@ -24,7 +24,7 @@ export function LanguageProvider({ initialLocale, children }: { initialLocale: L
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
     try {
-      document.cookie = `${COOKIE}=${l};path=/;max-age=31536000;samesite=lax`;
+      document.cookie = `${COOKIE}=${l};path=/;max-age=${COOKIE_MAX_AGE};samesite=lax`;
     } catch {
       /* no document during SSR */
     }

@@ -18,12 +18,12 @@ the advisor was given, and offers to delete the answers of anyone who would rath
 **English.** Help a research study on AI investment advice. You read eight short stories about made-up
 investors, see what an automated advisor recommends, and say what you would do. About 15 to 20 minutes,
 anonymous, no account, no real money. [Compensation, if any.] Open to anyone aged 18 or older:
-https://www.advice-it.online/participate
+https://www.advice-it.online/participate?lang=en
 
 **Bahasa Indonesia.** Bantu penelitian tentang saran investasi dari AI. Anda membaca delapan cerita
 singkat tentang investor rekaan, melihat saran dari penasihat otomatis, lalu menjawab apa yang akan Anda
 lakukan. Sekitar 15 sampai 20 menit, anonim, tanpa akun, tanpa uang sungguhan. [Kompensasi, jika ada.]
-Terbuka untuk siapa saja yang berusia 18 tahun ke atas: https://www.advice-it.online/participate
+Terbuka untuk siapa saja yang berusia 18 tahun ke atas: https://www.advice-it.online/participate?lang=id
 
 ## English
 

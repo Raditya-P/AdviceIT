@@ -30,4 +30,5 @@ jobs:
           npx --yes tsx scripts/sql-smoke.ts
           npx --yes tsx scripts/records-smoke.ts
           npx --yes tsx scripts/scoring-smoke.ts
+          npx --yes tsx scripts/locale-smoke.ts
       - run: npm run build

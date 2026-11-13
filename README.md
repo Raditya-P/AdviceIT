@@ -59,6 +59,8 @@ Everything is recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ### The language toggle
 
+On a first visit the site opens in Indonesian for visitors connecting from Indonesia or whose browser prefers Indonesian, and in English otherwise (`src/proxy.ts`, `detectLocale` in `src/lib/locale.ts`). Any link can fix the language with `?lang=id` or `?lang=en`, which is how the recruitment messages link to the study. The choice is kept in a cookie for a year, so a session never changes language part way.
+
 The button in the header switches the entire site, not only its labels. The generated sentences (Shapley and contribution sentences, counterfactuals, the contrastive why-not, confidence, the escalation reason, the adaptive plain-language version), the case narratives, and the consent, literacy, exit and debrief texts all have Indonesian versions. Two rules keep the data clean:
 
 - **Logged values stay English canonical** in both languages (decisions, portfolio names, suitability labels, condition ids), so responses need no language-dependent recoding.
@@ -107,7 +109,7 @@ The conversational delivery and the free-text reading run an open-weight languag
 | `/about` | Plain summary, the team and roles, and the doorway for researchers and reviewers. |
 | `/advisor/ml`, `/advisor/logit` | The advisor flow in three steps (explanation style, investor profile, recommendation), plus an optional response panel logged as `explore`. `?researcher=1` unlocks the flawed-advice scenario toggle, the suitability labels and the advisor comparison line. |
 | `/participate` | The seven explanation-style cards. The primary button assigns at random (logged as `random`), choosing a card is allowed (logged as `chosen`). |
-| `/study` | The full flow: consent, literacy questions, eight cases (each one read the case, watch the analysis, judge the advice), exit questionnaire, debrief, completion code. A researcher link can fix one of the five study conditions: `/study?cond=hybrid&pid=P07`. |
+| `/study` | The full flow: consent, literacy questions, eight cases (each one read the case, watch the analysis, judge the advice), exit questionnaire, debrief, completion code. A researcher link can fix one of the five study conditions: `/study?cond=hybrid&pid=P07`, and the language with `&lang=id`. |
 | `/training-data` | ILS-Bench: description, citation, live statistics, the two-advisor results table, all 400 cases to browse. |
 | `/researcher` | Key-gated dashboard: reliance, trust, time, secondary measures, attention checks, literacy moderator, exit answers, CSV download. |
 | `/design` | The design stated publicly: the five conditions, the cases and their flawed advice (computed live from the advisor), how decisions are scored, the hypotheses and the analysis plan. |

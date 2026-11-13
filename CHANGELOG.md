@@ -3,6 +3,29 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 3.1.1 (2026-11-13)
+
+The site picks Indonesian by itself for visitors in Indonesia. Until now every first visit was in
+English, and the language changed only when the visitor found the toggle.
+
+### Added
+
+- **First-visit language** (`src/proxy.ts`, `detectLocale` in `src/lib/locale.ts`). A visitor who has
+  not chosen a language gets Indonesian if they connect from Indonesia (the country Vercel adds to each
+  request) or if their browser ranks Indonesian above English (including the code `in` that older
+  Android phones send), and English otherwise. The language is remembered in the same cookie the
+  toggle writes, so a study session cannot switch language part way when the network changes, and the
+  toggle still overrides it.
+- **`?lang=id` and `?lang=en`** on any page set the language and redirect to the same address without
+  the parameter, keeping the others (`/study?lang=id&cond=hybrid` becomes `/study?cond=hybrid`). The
+  recruitment messages in `docs/research/consent-and-debrief.md` now link with the language of the
+  message.
+- `scripts/locale-smoke.ts`, run in CI, checks the detection rules.
+
+### Changed
+
+- The privacy page says how the first language is chosen, and that the location is used only for that
+  and is not stored.
 ## 3.1.0 (2026-11-13)
 
 Plainer words for people who are new to investing. The site is meant for retail investors, many of whom
