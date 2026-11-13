@@ -17,10 +17,15 @@ export function RecommendationCard({
   result,
   researcher,
   showCompare,
+  studyMode,
 }: {
   result: AdvisorResult;
   researcher?: boolean;
   showCompare?: boolean;
+  /* In a study case a referral says only that it is a referral. The reason
+     names the advisor's suitability labels, which is explanation content,
+     and the no-explanation condition must not see it. */
+  studyMode?: boolean;
 }) {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
@@ -59,7 +64,12 @@ export function RecommendationCard({
           <div className="flex items-start gap-3 rounded-2xl border border-amber-300/70 bg-amber-50 px-4 py-3.5 text-sm text-amber-900">
             <UserRound className="mt-0.5 size-4 shrink-0" aria-hidden />
             <p className="leading-relaxed">
-              {escalationReason(result.advisor, result.labels.tolerance, result.labels.capacity, result.labels.liquidity)}
+              {studyMode
+                ? t(
+                    "The advisor does not recommend an investment mix here. It suggests talking to a human adviser first.",
+                    "Penasihat tidak menyarankan komposisi investasi di sini. Penasihat menyarankan Anda berbicara dulu dengan penasihat manusia.",
+                  )
+                : escalationReason(result.advisor, result.labels.tolerance, result.labels.capacity, result.labels.liquidity)}
             </p>
           </div>
         )}
@@ -87,8 +97,8 @@ export function RecommendationCard({
             <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
             <p className="leading-relaxed">
               {t(
-                `Flawed advice scenario active: this recommendation was deliberately shifted in the wrong direction (sound outcome: ${result.soundPortfolio ? result.soundPortfolio.name : ""}). Logged rows are marked as flawed.`,
-                `Skenario saran keliru sedang aktif: rekomendasi ini sengaja digeser ke arah yang salah (hasil yang benar: ${result.soundPortfolio ? outcomeName(result.soundPortfolio.name) : ""}). Data yang tercatat ditandai keliru.`,
+                `Flawed advice scenario active: the advisor was given a wrong fact about this person, and everything shown follows from it (advice on the real facts: ${result.soundPortfolio ? result.soundPortfolio.name : ""}). Logged rows are marked as flawed.`,
+                `Skenario saran keliru sedang aktif: penasihat diberi satu fakta yang salah tentang orang ini, dan semua yang ditampilkan mengikuti fakta itu (saran berdasarkan fakta sebenarnya: ${result.soundPortfolio ? outcomeName(result.soundPortfolio.name) : ""}). Data yang tercatat ditandai keliru.`,
               )}
             </p>
           </div>

@@ -1,9 +1,10 @@
 /* Port verification: the TypeScript libraries must reproduce the numbers
    verified in AdviceIT v1. Run with: npx tsx scripts/verify.ts */
 import { ADVISORS, mlMeta, logitMeta, scorecard, mlProbabilities, logitProbabilities } from "../src/lib/advisor/advisors";
-import { EXAMPLE_PROFILES, normalizeProfile, deriveSuitabilityLabels, applyFlawedScenario, OUTCOMES } from "../src/lib/advisor/model";
+import { EXAMPLE_PROFILES, normalizeProfile, deriveSuitabilityLabels, OUTCOMES } from "../src/lib/advisor/model";
+import { findMisread, outcomeDistance, recommendWithMisread } from "../src/lib/advisor/flaw";
 import { featureExplanation, counterfactualExplanation, contrastiveExplanation, confidenceExplanation } from "../src/lib/advisor/explanations";
-import { buildPlan, completionCode } from "../src/lib/study";
+import { CASES, STUDY_ADVISOR, STUDY_CASES, buildPlan, completionCode } from "../src/lib/study";
 import bench from "../src/data/ils_bench_cases.json";
 import type { RawProfile } from "../src/lib/advisor/types";
 
@@ -87,17 +88,33 @@ for (const t of ["Growth", "Human review", "Capital preservation"]) {
   check(`contrastive ${t}`, typeof c.sentence === "string" && c.sentence.length > 10, c.sentence.slice(0, 60));
 }
 
-// 4. Flawed scenario: HR -> automated portfolio, others two steps wrong
-const hr = ADVISORS.ml.recommend(EXAMPLE_PROFILES[3].profile);
-const fl = applyFlawedScenario(hr);
-check("flawed HR gives a portfolio", fl.portfolio.allocation !== null && fl.soundPortfolio.name === "Human review", fl.portfolio.name);
+// 4. Flawed advice: each study case's misread gives clearly unsuitable advice
+//    (two mixes away, or a mix where a referral was due), the explanation
+//    describes the facts the advisor was given, and the directions balance.
+let riskier = 0;
+for (const c of CASES) {
+  const sound = ADVISORS[STUDY_ADVISOR].recommend(c.profile);
+  const fl = recommendWithMisread(STUDY_ADVISOR, c.profile, c.misread);
+  const dist = outcomeDistance(sound.portfolio, fl.portfolio);
+  check(`${c.id} misread gives clearly wrong advice`, dist >= 2 && fl.portfolio.allocation !== null, `${sound.portfolio.name} -> ${fl.portfolio.name}`);
+  check(`${c.id} sound advice carried`, fl.soundPortfolio.name === sound.portfolio.name);
+  const shownValues = featureExplanation(fl).items.map((i) => i.valueText).join("|");
+  const realValues = featureExplanation(sound).items.map((i) => i.valueText).join("|");
+  check(`${c.id} explanation shows the facts the advisor was given`, shownValues !== realValues, shownValues);
+  const order = ["capital-preservation", "conservative", "balanced", "growth", "aggressive-growth"];
+  if (sound.portfolio.allocation === null || order.indexOf(fl.portfolio.id) > order.indexOf(sound.portfolio.id)) riskier++;
+}
+check("half the flaws are riskier advice", riskier === CASES.length / 2, `${riskier} of ${CASES.length}`);
+const preview = findMisread("ml", EXAMPLE_PROFILES[0].profile);
+check("researcher preview finds a misread", preview !== null, JSON.stringify(preview));
 
 // 5. Study plan seeding + completion code stability
-const p1 = buildPlan("P42", 6).map((t) => t.profileId + t.scenario[0]).join(",");
-const p2 = buildPlan("P42", 6).map((t) => t.profileId + t.scenario[0]).join(",");
-const p3 = buildPlan("P43", 6).map((t) => t.profileId + t.scenario[0]).join(",");
+const p1 = buildPlan("P42").map((t) => t.profileId + t.scenario[0]).join(",");
+const p2 = buildPlan("P42").map((t) => t.profileId + t.scenario[0]).join(",");
+const p3 = buildPlan("P43").map((t) => t.profileId + t.scenario[0]).join(",");
 check("plan reproducible", p1 === p2 && p1 !== p3, p1);
-check("plan balanced", buildPlan("P42", 6).filter((t) => t.scenario === "sound").length === 3);
+check("plan has every case once", new Set(buildPlan("P42").map((t) => t.profileId)).size === CASES.length && buildPlan("P42").length === STUDY_CASES);
+check("plan balanced", buildPlan("P42").filter((t) => t.scenario === "sound").length === STUDY_CASES / 2);
 check("completion code stable", completionCode("P42") === completionCode("P42") && completionCode("P42") !== completionCode("P43"), completionCode("P42"));
 
 // 6. Scorecard reconstructs logit decisions

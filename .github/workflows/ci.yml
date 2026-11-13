@@ -29,4 +29,5 @@ jobs:
           npx --yes tsx scripts/session-smoke.ts
           npx --yes tsx scripts/sql-smoke.ts
           npx --yes tsx scripts/records-smoke.ts
+          npx --yes tsx scripts/scoring-smoke.ts
       - run: npm run build

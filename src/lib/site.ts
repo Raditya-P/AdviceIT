@@ -7,4 +7,4 @@ export const SITE_TITLE = "AdviceIT: explainable AI investment advice, studied w
 export const SITE_TITLE_ID = "AdviceIT: saran investasi AI yang menjelaskan dirinya, diteliti bersama Anda";
 
 export const SITE_DESCRIPTION =
-  "An open research study on which explanations help people trust AI investment advice the right amount. Try two advisors trained on expert-validated data, then contribute a 15-minute session.";
+  "An open research study on which explanations help people trust AI investment advice the right amount. Try two advisors trained on expert-validated data, then contribute a 15 to 20 minute session.";

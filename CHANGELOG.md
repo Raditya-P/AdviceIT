@@ -3,6 +3,75 @@
 All notable changes to the AdviceIT website are recorded here, starting at 2.0.0.
 The version shown in the site footer, `package.json` and `src/lib/version.ts` move together.
 
+## 3.0.0 (2026-11-13)
+
+The main-study instrument. The pilot's wide design is narrowed to the comparison one study can power,
+the flawed advice is rebuilt so that the explanations stay truthful, and the scoring, the consent and
+the research documents are ready for the ethics committee and the pre-registration. Sessions from
+3.0.0 on are a different design from the pilot before it, and every row says so.
+
+### Changed: the design
+
+- **Five conditions, one advisor.** Participants are placed in one of five explanation conditions (no
+  explanation, why, what would change it, how sure, all three), all shown as static panels, and
+  everyone sees the AI advisor. The interactive, adaptive and conversational conditions and the
+  advisor comparison leave the study: together they needed sixteen cells, more than one study can fill.
+  Their code stays, and the conversational explainer stays on the advisor pages. Choosing your own
+  style on the participate page is gone, so every session is part of the experiment.
+- **Eight cases instead of six.** Every participant judges all eight cases once, four with sound and
+  four with flawed advice.
+- **Flawed advice is a misread.** The advisor is given one or two wrong facts about the person, fixed
+  per case (`src/lib/study.ts`, `src/lib/advisor/flaw.ts`), so its advice does not suit them while
+  everything it says stays true: the explanations show the wrong fact it was given. Until now the shown
+  outcome was moved two mixes away from the computed one, and the explanations then attached the
+  computed outcome's numbers to the shown outcome's name. On a flawed case the "Why" panel read, for
+  example, "Investment horizon (12 years) increased the probability of Conservative by 83.2 points"
+  when those points belonged to Growth. Half the misreads make the advice riskier, half more cautious.
+  Case C4 was rewritten (moderate attitude to risk, the two years being the plan itself) so that a
+  single realistic misread, 20 years for 2, gives clearly wrong advice. The debrief now names the wrong
+  fact for each flawed case, and offers to delete the answers of anyone who would rather they were not
+  used.
+- **Attention checks are statements, not a case.** Two instructed-response statements, one before the
+  cases and one on the last page, replace the attention case. That case asked for Reject on one of the
+  six scored cases, so one decision in six was an instruction, not a judgement; the dashboard counted it
+  as reliance.
+
+### Fixed
+
+- **Asking a human adviser about a referral counted as rejecting it.** When the sound advice was itself
+  "see a human adviser", choosing "Ask a human adviser" was scored as under-reliance. Scoring now lives
+  in `src/lib/scoring.ts`: relying means Follow, or asking a human when the advice was a referral, and
+  correcting flawed advice (adjusting to the sound mix) is reported separately.
+- In the study, the "How sure" panel told participants that confidence displays are "exactly what this
+  study measures", and the panels carried method notes about Shapley values. Both are hidden in study
+  cases. A referral no longer shows the advisor's suitability labels there either, because the
+  no-explanation condition must not see explanation content.
+- The case screen no longer shows the participant the name of their condition.
+- Repeat sessions from the same browser were flagged to the participant but never recorded. Rows now
+  carry `repeatOf`.
+
+### Added
+
+- `appVersion`, `studyDesign`, `studyPhase`, `misread`, `attention1`, `attention2` and `repeatOf` on
+  every row. Balanced assignment counts only sessions of the same design and phase, so a new design or
+  the main study starts level.
+- **Pilot and main phases.** Until `ETHICS_APPROVAL` is filled in, the consent carries a pilot note and
+  rows are logged as pilot. Once it is, the consent names the committee and the reference, and new
+  sessions are the main study. A session saved under an earlier design is not resumed.
+- **The consent, rewritten** in short headed blocks, in plain words: who runs the study (Department of
+  Information Systems, ITS), 18 or older, that some details are explained at the end, how the anonymous
+  answers may be shared in a public archive, and that they can be deleted until publication.
+- **`docs/research`:** the protocol for the ethics committee, the consent and debrief texts in both
+  languages, an expert review form for the eight cases, a back-translation worksheet, and a
+  pre-registration draft. `scripts/power-sim.ts` plans the sample size by simulation;
+  `scripts/scoring-smoke.ts` pins the scoring rules. `scripts/sql-smoke.ts` checks that another design or
+  phase does not enter the balance, and `scripts/verify.ts` that every case's misread gives clearly wrong
+  advice and shows in its explanation.
+- The researcher dashboard filters by design and phase, leaves the old attention case out of every
+  reliance figure, and shows how often flawed advice was corrected.
+- The participate page explains the three steps of a case in plain words. The design page is rewritten
+  for the new design, with the case table computed from the advisor.
+
 ## 2.15.1 (2026-10-02)
 
 ### Fixed

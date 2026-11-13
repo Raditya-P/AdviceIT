@@ -387,12 +387,12 @@ export default function HomePage() {
                   {t("The study", "Penelitian")}
                 </p>
                 <h2 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                  {t("Judge the advisor on six short cases", "Nilai penasihatnya lewat enam kasus singkat")}
+                  {t("Judge the advisor on eight short cases", "Nilai penasihatnya lewat delapan kasus singkat")}
                 </h2>
                 <p className="max-w-xl leading-relaxed text-muted-foreground">
                   {t(
-                    "Read a case. See the recommendation with one kind of explanation. Say what you would do. Some recommendations are deliberately wrong and the debrief tells you which. The study is anonymous and takes about fifteen minutes with no account needed.",
-                    "Baca sebuah kasus, lihat rekomendasinya dengan satu jenis penjelasan, lalu katakan apa yang akan Anda lakukan. Sebagian rekomendasi sengaja dibuat keliru, dan di akhir kami beri tahu yang mana. Penelitian ini anonim, butuh sekitar lima belas menit, dan tidak perlu membuat akun.",
+                    "Read a case. See the recommendation with one kind of explanation. Say what you would do. Some recommendations are deliberately wrong and the debrief tells you which. The study is anonymous and takes about 15 to 20 minutes with no account needed.",
+                    "Baca sebuah kasus, lihat rekomendasinya dengan satu jenis penjelasan, lalu katakan apa yang akan Anda lakukan. Sebagian rekomendasi sengaja dibuat keliru, dan di akhir kami beri tahu yang mana. Penelitian ini anonim, butuh sekitar 15 sampai 20 menit, dan tidak perlu membuat akun.",
                   )}
                 </p>
               </div>

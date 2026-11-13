@@ -14,15 +14,21 @@
 
    The condition travels with the session rather than with the URL, so a
    participant who returns through a different link stays in the condition
-   they were assigned. Refreshing cannot be used to shop for another one. */
+   they were assigned. Refreshing cannot be used to shop for another one.
+
+   A session also records the design it began under. One saved under an
+   earlier design (or a version 1 record, from before 3.0.0) is dropped
+   rather than resumed into cases and measures it never started. */
 
 import type { ContentPart, Form, Modality } from "./conditions";
 import type { AssignmentMethod } from "./records";
+import { STUDY_DESIGN } from "./study";
 
 export type ResumableStage = "literacy" | "characteristics" | "trial" | "exit";
 
 export interface SavedSession {
-  v: 1;
+  v: 2;
+  design: string;
   pid: string;
   advisorId: "ml" | "logit";
   condition: string;
@@ -90,7 +96,7 @@ export function loadSession(): SavedSession | null {
     clearSession();
     return null;
   }
-  if (s?.v !== 1 || typeof s.pid !== "string" || !STAGES.includes(s.stage)) {
+  if (s?.v !== 2 || s.design !== STUDY_DESIGN || typeof s.pid !== "string" || !STAGES.includes(s.stage)) {
     clearSession();
     return null;
   }

@@ -4,13 +4,21 @@
    consent and debrief texts, an exit questionnaire, and a verifiable
    completion code. */
 
+import type { Misread } from "./advisor/flaw";
 import type { RawProfile } from "./advisor/types";
 
+/* misread: the wrong facts the advisor is given when this case comes up as
+   flawed advice (src/lib/advisor/flaw.ts). Each one is fixed in advance, so
+   every participant meets the same flaw for the same case, and each makes
+   the AI advisor's advice clearly unsuitable: at least two mixes away from
+   the sound one, or a mix where the person should be referred. Half the
+   flaws make the advice riskier than it should be, half more cautious. */
 export interface StudyCase {
   id: string;
   label: string;
   profile: RawProfile;
   text: string;
+  misread: Misread;
 }
 
 export const CASES: StudyCase[] = [
@@ -19,48 +27,56 @@ export const CASES: StudyCase[] = [
     label: "Early career saver",
     profile: { age: 27, horizon: 30, tolerance: "high", emergencyFund: true, incomeStable: true, knowledge: "intermediate" },
     text: "You are 27, in a permanent job with a steady salary, and you have six months of expenses in a savings account. You are investing for retirement, roughly 30 years away, and you say you are comfortable with large swings in value along the way.",
+    misread: { tolerance: "low" },
   },
   {
     id: "C2",
     label: "Mid-career, no buffer",
     profile: { age: 40, horizon: 15, tolerance: "medium", emergencyFund: false, incomeStable: true, knowledge: "intermediate" },
     text: "You are 40, employed with a stable income, but you do not have an emergency fund set aside. This money is for a goal about 15 years away, and you describe your attitude to risk as moderate.",
+    misread: { horizon: 5 },
   },
   {
     id: "C3",
     label: "Approaching retirement",
     profile: { age: 61, horizon: 6, tolerance: "low", emergencyFund: true, incomeStable: true, knowledge: "intermediate" },
     text: "You are 61, still working with a stable income, with a solid cash reserve. You expect to start drawing on this money in about 6 years, and you prefer to avoid large losses even if that means lower returns.",
+    misread: { horizon: 16, tolerance: "medium" },
   },
   {
     id: "C4",
-    label: "Freelancer with a near-term need",
-    profile: { age: 34, horizon: 2, tolerance: "high", emergencyFund: false, incomeStable: false, nearTermNeed: true, knowledge: "intermediate" },
-    text: "You are 34, self-employed with an income that varies a lot from month to month, and only a small cash reserve. You may need this money within about 2 years for a house deposit, but you say you want the highest possible return.",
+    label: "Freelancer saving for a house",
+    profile: { age: 34, horizon: 2, tolerance: "medium", emergencyFund: false, incomeStable: false, knowledge: "intermediate" },
+    text: "You are 34, self-employed with an income that varies a lot from month to month, and you have no cash set aside for emergencies. You are saving this money for a house deposit you plan to pay in about 2 years, and you are comfortable with moderate ups and downs along the way.",
+    misread: { horizon: 20 },
   },
   {
     id: "C5",
     label: "Steady mid-life investor",
     profile: { age: 48, horizon: 12, tolerance: "medium", emergencyFund: true, incomeStable: true, knowledge: "intermediate" },
     text: "You are 48, with a stable job and a comfortable emergency fund. This money is for a goal about 12 years away, and you describe yourself as moderately comfortable with risk.",
+    misread: { tolerance: "low" },
   },
   {
     id: "C6",
     label: "Young, variable income",
     profile: { age: 30, horizon: 20, tolerance: "medium", emergencyFund: true, incomeStable: false, knowledge: "intermediate" },
     text: "You are 30, working on short contracts so your income is irregular, but you keep six months of expenses in cash. You are investing for about 20 years and would accept moderate ups and downs.",
+    misread: { horizon: 5 },
   },
   {
     id: "C7",
     label: "Cautious saver, long horizon",
     profile: { age: 36, horizon: 25, tolerance: "low", emergencyFund: true, incomeStable: true, knowledge: "intermediate" },
     text: "You are 36, in a secure job with a full emergency fund. You are investing for about 25 years, but you say you would find any noticeable loss stressful and prefer a cautious approach.",
+    misread: { tolerance: "high" },
   },
   {
     id: "C8",
     label: "Late starter",
     profile: { age: 55, horizon: 10, tolerance: "high", emergencyFund: false, incomeStable: true, debtObligations: true, knowledge: "intermediate" },
     text: "You are 55, employed with a stable income, without an emergency fund and still repaying a sizeable loan. You want to catch up on retirement savings over the next 10 years and say you are willing to take substantial risk to do so.",
+    misread: { tolerance: "medium" },
   },
 ];
 
@@ -101,10 +117,13 @@ export interface Trial {
   text: string;
   profile: RawProfile;
   scenario: "sound" | "flawed";
-  attention: boolean;
+  misread: Misread;
 }
 
-export function buildPlan(participantId: string, n = 6): Trial[] {
+/* Every case once, in an order seeded by the participant ID, half of them
+   flawed. The attention checks are statements in the questionnaires
+   (ATTENTION_ITEMS), not a case, so all eight cases are scored. */
+export function buildPlan(participantId: string, n = STUDY_CASES): Trial[] {
   const count = Math.max(2, Math.min(12, n));
   const rand = mulberry32(hashString(String(participantId || "anon")));
   const cases = shuffle(CASES, rand);
@@ -113,7 +132,6 @@ export function buildPlan(participantId: string, n = 6): Trial[] {
   let scenarios: ("sound" | "flawed")[] = [];
   for (let k = 0; k < count; k++) scenarios.push(k < Math.ceil(count / 2) ? "sound" : "flawed");
   scenarios = shuffle(scenarios, rand);
-  const attentionIndex = Math.min(2, count - 1);
   return picked.map((c, idx) => ({
     index: idx,
     profileId: c.id,
@@ -121,26 +139,37 @@ export function buildPlan(participantId: string, n = 6): Trial[] {
     text: c.text,
     profile: c.profile,
     scenario: scenarios[idx],
-    attention: idx === attentionIndex,
+    misread: c.misread,
   }));
 }
 
-/* Random assignment for the public study. "none" stays in the pool as the
-   control. The conversational condition is excluded from random assignment
-   because it needs WebGPU and a large download. */
-/* The random pool: the nine cells of the fractional design minus the
-   conversational one, which needs WebGPU and is offered by choice only. */
-export const ASSIGNABLE_CONDITIONS = [
-  "none",
-  "feature",
-  "counterfactual",
-  "confidence",
-  "hybrid",
-  "interactive",
-  "interactive-hybrid",
-  "adaptive",
-] as const;
-export type Condition = (typeof ASSIGNABLE_CONDITIONS)[number] | "llm";
+/* ---------------- The design in force ----------------
+   From 3.0.0 the study is the content arm of the earlier design: five
+   explanation contents, all shown as static panels, with one advisor. The
+   delivery conditions (interactive, adaptive, conversational) and the
+   advisor comparison are left for later studies, which keeps the sample
+   each comparison needs within reach. Every row carries STUDY_DESIGN and
+   STUDY_PHASE, so data from different designs and phases never mix. */
+export const ASSIGNABLE_CONDITIONS = ["none", "feature", "counterfactual", "confidence", "hybrid"] as const;
+export type Condition = (typeof ASSIGNABLE_CONDITIONS)[number];
+
+/** The AI (neural network) advisor, for every participant. */
+export const STUDY_ADVISOR = "ml" as const;
+/** Cases per session: all eight, four sound and four flawed. */
+export const STUDY_CASES = 8;
+/** Names this design in the data. Change it whenever the cases, the flaws,
+ *  the conditions or the measures change. */
+export const STUDY_DESIGN = "content5-ml-misread8";
+
+/* The ethics approval. While it is null the study runs as a pilot: the
+   consent says so, and every row is logged with studyPhase "pilot". Fill it
+   in when the committee has approved the protocol, and the next deployment
+   collects the main study under the approved consent. */
+export const ETHICS_APPROVAL: { committee: string; reference: string } | null = null;
+export const STUDY_PHASE: "pilot" | "main" = ETHICS_APPROVAL ? "main" : "pilot";
+
+/* The lecturer who supervises the study, named in the consent once known. */
+export const SUPERVISOR: { name: string; email: string } | null = null;
 
 export function randomParticipantId() {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -151,10 +180,6 @@ export function randomParticipantId() {
 
 export function randomCondition(): Condition {
   return ASSIGNABLE_CONDITIONS[Math.floor(Math.random() * ASSIGNABLE_CONDITIONS.length)];
-}
-
-export function randomAdvisor(): "ml" | "logit" {
-  return Math.random() < 0.5 ? "ml" : "logit";
 }
 
 /* Verifiable completion code: derived from the participant ID, so the
@@ -168,15 +193,41 @@ export function completionCode(participantId: string) {
    consent, the debrief and the privacy page all read it from here. */
 export const CONTACT = { name: "Raditya Pratama", email: "radityapratama2077@gmail.com" };
 
+/* The consent is short headed blocks rather than a wall of text, for
+   participants who do not read long pages online. The same blocks are in
+   docs/research/consent-and-debrief.md for the ethics submission; change
+   both together. "Some details are explained at the end" covers the flawed
+   advice without giving it away, and the debrief then names it. */
 export const TEXTS = {
   consentTitle: "Before you start",
+  consentIntro:
+    "This is a research study about how people use investment advice from an automated advisor. It is run by the Department of Information Systems, Institut Teknologi Sepuluh Nopember (ITS), Surabaya, and takes about 15 to 20 minutes.",
   consent: [
-    "This is a research study about how people use investment advice from an automated advisor. It takes about 15 minutes, including a few short questions before and after the cases.",
-    "You will read a few short descriptions of hypothetical investors, see the advisor's recommendation for each of them, and tell us whether you would follow it and how much you trust it. Before the cases come three questions about financial knowledge and nine short statements about how you think and what you expect. After them come a few short ratings and two open questions.",
-    "Nothing here is real financial advice, and no real money is involved. Please answer as the person described in each case.",
-    "Your answers are stored under an anonymous participant ID together with the recommendation you saw and your responses. No name, email or account information is collected, and nothing can identify you. You can stop at any time by closing this page. If you leave part way through, your progress is kept in this browser for a week so that you can come back and carry on where you left off, and it is erased as soon as you finish. You can ask for your data to be deleted by quoting your participant ID.",
-    "This is a pilot study run to develop the instrument. By continuing you confirm that you have read this and agree to take part.",
+    {
+      heading: "What you will do",
+      text: "You will read eight short stories about made-up investors. For each one, an automated advisor recommends how to invest, and you say whether you would follow the advice and how much you trust it. Before the stories there are three questions about money and some short statements about how you think. After them there are a few ratings and two questions you may leave empty.",
+    },
+    {
+      heading: "Good to know",
+      text: "Nothing here is real financial advice and no real money is involved. Please answer as if you were the person in each story. Some details of the study are explained at the end.",
+    },
+    {
+      heading: "Who can take part",
+      text: "Anyone aged 18 or older. Taking part is voluntary, and you can stop at any time by closing this page, without giving a reason.",
+    },
+    {
+      heading: "Your data",
+      text: "We do not ask for your name, email or any account. Your answers are stored under a random participant ID, together with the advice you saw, so they cannot be traced back to you. If you stop part way, your progress is kept in this browser for up to a week so you can continue, and it is deleted when you finish.",
+    },
+    {
+      heading: "How the answers are used",
+      text: "The anonymous answers are analysed for research papers and may be shared in a public research data archive, so that other researchers can check the results. Until the data are published, you can have your answers deleted by sending your participant ID to the researcher.",
+    },
   ],
+  pilotNote:
+    "This is a trial run (pilot) to test the study before the main data collection. Answers from the trial run are used to improve the study and are not reported as research results.",
+  approvalNote: "This study was approved by {committee} (reference {reference}).",
+  agree: "I am 18 or older, I have read the information above, and I agree to take part.",
   literacyTitle: "Three quick questions",
   literacyIntro: "These questions are about general financial knowledge. There is no penalty for answering “Do not know”.",
   exitTitle: "Two final questions",
@@ -185,9 +236,9 @@ export const TEXTS = {
   exitQ2: "What would you have wanted the advisor to explain that it did not?",
   debriefTitle: "Thank you. One more thing you should know",
   debriefIntro:
-    "In this study some of the recommendations you saw were deliberately altered to be unsuitable for the case, in order to measure how people react to good and bad automated advice. The altered trials were:",
+    "In some of the stories, the advisor was given one or two wrong facts about the person on purpose, so its advice did not suit them. We did this to see how people react to good and bad advice from an automated advisor. In these stories, the advice was based on a wrong fact:",
   debriefOutro:
-    "The advisor and the recommendations are part of a research instrument, not a financial service. If you have questions about the study, please contact the researcher.",
+    "Real automated advisors can make the same kind of mistake when information is entered or read wrongly, so it is always worth checking that advice fits your own situation. The advisor here is part of a research study, not a financial service. If, now that you know this, you would rather your answers were not used, send the participant ID on the next screen to the researcher and they will be deleted.",
   doneTitle: "All done",
   done: "Your responses have been recorded. Thank you for contributing to this research. Your completion code:",
 };
@@ -210,8 +261,8 @@ export const CASES_ID: Record<string, { label: string; text: string }> = {
     text: "Anda berusia 61 tahun, masih bekerja dengan pendapatan stabil, dan punya cadangan uang tunai yang cukup besar. Anda berencana mulai memakai uang ini sekitar 6 tahun lagi, dan Anda lebih memilih menghindari kerugian besar meskipun hasilnya jadi lebih kecil.",
   },
   C4: {
-    label: "Pekerja lepas, butuh dana dalam waktu dekat",
-    text: "Anda berusia 34 tahun, bekerja lepas dengan pendapatan yang bisa jauh berbeda dari bulan ke bulan, dan hanya punya sedikit cadangan uang tunai. Anda mungkin membutuhkan uang ini sekitar 2 tahun lagi untuk uang muka rumah, tetapi Anda mengaku ingin hasil investasi setinggi mungkin.",
+    label: "Pekerja lepas yang menabung untuk rumah",
+    text: "Anda berusia 34 tahun, bekerja lepas dengan pendapatan yang bisa jauh berbeda dari bulan ke bulan, dan belum punya simpanan untuk keadaan darurat. Uang ini Anda tabung untuk uang muka rumah yang rencananya dibayar sekitar 2 tahun lagi, dan Anda bisa menerima naik turun nilai investasi yang sedang-sedang saja.",
   },
   C5: {
     label: "Investor paruh baya yang mapan",
@@ -236,15 +287,91 @@ export function caseDisplay(trial: { profileId: string; label: string; text: str
   return { label: trial.label, text: trial.text };
 }
 
+/* The debrief names what the advisor was told wrongly in each flawed case,
+   in plain words, so the participant learns what kind of mistake it was. */
+const TOL_EN: Record<string, string> = { low: "low", medium: "medium", high: "high" };
+const TOL_ID: Record<string, string> = { low: "rendah", medium: "sedang", high: "tinggi" };
+
+export function misreadSentence(misread: Misread, profile: RawProfile, locale: "en" | "id"): string {
+  const parts: string[] = [];
+  const id = locale === "id";
+  if (misread.horizon !== undefined) {
+    parts.push(
+      id
+        ? `jangka waktu ${misread.horizon} tahun, padahal ${profile.horizon} tahun`
+        : `a time frame of ${misread.horizon} years instead of ${profile.horizon}`,
+    );
+  }
+  if (misread.tolerance !== undefined) {
+    const was = profile.tolerance ?? "medium";
+    parts.push(
+      id
+        ? `sikap terhadap risiko ${TOL_ID[misread.tolerance]}, padahal ${TOL_ID[was]}`
+        : `a ${TOL_EN[misread.tolerance]} attitude to risk instead of ${TOL_EN[was]}`,
+    );
+  }
+  if (misread.emergencyFund !== undefined) {
+    parts.push(
+      misread.emergencyFund
+        ? id ? "punya dana darurat, padahal tidak" : "an emergency fund the person does not have"
+        : id ? "tidak punya dana darurat, padahal punya" : "no emergency fund, although the person has one",
+    );
+  }
+  if (misread.incomeStable !== undefined) {
+    parts.push(
+      misread.incomeStable
+        ? id ? "pendapatan stabil, padahal tidak tetap" : "a stable income, although it varies"
+        : id ? "pendapatan tidak tetap, padahal stabil" : "an income that varies, although it is stable",
+    );
+  }
+  if (misread.nearTermNeed !== undefined) {
+    parts.push(
+      misread.nearTermNeed
+        ? id ? "butuh uangnya dalam waktu dekat, padahal tidak" : "a need for the money soon, which the person does not have"
+        : id ? "tidak butuh uangnya dalam waktu dekat, padahal butuh" : "no need for the money soon, although there is one",
+    );
+  }
+  if (misread.debtObligations !== undefined) {
+    parts.push(
+      misread.debtObligations
+        ? id ? "punya utang besar, padahal tidak" : "large debts the person does not have"
+        : id ? "tidak punya utang besar, padahal punya" : "no large debts, although the person has them",
+    );
+  }
+  const list = parts.join(id ? ", dan " : ", and ");
+  return id ? `Penasihat diberi tahu: ${list}.` : `The advisor was told ${list}.`;
+}
+
 const TEXTS_ID: typeof TEXTS = {
   consentTitle: "Sebelum Anda mulai",
+  consentIntro:
+    "Ini adalah penelitian tentang cara orang menggunakan saran investasi dari penasihat otomatis. Penelitian ini dijalankan oleh Departemen Sistem Informasi, Institut Teknologi Sepuluh Nopember (ITS), Surabaya, dan membutuhkan waktu sekitar 15 sampai 20 menit.",
   consent: [
-    "Ini adalah penelitian tentang cara orang menggunakan saran investasi dari penasihat otomatis. Waktu yang dibutuhkan sekitar 15 menit, termasuk beberapa pertanyaan singkat sebelum dan sesudah bagian kasus.",
-    "Anda akan membaca beberapa gambaran singkat tentang investor rekaan, melihat rekomendasi penasihat untuk masing-masing, lalu menjawab apakah Anda akan mengikutinya dan seberapa besar Anda memercayainya. Sebelum bagian kasus, ada tiga pertanyaan tentang pengetahuan keuangan dan sembilan pernyataan singkat tentang cara Anda berpikir dan apa yang Anda harapkan. Setelahnya, ada beberapa penilaian singkat dan dua pertanyaan terbuka.",
-    "Tidak ada saran keuangan sungguhan di sini, dan tidak ada uang sungguhan yang dipakai. Jawablah seolah-olah Anda adalah orang yang digambarkan dalam setiap kasus.",
-    "Jawaban Anda disimpan dengan ID peserta anonim, bersama rekomendasi yang Anda lihat. Kami tidak mengumpulkan nama, email, atau informasi akun, jadi tidak ada data yang bisa mengenali Anda. Anda bisa berhenti kapan saja dengan menutup halaman ini. Jika Anda berhenti di tengah jalan, jawaban Anda disimpan di browser ini selama satu minggu supaya Anda bisa kembali dan melanjutkannya. Data itu dihapus begitu Anda selesai. Anda bisa meminta data Anda dihapus dengan menyebutkan ID peserta Anda.",
-    "Ini adalah studi uji coba (pilot) untuk mengembangkan alat ukur penelitian ini. Dengan melanjutkan, Anda menyatakan sudah membaca informasi ini dan bersedia ikut serta.",
+    {
+      heading: "Apa yang akan Anda lakukan",
+      text: "Anda akan membaca delapan cerita singkat tentang investor rekaan. Untuk setiap cerita, penasihat otomatis menyarankan cara berinvestasi, lalu Anda menjawab apakah Anda akan mengikuti saran itu dan seberapa besar Anda memercayainya. Sebelum cerita, ada tiga pertanyaan tentang keuangan dan beberapa pernyataan singkat tentang cara Anda berpikir. Setelahnya, ada beberapa penilaian dan dua pertanyaan yang boleh dikosongkan.",
+    },
+    {
+      heading: "Perlu Anda ketahui",
+      text: "Tidak ada saran keuangan sungguhan di sini, dan tidak ada uang sungguhan yang dipakai. Jawablah seolah-olah Anda adalah orang dalam setiap cerita. Beberapa hal tentang penelitian ini akan dijelaskan di bagian akhir.",
+    },
+    {
+      heading: "Siapa yang boleh ikut",
+      text: "Siapa saja yang berusia 18 tahun ke atas. Keikutsertaan ini sukarela, dan Anda bisa berhenti kapan saja dengan menutup halaman ini, tanpa perlu memberi alasan.",
+    },
+    {
+      heading: "Data Anda",
+      text: "Kami tidak meminta nama, email, atau akun apa pun. Jawaban Anda disimpan dengan ID peserta acak, bersama saran yang Anda lihat, sehingga tidak bisa dilacak kembali ke Anda. Jika Anda berhenti di tengah jalan, jawaban Anda disimpan di browser ini paling lama satu minggu supaya Anda bisa melanjutkannya, dan dihapus begitu Anda selesai.",
+    },
+    {
+      heading: "Penggunaan jawaban",
+      text: "Jawaban yang anonim ini dianalisis untuk makalah penelitian dan dapat dibagikan di arsip data penelitian terbuka, agar peneliti lain bisa memeriksa hasilnya. Sebelum data itu diterbitkan, Anda bisa meminta jawaban Anda dihapus dengan mengirimkan ID peserta Anda kepada peneliti.",
+    },
   ],
+  pilotNote:
+    "Ini adalah uji coba (pilot) untuk menguji penelitian sebelum pengumpulan data utama. Jawaban dari uji coba dipakai untuk memperbaiki penelitian dan tidak dilaporkan sebagai hasil penelitian.",
+  approvalNote: "Penelitian ini telah disetujui oleh {committee} (nomor {reference}).",
+  agree: "Saya berusia 18 tahun ke atas, sudah membaca informasi di atas, dan bersedia ikut serta.",
   literacyTitle: "Tiga pertanyaan singkat",
   literacyIntro: "Pertanyaan berikut menyangkut pengetahuan keuangan umum. Tidak apa-apa jika Anda menjawab “Tidak tahu”.",
   exitTitle: "Dua pertanyaan terakhir",
@@ -253,9 +380,9 @@ const TEXTS_ID: typeof TEXTS = {
   exitQ2: "Apa yang Anda harap dijelaskan oleh penasihat, tetapi ternyata tidak?",
   debriefTitle: "Terima kasih. Satu hal lagi yang perlu Anda ketahui",
   debriefIntro:
-    "Dalam penelitian ini, sebagian rekomendasi yang Anda lihat sengaja diubah supaya tidak cocok untuk kasusnya. Tujuannya untuk mengukur bagaimana orang menanggapi saran otomatis yang baik dan yang buruk. Kasus yang diubah adalah:",
+    "Di beberapa cerita, penasihat sengaja diberi satu atau dua fakta yang salah tentang orang tersebut, sehingga sarannya tidak cocok untuknya. Kami melakukan ini untuk melihat bagaimana orang menanggapi saran yang baik dan yang buruk dari penasihat otomatis. Di cerita-cerita berikut, saran diberikan berdasarkan fakta yang salah:",
   debriefOutro:
-    "Penasihat dan rekomendasinya adalah bagian dari alat penelitian, bukan layanan keuangan. Jika ada pertanyaan tentang penelitian ini, silakan hubungi peneliti.",
+    "Penasihat otomatis sungguhan juga bisa membuat kesalahan seperti ini jika informasi dimasukkan atau dibaca dengan salah, jadi selalu periksa apakah saran yang Anda terima cocok dengan keadaan Anda sendiri. Penasihat di sini adalah bagian dari penelitian, bukan layanan keuangan. Jika setelah mengetahui hal ini Anda tidak ingin jawaban Anda dipakai, kirimkan ID peserta yang tertera di layar berikutnya kepada peneliti, dan jawaban Anda akan dihapus.",
   doneTitle: "Selesai",
   done: "Jawaban Anda sudah tersimpan. Terima kasih telah berkontribusi dalam penelitian ini. Kode penyelesaian Anda:",
 };
@@ -364,6 +491,32 @@ export const LIKERT_LABELS = {
   en: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
   id: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"],
 };
+
+/* Attention checks: instructed-response statements (Meade and Craig 2012),
+   one among the statements before the cases and one on the last page,
+   which every condition sees. `expected` is the point on the 1 to 5 scale
+   the statement asks for. They replace the attention case of the pilot,
+   which asked for Reject on a scored case and so contaminated its data. */
+export const ATTENTION_ITEMS: (LikertItem & { expected: number })[] = [
+  {
+    name: "attn1",
+    en: "To show that you are reading carefully, please choose “Disagree” for this statement.",
+    id: "Untuk menunjukkan bahwa Anda membaca dengan teliti, pilih “Tidak setuju” untuk pernyataan ini.",
+    expected: 2,
+  },
+  {
+    name: "attn2",
+    en: "To show that you are still reading carefully, please choose “Strongly agree” for this statement.",
+    id: "Untuk menunjukkan bahwa Anda masih membaca dengan teliti, pilih “Sangat setuju” untuk pernyataan ini.",
+    expected: 5,
+  },
+];
+
+export function attentionResult(name: "attn1" | "attn2", answer: number | undefined): "passed" | "failed" | "" {
+  if (answer === undefined) return "";
+  const item = ATTENTION_ITEMS.find((it) => it.name === name)!;
+  return answer === item.expected ? "passed" : "failed";
+}
 
 export const NFC_ITEMS: LikertItem[] = [
   {

@@ -1,113 +1,80 @@
 "use client";
 
-/* The design rationale, stated publicly: the two factors, the cells this
-   pilot fills, which contrasts are interpretable, and how the quantitative
-   and qualitative strands are meant to be read together. Kept in sync with
-   PRESETS in src/lib/conditions.ts and ASSIGNABLE_CONDITIONS in
-   src/lib/study.ts. */
+/* The study design, stated publicly: the five conditions, the cases and how
+   their flawed advice is made, how each decision is scored, the hypotheses
+   and the analysis. The case table is computed from the advisor and the
+   study definitions at render time, so it cannot drift from what
+   participants see. The full protocol and the pre-registration are in
+   docs/research. Kept in sync with src/lib/study.ts and src/lib/scoring.ts. */
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, XCircle } from "lucide-react";
+import { useMemo } from "react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Reveal } from "@/components/motion";
 import { PageHero } from "@/components/page-hero";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { PageTransition } from "@/components/page-transition";
+import { ADVISORS } from "@/lib/advisor/advisors";
+import { recommendWithMisread } from "@/lib/advisor/flaw";
+import { outcomeName } from "@/lib/advisor/strings";
 import { tr, useLang } from "@/lib/i18n";
+import { CASES, STUDY_ADVISOR, STUDY_CASES, caseDisplay, misreadSentence } from "@/lib/study";
 
 type L = { en: string; id: string };
 
-const CONTENT_LEVELS: { key: string; name: L; what: L }[] = [
+const CONDITIONS: { name: L; what: L }[] = [
   {
-    key: "none",
     name: { en: "No explanation", id: "Tanpa penjelasan" },
-    what: { en: "The recommendation on its own. The control.", id: "Hanya rekomendasi, tanpa penjelasan. Ini kondisi kontrol." },
+    what: { en: "The recommendation alone. The control.", id: "Hanya rekomendasi. Ini kondisi kontrol." },
   },
   {
-    key: "feature",
     name: { en: "Why", id: "Mengapa" },
     what: {
-      en: "Attribution: how much each answer counted, as exact Shapley values for the network and as exact weights for the scorecard.",
-      id: "Atribusi: seberapa besar pengaruh setiap jawaban, berupa nilai Shapley yang eksak untuk jaringan saraf dan bobot yang eksak untuk scorecard.",
+      en: "How much each fact about the person counted, as bars (exact Shapley values of the network).",
+      id: "Seberapa besar pengaruh setiap fakta tentang orang itu, dalam bentuk grafik batang (nilai Shapley jaringan yang eksak).",
     },
   },
   {
-    key: "counterfactual",
     name: { en: "What would change it", id: "Apa yang bisa mengubahnya" },
     what: {
-      en: "Contrastive: the smallest single change to the situation that flips the outcome, found by re-running the advisor.",
-      id: "Kontrastif: satu perubahan terkecil pada situasi yang membuat hasilnya berubah, ditemukan dengan menjalankan ulang penasihat.",
+      en: "The smallest change to one fact that gives different advice, found by re-running the advisor.",
+      id: "Perubahan terkecil pada satu fakta yang menghasilkan saran berbeda, ditemukan dengan menjalankan ulang penasihat.",
     },
   },
   {
-    key: "confidence",
     name: { en: "How sure", id: "Seberapa yakin" },
     what: {
-      en: "Uncertainty: the calibrated probability of the outcome, with the probability of every other outcome.",
-      id: "Ketidakpastian: peluang terkalibrasi untuk hasil yang dipilih, beserta peluang semua hasil lain.",
+      en: "The calibrated probability of the advice, beside that of every other outcome.",
+      id: "Peluang terkalibrasi untuk saran itu, di samping peluang semua hasil lain.",
     },
   },
   {
-    key: "hybrid",
     name: { en: "All three", id: "Ketiganya sekaligus" },
-    what: { en: "The three contents above, together.", id: "Ketiga penjelasan di atas, ditampilkan bersamaan." },
+    what: { en: "Why, what would change it and how sure, together.", id: "Mengapa, apa yang bisa mengubahnya, dan seberapa yakin, sekaligus." },
   },
 ];
-
-const DELIVERY_LEVELS: { key: string; name: L; what: L }[] = [
-  {
-    key: "static",
-    name: { en: "Static", id: "Statis" },
-    what: { en: "A panel, read as it is.", id: "Satu panel yang cukup dibaca saja." },
-  },
-  {
-    key: "interactive",
-    name: { en: "Interactive", id: "Interaktif" },
-    what: {
-      en: "The inputs can be moved and the advice reacts live, with a why-not selector.",
-      id: "Faktor-faktornya bisa diubah dan sarannya langsung menyesuaikan, dilengkapi pilihan mengapa-bukan (why-not).",
-    },
-  },
-  {
-    key: "adaptive",
-    name: { en: "Adaptive", id: "Adaptif" },
-    what: {
-      en: "Plain sentences or the detailed version, chosen by the measured financial literacy score.",
-      id: "Kalimat sederhana atau versi rinci, dipilih berdasarkan skor literasi keuangan peserta.",
-    },
-  },
-  {
-    key: "llm",
-    name: { en: "Conversational", id: "Percakapan" },
-    what: {
-      en: "A language model in the browser retells the computed facts and answers follow-up questions.",
-      id: "Model bahasa di browser menyampaikan ulang fakta hasil perhitungan dan menjawab pertanyaan lanjutan.",
-    },
-  },
-];
-
-/* content key -> delivery key -> the condition that fills that cell */
-const CELLS: Record<string, Record<string, L>> = {
-  none: {
-    static: { en: "No explanation", id: "Tanpa penjelasan" },
-    interactive: { en: "Interactive only", id: "Interaktif saja" },
-  },
-  feature: { static: { en: "Why", id: "Mengapa" } },
-  counterfactual: { static: { en: "What would change it", id: "Apa yang bisa mengubahnya" } },
-  confidence: { static: { en: "How sure", id: "Seberapa yakin" } },
-  hybrid: {
-    static: { en: "All three", id: "Ketiganya sekaligus" },
-    interactive: { en: "Interactive with all three", id: "Interaktif dengan ketiga penjelasan" },
-    adaptive: { en: "Adaptive to literacy", id: "Disesuaikan dengan literasi" },
-    llm: { en: "Conversational", id: "Percakapan" },
-  },
-};
 
 export function DesignContent() {
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const p = (v: L) => tr(locale, v);
+
+  /* Each case's advice on the real facts and on the misread ones, from the
+     advisor itself. */
+  const rows = useMemo(
+    () =>
+      CASES.map((c) => ({
+        id: c.id,
+        label: caseDisplay({ profileId: c.id, label: c.label, text: c.text }, locale).label,
+        sound: ADVISORS[STUDY_ADVISOR].recommend(c.profile).portfolio.name,
+        flawed: recommendWithMisread(STUDY_ADVISOR, c.profile, c.misread).portfolio.name,
+        misread: misreadSentence(c.misread, c.profile, locale),
+      })),
+    [locale],
+  );
 
   return (
     <>
@@ -118,8 +85,8 @@ export function DesignContent() {
           eyebrow={t("Method", "Metode")}
           title={t("How this study is designed", "Bagaimana studi ini dirancang")}
           lead={t(
-            "AdviceIT varies two things independently: what an explanation says, and how it reaches you. This page states the design, the cells this pilot fills, which comparisons are interpretable, and how the numbers and the free text are meant to be read together.",
-            "AdviceIT mengubah dua hal secara terpisah: isi sebuah penjelasan, dan cara penjelasan itu disampaikan kepada Anda. Halaman ini menjelaskan rancangannya, sel mana saja yang diisi studi pilot ini, perbandingan mana yang bisa ditafsirkan, dan bagaimana angka serta jawaban tertulis dibaca bersama.",
+            "One question: does what an explanation says help people tell good AI investment advice from bad? Each participant judges eight cases, half of them with advice that is deliberately wrong, under one of five explanation conditions.",
+            "Satu pertanyaan: apakah isi sebuah penjelasan membantu orang membedakan saran investasi AI yang baik dari yang buruk? Setiap peserta menilai delapan kasus, separuhnya dengan saran yang sengaja dibuat keliru, dalam salah satu dari lima kondisi penjelasan.",
           )}
           width="max-w-5xl"
         />
@@ -127,310 +94,219 @@ export function DesignContent() {
         <div className="mx-auto max-w-5xl space-y-12 px-4 py-14 sm:px-6">
           <p className="rounded-2xl border border-border/70 bg-muted/40 px-5 py-4 text-sm text-muted-foreground">
             {t(
-              "This page is written for researchers and reviewers. If you are taking part in the study, you do not need any of it: the participate page tells you everything you need.",
-              "Halaman ini ditulis untuk peneliti dan reviewer. Jika Anda peserta penelitian, Anda tidak perlu membaca ini: semua yang perlu Anda ketahui ada di halaman Ikut serta.",
+              "This page is written for researchers and reviewers. If you are taking part in the study, you do not need any of it.",
+              "Halaman ini ditulis untuk peneliti dan reviewer. Jika Anda peserta penelitian, Anda tidak perlu membaca ini.",
             )}{" "}
             <Link href="/participate" className="font-medium text-primary underline underline-offset-4">
-              {t("Take part", "Ikut penelitian")}
+              {t("Take part", "Ikut serta")}
             </Link>
           </p>
-          {/* 1. Two factors */}
+
+          {/* 1. Conditions */}
           <Reveal as="section" className="space-y-5">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("1. Two factors, not one list", "1. Dua faktor, bukan satu daftar")}
-            </h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("1. Five explanation conditions", "1. Lima kondisi penjelasan")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
-                "An explanation condition is a pair. The content factor sets what is explained. The delivery factor sets how that material reaches the participant. Interactivity, adaptation and conversation are not kinds of explanation, they are ways of handing the same material over. Keeping them on their own axis is what makes it possible to say whether an effect came from the information or from the way it was given.",
-                "Setiap kondisi penjelasan terdiri dari dua bagian. Faktor konten menentukan apa yang dijelaskan. Faktor penyajian menentukan bagaimana konten itu sampai kepada peserta. Interaktivitas, penyesuaian, dan percakapan bukan jenis penjelasan, melainkan cara menyampaikan konten yang sama. Karena keduanya dipisahkan, kita bisa mengetahui apakah sebuah efek berasal dari informasinya atau dari cara penyampaiannya.",
+                "Each participant sees one condition throughout (between participants). The explanation is always a static panel under the recommendation, and the advisor is the same for everyone: the AI advisor, a neural network trained on 400 expert-reviewed cases. At consent, each participant is placed in the condition with the fewest people so far.",
+                "Setiap peserta melihat satu kondisi dari awal sampai akhir (antarpeserta). Penjelasan selalu berupa panel biasa di bawah rekomendasi, dan penasihatnya sama untuk semua orang: penasihat AI, jaringan saraf yang dilatih dengan 400 kasus yang sudah ditinjau ahli. Saat memberi persetujuan, setiap peserta ditempatkan pada kondisi yang pesertanya paling sedikit sejauh ini.",
               )}
             </p>
-            <div className="grid gap-5 md:grid-cols-2">
-              <div className="panel p-6">
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">
-                  {t("Factor A: content", "Faktor A: konten")}
-                </h3>
-                <dl className="mt-4 space-y-3 text-sm">
-                  {CONTENT_LEVELS.map((c) => (
-                    <div key={c.key}>
-                      <dt className="font-medium">{p(c.name)}</dt>
-                      <dd className="text-muted-foreground">{p(c.what)}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-              <div className="panel p-6">
-                <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">
-                  {t("Factor B: delivery", "Faktor B: penyajian")}
-                </h3>
-                <dl className="mt-4 space-y-3 text-sm">
-                  {DELIVERY_LEVELS.map((d) => (
-                    <div key={d.key}>
-                      <dt className="font-medium">{p(d.name)}</dt>
-                      <dd className="text-muted-foreground">{p(d.what)}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "A modality factor sits inside the why content, which is the one content that exists both as bars and as sentences: visual, textual, or both together. It is held at visual in every cell of the design below, and varied only in a separate within-subject study, so that it does not multiply the cells here.",
-                "Di dalam konten Mengapa ada satu faktor lagi, yaitu bentuk penyajian (modalitas): grafik, teks, atau keduanya. Hanya konten ini yang tersedia dalam bentuk grafik batang sekaligus kalimat. Di semua sel rancangan di bawah, bentuknya ditetapkan sebagai grafik, dan hanya divariasikan dalam studi within-subject terpisah, supaya jumlah sel di sini tidak berlipat ganda.",
-              )}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {t(
-                "A third factor runs alongside them: the advisor itself, a neural network whose explanations are computed after the decision, or an interpretable scorecard whose explanations are exact. It is assigned at random and logged, which turns explanation faithfulness into a measured variable rather than an assumption.",
-                "Ada faktor ketiga di samping keduanya, yaitu penasihatnya sendiri: jaringan saraf yang penjelasannya dihitung setelah keputusan dibuat, atau scorecard transparan yang penjelasannya eksak. Faktor ini diundi secara acak dan dicatat, sehingga kesetiaan penjelasan (faithfulness) menjadi variabel yang diukur, bukan sekadar asumsi.",
-              )}
-            </p>
+            <dl className="grid gap-3 sm:grid-cols-2">
+              {CONDITIONS.map((c) => (
+                <div key={c.name.en} className="panel p-5">
+                  <dt className="font-semibold">{p(c.name)}</dt>
+                  <dd className="mt-1 text-sm text-muted-foreground">{p(c.what)}</dd>
+                </div>
+              ))}
+            </dl>
           </Reveal>
 
-          {/* 2. The cells */}
+          {/* 2. Cases and flaws */}
           <Reveal as="section" className="space-y-5">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("2. The cells this pilot fills", "2. Sel yang diisi studi pilot ini")}
-            </h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("2. The cases and the flawed advice", "2. Kasus dan saran yang keliru")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
-                "Crossing five contents with four deliveries gives twenty cells, far more than a pilot can fill. This is a fractional design: five cells vary content while delivery is held static, four cells vary delivery while the content is held at all three, and the all-three static condition sits in both arms as the hinge that ties them together.",
-                "Jika lima konten disilangkan dengan empat cara penyajian, hasilnya dua puluh sel, jauh lebih banyak daripada yang bisa diisi studi pilot. Karena itu dipakai rancangan fraksional: lima sel memvariasikan konten dengan penyajian tetap statis, empat sel memvariasikan penyajian dengan konten tetap pada ketiga penjelasan, dan kondisi ketiga penjelasan yang statis berada di kedua lengan sebagai penghubung (hinge) keduanya.",
+                `Every participant judges all ${STUDY_CASES} cases once, in an order seeded by their ID, and half of them, drawn at random, come with flawed advice. To make advice flawed, the advisor is given one or two wrong facts about the person, as if an answer had been entered or read wrongly. Its advice then does not suit the person described, while everything it says about its own reasoning stays true: the explanations describe the facts it was given, the wrong ones included.`,
+                `Setiap peserta menilai ke-${STUDY_CASES} kasus masing-masing sekali, dengan urutan yang ditentukan oleh ID-nya, dan separuhnya, dipilih secara acak, disertai saran yang keliru. Untuk membuat saran keliru, penasihat diberi satu atau dua fakta yang salah tentang orang itu, seolah-olah ada jawaban yang salah dimasukkan atau dibaca. Sarannya lalu tidak cocok untuk orang yang digambarkan, sementara semua yang dikatakannya tentang alasannya sendiri tetap benar: penjelasan menggambarkan fakta yang diterimanya, termasuk yang salah.`,
               )}
             </p>
             <div className="panel overflow-x-auto p-2">
-              <table className="w-full min-w-[42rem] border-collapse text-sm">
-                <thead>
-                  <tr>
-                    <th className="p-3 text-left text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                      {t("Content", "Konten")}
-                    </th>
-                    {DELIVERY_LEVELS.map((d) => (
-                      <th
-                        key={d.key}
-                        className="p-3 text-left text-xs font-semibold uppercase tracking-widest text-muted-foreground"
-                      >
-                        {p(d.name)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {CONTENT_LEVELS.map((c) => (
-                    <tr key={c.key} className="border-t border-border/70">
-                      <th scope="row" className="p-3 text-left font-medium">
-                        {p(c.name)}
-                      </th>
-                      {DELIVERY_LEVELS.map((d) => {
-                        const cell = CELLS[c.key]?.[d.key];
-                        return (
-                          <td key={d.key} className="p-3 align-top">
-                            {cell ? (
-                              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
-                                <CheckCircle2 className="size-3.5" aria-hidden />
-                                {p(cell)}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-muted-foreground/60">
-                                {t("not run", "tidak dijalankan")}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("Case", "Kasus")}</TableHead>
+                    <TableHead>{t("Advice on the real facts", "Saran berdasarkan fakta sebenarnya")}</TableHead>
+                    <TableHead>{t("The wrong facts", "Fakta yang salah")}</TableHead>
+                    <TableHead>{t("Advice it then gives", "Saran yang kemudian diberikan")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rows.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell className="font-medium">
+                        {r.id} · {r.label}
+                      </TableCell>
+                      <TableCell>{outcomeName(r.sound)}</TableCell>
+                      <TableCell className="min-w-56 text-muted-foreground">{r.misread}</TableCell>
+                      <TableCell>{outcomeName(r.flawed)}</TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {t(
+                "Each flaw puts the advice at least two mixes away from the sound one, or gives a mix where a referral to a person was due. Half make the advice riskier than it should be, half more cautious. The flaw can be caught in every condition, but by different routes: without an explanation only by judging the advice against the case; with Why or What would change it also by spotting a fact that does not match the case; with How sure not from the panel, because the advisor is as confident about the facts it was given as ever. The instrument never states the mismatch itself.",
+                "Setiap kekeliruan membuat saran berjarak setidaknya dua komposisi dari saran yang tepat, atau memberi komposisi padahal seharusnya dirujuk ke manusia. Separuhnya membuat saran lebih berisiko dari seharusnya, separuhnya lebih hati-hati. Kekeliruan bisa dikenali di setiap kondisi, tetapi lewat cara berbeda: tanpa penjelasan hanya dengan menilai saran terhadap kasusnya; dengan Mengapa atau Apa yang bisa mengubahnya juga dengan melihat fakta yang tidak cocok dengan kasusnya; dengan Seberapa yakin tidak dari panelnya, karena penasihat tetap yakin dengan fakta yang diterimanya. Alat ini tidak pernah menyebutkan ketidakcocokan itu secara langsung.",
+              )}
+            </p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {t(
+                "The sound advice is the advisor's own answer on the real facts. Before the main study, two to three financial experts confirm, case by case, that it suits the person and that the flawed advice does not.",
+                "Saran yang tepat adalah jawaban penasihat sendiri berdasarkan fakta sebenarnya. Sebelum studi utama, dua sampai tiga ahli keuangan memastikan, kasus demi kasus, bahwa saran itu cocok untuk orangnya dan saran yang keliru tidak.",
+              )}
+            </p>
+          </Reveal>
+
+          {/* 3. Measures and scoring */}
+          <Reveal as="section" className="space-y-5">
+            <h2 className="text-2xl font-semibold tracking-tight">{t("3. What is measured, and how it is scored", "3. Apa yang diukur, dan cara menilainya")}</h2>
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="panel space-y-2 p-6 text-sm">
+                <h3 className="font-semibold">{t("In each case", "Di setiap kasus")}</h3>
+                <p className="text-muted-foreground">
+                  {t(
+                    "The decision (follow, adjust to another mix, reject, ask a human adviser), trust, understanding, confidence in the decision and mental demand on 7-point scales, an optional reason, the time spent reading the case and the time to decide.",
+                    "Keputusan (ikuti, sesuaikan ke komposisi lain, tolak, tanya penasihat manusia), kepercayaan, pemahaman, keyakinan atas keputusan, dan beban berpikir pada skala 7 poin, alasan yang tidak wajib, waktu membaca kasus, dan waktu untuk memutuskan.",
+                  )}
+                </p>
+              </div>
+              <div className="panel space-y-2 p-6 text-sm">
+                <h3 className="font-semibold">{t("Once per participant", "Sekali per peserta")}</h3>
+                <p className="text-muted-foreground">
+                  {t(
+                    "Before the cases: the Big Three financial literacy questions, need for cognition (six items) and ease of satisfaction (three items). After them: five ratings of the explanations (not asked in the control), two open questions. Two instructed-response statements check attention, one before and one after the cases.",
+                    "Sebelum kasus: tiga pertanyaan literasi keuangan Big Three, kebutuhan berpikir (enam butir), dan kemudahan merasa puas (tiga butir). Setelahnya: lima penilaian tentang penjelasan (tidak ditanyakan di kondisi kontrol) dan dua pertanyaan terbuka. Dua pernyataan berisi instruksi memeriksa perhatian, satu sebelum dan satu sesudah kasus.",
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="panel p-6 text-sm">
+              <h3 className="font-semibold">{t("Scoring a decision", "Cara menilai keputusan")}</h3>
+              <ul className="mt-2 list-disc space-y-1.5 pl-5 text-muted-foreground">
+                <li>
+                  {t(
+                    "Relied on the advice: Follow, or Ask a human adviser when the advice itself was to see one.",
+                    "Mengandalkan saran: Ikuti, atau Tanya penasihat manusia jika sarannya memang untuk menemui penasihat manusia.",
+                  )}
+                </li>
+                <li>
+                  {t(
+                    "Appropriate (the primary outcome): relied on sound advice, or did not rely on flawed advice.",
+                    "Tepat (hasil utama): mengandalkan saran yang tepat, atau tidak mengandalkan saran yang keliru.",
+                  )}
+                </li>
+                <li>
+                  {t(
+                    "Corrected (secondary, flawed cases only): adjusted to the sound mix, or asked a human adviser when a referral was the sound outcome.",
+                    "Dikoreksi (sekunder, hanya kasus keliru): menyesuaikan ke komposisi yang tepat, atau bertanya ke penasihat manusia jika rujukan adalah hasil yang tepat.",
+                  )}
+                </li>
+              </ul>
+            </div>
+          </Reveal>
+
+          {/* 4. Hypotheses */}
+          <Reveal as="section" className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">{t("4. Hypotheses", "4. Hipotesis")}</h2>
+            <ol className="list-decimal space-y-2 pl-5 leading-relaxed text-muted-foreground">
+              <li>
+                {t(
+                  "The explanation condition changes how well people tell sound advice from flawed advice (condition by scenario interaction on reliance).",
+                  "Kondisi penjelasan mengubah seberapa baik orang membedakan saran yang tepat dari yang keliru (interaksi kondisi dan skenario terhadap ketergantungan).",
+                )}
+              </li>
+              <li>
+                {t(
+                  "Why, What would change it and All three, which show the facts the advisor used, improve that discrimination over No explanation, mainly by lowering reliance on flawed advice.",
+                  "Mengapa, Apa yang bisa mengubahnya, dan Ketiganya sekaligus, yang menampilkan fakta yang dipakai penasihat, meningkatkan kemampuan membedakan itu dibandingkan Tanpa penjelasan, terutama dengan menurunkan ketergantungan pada saran yang keliru.",
+                )}
+              </li>
+              <li>
+                {t(
+                  "How sure does not improve discrimination over No explanation, because flawed advice comes with high confidence.",
+                  "Seberapa yakin tidak meningkatkan kemampuan membedakan dibandingkan Tanpa penjelasan, karena saran yang keliru tetap disertai keyakinan tinggi.",
+                )}
+              </li>
+            </ol>
             <p className="text-sm text-muted-foreground">
               {t(
-                "Nine cells. Eight of them are in the random pool. The conversational cell is offered by choice only, because it needs a WebGPU browser and downloads a model, so assigning it at random would fail for part of the sample. Within the pool, each new participant goes to the condition and advisor pair with the fewest people so far, ties broken at random, so the sixteen pairs fill evenly instead of drifting apart as they would under simple randomisation.",
-                "Sembilan sel. Delapan di antaranya diundi secara acak. Sel percakapan hanya bisa dipilih sendiri, karena membutuhkan browser dengan WebGPU dan harus mengunduh model, sehingga jika diundi akan gagal untuk sebagian peserta. Di antara sel yang diundi, setiap peserta baru ditempatkan pada pasangan kondisi dan penasihat yang pesertanya paling sedikit sejauh ini (jika sama banyak, dipilih acak), sehingga keenam belas pasangan terisi merata dan tidak timpang seperti pada pengacakan sederhana.",
+                "Trust, understanding, mental demand, correction, and moderation by financial literacy and need for cognition are secondary and exploratory. The full wording is in the pre-registration.",
+                "Kepercayaan, pemahaman, beban berpikir, koreksi, serta pengaruh literasi keuangan dan kebutuhan berpikir bersifat sekunder dan eksploratif. Rumusan lengkapnya ada di dokumen pra-registrasi.",
               )}
             </p>
           </Reveal>
 
-          {/* 3. Contrasts */}
-          <Reveal as="section" className="space-y-5">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("3. Which comparisons are interpretable", "3. Perbandingan yang bisa ditafsirkan")}
-            </h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="panel space-y-3 p-6">
-                <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <CheckCircle2 className="size-4 text-primary" aria-hidden />
-                  {t("Clean", "Bersih")}
-                </h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    {t(
-                      "Why, What would change it, How sure and All three, each against No explanation. Delivery is static throughout, so a difference is attributable to content.",
-                      "Mengapa, Apa yang bisa mengubahnya, Seberapa yakin, dan Ketiganya sekaligus, masing-masing dibandingkan dengan Tanpa penjelasan. Penyajiannya statis di semua kondisi itu, jadi perbedaan yang muncul bisa dikaitkan dengan konten.",
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "Interactive with all three, Adaptive and Conversational, each against All three static. The content is identical, so a difference is attributable to delivery.",
-                      "Interaktif dengan ketiga penjelasan, Disesuaikan dengan literasi, dan Percakapan, masing-masing dibandingkan dengan Ketiganya sekaligus yang statis. Kontennya sama persis, jadi perbedaan yang muncul bisa dikaitkan dengan cara penyajian.",
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "Interactive only against No explanation. Neither shows written explanation content, so this asks whether exploration on its own can do the work an explanation does.",
-                      "Interaktif saja dibandingkan dengan Tanpa penjelasan. Keduanya tidak menampilkan penjelasan tertulis, jadi perbandingan ini menguji apakah mencoba-coba sendiri sudah bisa menggantikan peran sebuah penjelasan.",
-                    )}
-                  </li>
-                </ul>
-              </div>
-              <div className="panel space-y-3 p-6">
-                <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <XCircle className="size-4 text-destructive" aria-hidden />
-                  {t("Not reported", "Tidak dilaporkan")}
-                </h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    {t(
-                      "Interactive only against All three static. The two differ on content and on delivery at the same time, so any difference between them cannot be assigned to either factor.",
-                      "Interaktif saja dibandingkan dengan Ketiganya sekaligus yang statis. Keduanya berbeda dalam konten dan penyajian sekaligus, jadi perbedaan apa pun di antara keduanya tidak bisa dikaitkan dengan salah satu faktor.",
-                    )}
-                  </li>
-                  <li>
-                    {t(
-                      "Any comparison that crosses both arms without passing through the hinge condition.",
-                      "Perbandingan apa pun antara kedua lengan yang tidak melewati kondisi penghubung.",
-                    )}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* 4. Outcome */}
+          {/* 5. Analysis */}
           <Reveal as="section" className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("4. The outcome is an interaction", "4. Hasil utamanya adalah sebuah interaksi")}
-            </h2>
-            <p className="leading-relaxed text-muted-foreground">
-              {t(
-                "Half of the recommendations each participant sees are deliberately shifted in the wrong direction while the explanation keeps describing the advisor's real reasoning. Appropriate reliance is following the sound ones and overriding the flawed ones. A condition that raises following on both is producing compliance, not calibration, which is why the quantity of interest is the condition by scenario interaction and never a main effect on trust.",
-                "Separuh rekomendasi yang dilihat setiap peserta sengaja digeser ke arah yang salah, sementara penjelasannya tetap menggambarkan alasan asli penasihat. Ketergantungan yang tepat berarti mengikuti saran yang benar dan menolak saran yang keliru. Kondisi yang membuat orang lebih sering mengikuti keduanya hanya menghasilkan kepatuhan, bukan kepercayaan yang sepadan. Karena itu, yang dicari adalah interaksi antara kondisi dan skenario, bukan efek utama terhadap kepercayaan.",
-              )}
-            </p>
-            <p className="leading-relaxed text-muted-foreground">
-              {t(
-                "The flaw is detectable in every condition, through that condition's own honest content: the confidence bars peak at a different outcome than the headline, the attribution describes evidence that does not fit the shown portfolio, the counterfactual reports that a trivial change would flip the advice, and the interactive previews re-run the real advisor. What the instrument never does is state the mismatch itself. During study trials the interactive panel therefore shows its previews without a sentence comparing them to the shown recommendation, because that sentence would perform the detection for the participant.",
-                "Kekeliruan itu bisa dikenali di setiap kondisi, lewat konten jujur dari kondisi itu sendiri: grafik keyakinan memuncak di hasil yang berbeda dari judul rekomendasi, atribusi menggambarkan bukti yang tidak cocok dengan portofolio yang ditampilkan, kontrafaktual menunjukkan bahwa perubahan kecil saja akan mengubah sarannya, dan pratinjau interaktif menjalankan ulang penasihat yang sebenarnya. Yang tidak pernah dilakukan alat ini adalah menyebutkan ketidakcocokan itu secara langsung. Karena itu, selama kasus penelitian, panel interaktif menampilkan pratinjaunya tanpa kalimat yang membandingkannya dengan rekomendasi yang ditampilkan, sebab kalimat itu akan mendeteksi kekeliruan atas nama peserta.",
-              )}
-            </p>
-            <div className="panel p-6 text-sm">
-              <p className="font-medium">{t("Measures per trial", "Ukuran untuk setiap kasus")}</p>
-              <p className="mt-2 leading-relaxed text-muted-foreground">
-                {t(
-                  "Decision (follow, adjust, reject, ask a human), the direction and size of an adjustment, trust, understanding, decision confidence, mental demand, decision time, the time spent reading the case, and the interaction traces: what-if moves, why-not questions and conversational turns.",
-                  "Keputusan (ikuti, sesuaikan, tolak, tanya penasihat manusia), arah dan besar penyesuaian, kepercayaan, pemahaman, keyakinan atas keputusan, beban berpikir, waktu memutuskan, waktu membaca kasus, serta jejak interaksi: perubahan simulasi (what-if), pertanyaan mengapa-bukan, dan jumlah giliran percakapan.",
-                )}
-              </p>
-              <p className="mt-4 font-medium">{t("Moderators", "Moderator")}</p>
-              <p className="mt-2 leading-relaxed text-muted-foreground">
-                {t(
-                  "Financial literacy measured with the Big Three questions, need for cognition (six items), ease-of-satisfaction (three items), self-rated financial knowledge, and the language the session ran in.",
-                  "Literasi keuangan yang diukur dengan tiga pertanyaan Big Three, kebutuhan berpikir atau need for cognition (enam butir), kemudahan merasa puas atau ease-of-satisfaction (tiga butir), penilaian diri atas pengetahuan keuangan, dan bahasa yang dipakai selama sesi.",
-                )}
-              </p>
-            </div>
-          </Reveal>
-
-          {/* 5. Mixed methods */}
-          <Reveal as="section" className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("5. How the two strands fit together", "5. Cara kedua jenis data digabungkan")}
-            </h2>
-            <p className="leading-relaxed text-muted-foreground">
-              {t(
-                "This is a convergent design with an embedded qualitative strand. The experiment is the core, and the qualitative material is collected inside the same session rather than in a separate study, so every free-text answer is attached to a decision whose condition and scenario are known.",
-                "Ini adalah rancangan konvergen dengan komponen kualitatif yang tertanam (embedded). Eksperimen menjadi intinya, dan data kualitatif dikumpulkan di dalam sesi yang sama, bukan lewat studi terpisah, sehingga setiap jawaban tertulis terhubung dengan satu keputusan yang kondisi dan skenarionya diketahui.",
-              )}
-            </p>
-            <div className="grid gap-4 md:grid-cols-3">
-              {[
-                {
-                  title: { en: "Quantitative core", id: "Inti kuantitatif" },
-                  body: {
-                    en: "Between participants: explanation condition and advisor. Within participants: six cases, half sound and half flawed. Outcome: appropriate reliance, with trust, understanding, confidence, demand and time alongside it.",
-                    id: "Antarpeserta: kondisi penjelasan dan penasihat. Dalam diri peserta: enam kasus, separuh tepat dan separuh keliru. Hasil yang diukur: ketergantungan yang tepat, ditambah kepercayaan, pemahaman, keyakinan, beban berpikir, dan waktu.",
-                  },
-                },
-                {
-                  title: { en: "Embedded qualitative", id: "Kualitatif tertanam" },
-                  body: {
-                    en: "One reason per decision written in the moment, two reflective questions at the end, and the full transcripts of the conversational condition, which record what people ask when they can ask anything.",
-                    id: "Satu alasan untuk setiap keputusan yang ditulis saat itu juga, dua pertanyaan reflektif di akhir, dan transkrip lengkap kondisi percakapan, yang menunjukkan apa yang ditanyakan orang ketika mereka bebas bertanya apa saja.",
-                  },
-                },
-                {
-                  title: { en: "Integration", id: "Integrasi" },
-                  body: {
-                    en: "A joint display with one row per condition, reliance numbers beside the themes from that condition's reasons. The interesting findings live where the two disagree, for example a condition that raises trust and self-reported understanding while reliance gets worse.",
-                    id: "Tampilan gabungan (joint display) dengan satu baris untuk setiap kondisi: angka ketergantungan ditampilkan di samping tema dari alasan-alasan pada kondisi itu. Temuan yang menarik justru muncul saat keduanya tidak sejalan, misalnya kondisi yang menaikkan kepercayaan dan pemahaman menurut peserta sendiri, tetapi ketergantungannya malah memburuk.",
-                  },
-                },
-              ].map((b) => (
-                <div key={b.title.en} className="panel p-6">
-                  <h3 className="text-xs font-semibold uppercase tracking-widest text-primary">{p(b.title)}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p(b.body)}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-
-          {/* 6. Analysis and exclusions */}
-          <Reveal as="section" className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("6. Analysis plan and what gets excluded", "6. Rencana analisis dan data yang dikecualikan")}
-            </h2>
-            <ul className="space-y-3 leading-relaxed text-muted-foreground">
+            <h2 className="text-2xl font-semibold tracking-tight">{t("5. Analysis and exclusions", "5. Analisis dan data yang dikecualikan")}</h2>
+            <ul className="list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
               <li>
                 {t(
-                  "Appropriate reliance is modelled with mixed-effects logistic regression, condition by scenario, with random intercepts for the participant and for the case, and literacy entered as a moderator.",
-                  "Ketergantungan yang tepat dimodelkan dengan regresi logistik efek campuran (kondisi × skenario), dengan intersep acak untuk peserta dan untuk kasus, serta literasi sebagai moderator.",
+                  "Reliance in each case is modelled with mixed-effects logistic regression, condition by scenario, with random intercepts for the participant and the case. Each condition is compared with No explanation on the scenario effect, with Holm correction.",
+                  "Ketergantungan di setiap kasus dimodelkan dengan regresi logistik efek campuran (kondisi × skenario), dengan intersep acak untuk peserta dan kasus. Setiap kondisi dibandingkan dengan Tanpa penjelasan pada efek skenario, dengan koreksi Holm.",
                 )}
               </li>
               <li>
                 {t(
-                  "Sessions where the explanation style was assigned at random are the experiment. Sessions where a participant chose their style are a separate stratum, analysed as a preference signal and never pooled with the random one.",
-                  "Sesi dengan gaya penjelasan yang diundi secara acak adalah inti eksperimen. Sesi dengan gaya yang dipilih sendiri oleh peserta menjadi kelompok terpisah, dianalisis sebagai petunjuk preferensi, dan tidak pernah digabung dengan sesi acak.",
+                  "Excluded: participants who fail either attention statement, repeat sessions from the same browser, sessions finished implausibly fast (the cut-off is fixed in the pre-registration) and researcher test links.",
+                  "Dikecualikan: peserta yang gagal di salah satu pernyataan perhatian, sesi ulang dari browser yang sama, sesi yang selesai terlalu cepat (batasnya ditetapkan di pra-registrasi), dan tautan uji coba peneliti.",
                 )}
               </li>
               <li>
                 {t(
-                  "Dropout is compared across conditions. Every session records the condition it was given at consent, so a condition that loses more people than the others is visible and can be accounted for, rather than silently reshaping who is left to analyse.",
-                  "Jumlah peserta yang berhenti di tengah jalan dibandingkan antarkondisi. Setiap sesi mencatat kondisi yang diterimanya saat persetujuan diberikan, sehingga kondisi yang kehilangan lebih banyak peserta daripada yang lain bisa terlihat dan diperhitungkan, tidak diam-diam mengubah siapa saja yang tersisa untuk dianalisis.",
+                  "The sample size is planned by simulation before collection starts, and collection stops at that number of valid participants per condition.",
+                  "Ukuran sampel direncanakan lewat simulasi sebelum pengumpulan data dimulai, dan pengumpulan berhenti setelah jumlah peserta valid per kondisi tercapai.",
                 )}
               </li>
               <li>
                 {t(
-                  "Excluded from the experimental analysis: sessions that fail the attention check, repeat sessions from the same browser, and responses on the advisor pages, which are marked as tryouts because the person chose their own style and wrote their own profile.",
-                  "Dikecualikan dari analisis eksperimen: sesi yang gagal dalam cek perhatian, sesi ulang dari browser yang sama, dan jawaban di halaman penasihat, yang ditandai sebagai uji coba karena orangnya memilih gaya dan menulis profilnya sendiri.",
-                )}
-              </li>
-              <li>
-                {t(
-                  "This deployment is a pilot for developing the instrument. It is not powered for confirmatory tests, and pilot data is not for publication before a formal ethics review. The confirmatory plan is to run the content arm first and the delivery arm afterwards at the content level that arm selects.",
-                  "Versi yang berjalan saat ini adalah studi pilot untuk mengembangkan alat penelitian. Jumlah pesertanya tidak dirancang untuk uji konfirmatori, dan data pilot tidak akan dipublikasikan sebelum ada kajian etik resmi. Rencana untuk tahap konfirmatori adalah menjalankan lengan konten lebih dulu, lalu lengan penyajian pada tingkat konten yang terpilih dari lengan pertama.",
+                  "Every row records the app version, the design and the phase. Pilot answers are used to improve the study and are not reported as results; the main study begins once the ethics committee has approved the protocol.",
+                  "Setiap baris data mencatat versi aplikasi, rancangan, dan tahapnya. Jawaban dari tahap uji coba dipakai untuk memperbaiki penelitian dan tidak dilaporkan sebagai hasil; studi utama dimulai setelah komisi etik menyetujui protokolnya.",
                 )}
               </li>
             </ul>
           </Reveal>
 
+          {/* 6. History */}
+          <Reveal as="section" className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">{t("6. How the design got here", "6. Asal-usul rancangan ini")}</h2>
+            <p className="leading-relaxed text-muted-foreground">
+              {t(
+                "The pilot up to version 2.15 ran a wider fractional design: the five contents above, plus interactive, adaptive and conversational delivery, with two advisors assigned at random, nine cells in all. That needs more participants than one study can recruit, so version 3.0.0 keeps the content comparison with one advisor and leaves delivery and the advisor comparison for later studies. The pilot's flawed advice also changed: it used to show a different outcome from the one the advisor computed, which made the explanations attach the computed outcome's numbers to the shown outcome's name. The code for the other conditions stays in the repository, and the conversational explainer stays on the advisor pages, outside the study.",
+                "Uji coba hingga versi 2.15 memakai rancangan fraksional yang lebih luas: lima konten di atas, ditambah penyajian interaktif, adaptif, dan percakapan, dengan dua penasihat yang diundi, total sembilan sel. Itu membutuhkan lebih banyak peserta daripada yang bisa direkrut satu studi, sehingga versi 3.0.0 mempertahankan perbandingan konten dengan satu penasihat dan menyisakan penyajian serta perbandingan penasihat untuk studi berikutnya. Cara membuat saran keliru juga berubah: dulu yang ditampilkan adalah hasil yang berbeda dari hasil hitungan penasihat, sehingga penjelasan menempelkan angka hasil hitungan pada nama hasil yang ditampilkan. Kode untuk kondisi lain tetap ada di repositori, dan fitur percakapan tetap ada di halaman penasihat, di luar penelitian.",
+              )}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t("The protocol, the consent text and the pre-registration draft are in", "Protokol, teks persetujuan, dan draf pra-registrasi ada di")}{" "}
+              <a
+                href="https://github.com/Raditya-P/AdviceIT/tree/main/docs/research"
+                target="_blank"
+                rel="noopener"
+                className="font-medium text-primary underline underline-offset-4"
+              >
+                docs/research
+              </a>
+              .
+            </p>
+          </Reveal>
+
           <Reveal as="section" className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {t("See it from the inside", "Coba sendiri")}
-            </h2>
+            <h2 className="text-2xl font-semibold tracking-tight">{t("See it from the inside", "Coba sendiri")}</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
               {t(
-                "The fastest way to understand the design is to sit in one of its cells for ten minutes.",
-                "Cara tercepat memahami rancangan ini adalah mencobanya sendiri sebagai peserta selama sepuluh menit.",
+                "The fastest way to understand the design is to take part once.",
+                "Cara tercepat memahami rancangan ini adalah mencobanya sendiri sebagai peserta.",
               )}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">

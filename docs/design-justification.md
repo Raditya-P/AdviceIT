@@ -150,11 +150,25 @@ set goes to the language model with context. The model never originates a number
 
 ## 13. Sound versus flawed advice, and appropriate reliance
 
+**Decision (from 3.0.0).** Flawed advice is made by giving the advisor one or two wrong facts about the
+person (a misread), fixed per case, so its advice is unsuitable while its explanations stay faithful to
+what it computed, the wrong facts included. Up to 2.15 the shown outcome was shifted two mixes away from
+the computed one, which made the explanations attach the computed outcome's numbers to the shown
+outcome's name: an unfaithful explanation, and a cue that told the participant the answer outright.
+The primary outcome is defined in `src/lib/scoring.ts`: relying on sound advice and not relying on
+flawed advice are appropriate, and asking a human adviser counts as relying when the advice itself was
+a referral.
+
 | Source | What it supports | Status |
 | --- | --- | --- |
 | Schemmer, Kühl, Benz, Bartos and Satzger (2023). Appropriate Reliance on AI Advice: Conceptualization and the Effect of Explanations. IUI '23. doi:10.1145/3581641.3584066 | The two-dimensional Appropriateness of Reliance measurement concept, which our primary outcome should be defined against | WEB |
 | Buçinca, Malaya and Gajos (2021) | Overreliance as the failure mode, and that explanations alone do not fix it | WEB |
+| Bansal, Wu, Zhou, Fok, Nushi, Kamar, Ribeiro and Weld (2021). Does the Whole Exceed its Parts? The Effect of AI Explanations on Complementary Team Performance. CHI '21. doi:10.1145/3411764.3445717 | Explanations raised acceptance of AI recommendations whether or not they were correct. The reason the study needs flawed advice at all, and the null expectation against which H2 is set | WEB |
 | Dietvorst, Simmons and Massey. Algorithm Aversion, and Overcoming Algorithm Aversion | The opposite failure, rejection of sound algorithmic advice | PDF (in PAPERS) |
+
+**Honest note.** A misread is one realistic way automated advice goes wrong (bad input), not the only
+one. A model that is wrong on correct input, the case Bansal et al. study, is not represented, and the
+paper should say so.
 
 ## 14. Perception measures
 
@@ -165,6 +179,16 @@ set goes to the language model with context. The model never originates a number
 | Van Der Laan, Heino and De Waard (1997). A simple procedure for the assessment of acceptance of advanced transport telematics | The acceptance scale Szymanski adapted | REF (TIIS ref 85) |
 | Wijekoon et al. (2024). XEQ Scale for Evaluating XAI Experience Quality | The scale for the conversational condition specifically | REF (CUI ref 67) |
 | Balog and Radlinski (2020). Measuring Recommendation Explanation Quality. SIGIR '20 | Explanation quality has conflicting goals, so single-item quality measures mislead | REF (TIIS ref 6) |
+
+## 14b. Attention checks
+
+**Decision (from 3.0.0).** Two instructed-response statements, one among the statements before the
+cases and one on the last page, replace the pilot's attention case, which asked for Reject on one of the
+scored cases and so mixed an instruction into the reliance data.
+
+| Source | What it supports | Status |
+| --- | --- | --- |
+| Meade and Craig (2012). Identifying careless responses in survey data. Psychological Methods 17(3), 437-455. doi:10.1037/a0028085 | Instructed-response items as a detector of careless responding, recommended for inclusion before data collection | WEB |
 
 ## 15. Personal characteristics
 

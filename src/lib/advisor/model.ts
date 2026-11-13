@@ -124,33 +124,6 @@ export function deriveSuitabilityLabels(profile: Profile): Labels {
   };
 }
 
-/* Flawed advice for measuring appropriate reliance: the shown outcome is
-   shifted two portfolios in the wrong direction. A Human review outcome is
-   replaced by an automated portfolio two steps more aggressive than the
-   score-based second choice, the realistic failure of automating a case
-   that should have gone to a human. */
-export function applyFlawedScenario<T extends { portfolioIndex: number; scorePortfolio: Outcome; portfolio: Outcome }>(
-  result: T,
-): T & { flawed: true; soundPortfolio: Outcome; soundPortfolioIndex: number } {
-  const idx = result.portfolioIndex;
-  let wrongIdx: number;
-  if (idx === HUMAN_REVIEW_INDEX) {
-    const base = result.scorePortfolio ? PORTFOLIOS.findIndex((p) => p.id === result.scorePortfolio.id) : 2;
-    wrongIdx = clamp((base < 0 ? 2 : base) + 2, 0, PORTFOLIOS.length - 1);
-  } else {
-    wrongIdx = idx <= 2 ? idx + 2 : idx - 2;
-    wrongIdx = clamp(wrongIdx, 0, PORTFOLIOS.length - 1);
-  }
-  return {
-    ...result,
-    flawed: true as const,
-    soundPortfolio: result.portfolio,
-    soundPortfolioIndex: result.portfolioIndex,
-    portfolio: PORTFOLIOS[wrongIdx],
-    portfolioIndex: wrongIdx,
-  };
-}
-
 export interface ExampleProfile {
   id: string;
   label: string;

@@ -16,9 +16,12 @@ import { SiteFooter } from "@/components/site-footer";
 import { PageHero } from "@/components/page-hero";
 import { grantResearcherAccess } from "@/lib/researcher";
 import { SiteHeader } from "@/components/site-header";
+import { STUDY_DESIGN, STUDY_PHASE } from "@/lib/study";
 import {
   CONDITION_LABELS,
   assignmentTable,
+  inCohort,
+  type PhaseFilter,
   dedupeRows,
   exits,
   fmt,
@@ -42,6 +45,11 @@ export default function ResearcherPage() {
   const [busy, setBusy] = useState(false);
   const [randomOnly, setRandomOnly] = useState(false);
   const [dropFailedAttention, setDropFailedAttention] = useState(false);
+  /* The design in force and its current phase, by default: rows from the
+     earlier pilot designs are a different study and stay out of the tables
+     unless asked for. */
+  const [currentDesign, setCurrentDesign] = useState(true);
+  const [phase, setPhase] = useState<PhaseFilter>(STUDY_PHASE);
 
   /* The API returns pages of rows, oldest first, and the key goes in a
      header so it never appears in a request log. */
@@ -110,7 +118,7 @@ export default function ResearcherPage() {
   /* The tables read deduplicated rows, and the experiment tables follow the
      two analysis-population toggles. The CSV downloads stay the raw rows,
      so no exclusion is decided for the analyst. */
-  const unique = rows ? dedupeRows(rows) : null;
+  const unique = rows ? dedupeRows(rows).filter((r) => inCohort(r, currentDesign ? STUDY_DESIGN : null, phase)) : null;
   const duplicates = rows && unique ? rows.length - unique.length : 0;
   const failedParticipants = unique
     ? new Set(unique.filter((r) => r.attentionCheck === "failed").map((r) => String(r.participantId))).size
@@ -163,7 +171,8 @@ export default function ResearcherPage() {
                 /advisor/logit?researcher=1
               </Link>
               , where the scenario toggle, the suitability labels, the advisor comparison and the ILS-Bench case loader
-              live. Custom study links: /study?cond=&lt;preset&gt;&amp;pid=P07, or /study?content=feature,confidence&amp;form=interactive.
+              live. A study link can fix the condition for testing: /study?cond=hybrid&amp;pid=P07 (one of none, feature,
+              counterfactual, confidence, hybrid). Such sessions are logged with assignmentMethod &quot;url&quot;.
             </p>
           </div>
         </PageHero>
@@ -199,12 +208,28 @@ export default function ResearcherPage() {
                   Analysis population
                 </span>
                 <label className="flex items-center gap-2">
+                  <Checkbox checked={currentDesign} onCheckedChange={(v) => setCurrentDesign(v === true)} />
+                  Current design only ({STUDY_DESIGN})
+                </label>
+                <label className="flex items-center gap-2">
+                  Phase
+                  <select
+                    value={phase}
+                    onChange={(e) => setPhase(e.target.value as PhaseFilter)}
+                    className="rounded-md border bg-background px-2 py-1"
+                  >
+                    <option value="pilot">Pilot</option>
+                    <option value="main">Main study</option>
+                    <option value="all">All</option>
+                  </select>
+                </label>
+                <label className="flex items-center gap-2">
                   <Checkbox checked={randomOnly} onCheckedChange={(v) => setRandomOnly(v === true)} />
                   Random assignment only (the experiment)
                 </label>
                 <label className="flex items-center gap-2">
                   <Checkbox checked={dropFailedAttention} onCheckedChange={(v) => setDropFailedAttention(v === true)} />
-                  Exclude participants who failed the attention check ({failedParticipants})
+                  Exclude participants who failed an attention check ({failedParticipants})
                 </label>
                 {duplicates > 0 && (
                   <span className="text-muted-foreground">{duplicates} duplicate rows are counted once.</span>
@@ -299,7 +324,7 @@ export default function ResearcherPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      {["Condition", "n", "sound n", "follow on sound", "flawed n", "override on flawed", "appropriate", "over-reliance", "under-reliance", "asked a human"].map((h) => (
+                      {["Condition", "n", "sound n", "relied on sound", "flawed n", "did not rely on flawed", "appropriate", "over-reliance", "under-reliance", "corrected flawed", "asked a human"].map((h) => (
                         <TableHead key={h}>{h}</TableHead>
                       ))}
                     </TableRow>
@@ -316,6 +341,7 @@ export default function ResearcherPage() {
                         <TableCell>{r.appropriate}</TableCell>
                         <TableCell>{r.overReliance}</TableCell>
                         <TableCell>{r.underReliance}</TableCell>
+                        <TableCell>{r.correctedFlawed}</TableCell>
                         <TableCell>{r.askedHuman}</TableCell>
                       </TableRow>
                     ))}

@@ -28,22 +28,27 @@ export const ASSIGN_LOCK = `select pg_advisory_xact_lock(20261001)`;
    counts everyone who finished in it under random assignment, plus everyone
    given it in the last two hours who has not finished yet, the people
    probably still taking part. Someone who abandoned a session hours ago no
-   longer holds a place, so dropout does not starve a cell.
-   $1 participant, $2 the assignable conditions comma separated, $3 language. */
+   longer holds a place, so dropout does not starve a cell. Only sessions of
+   the same design and phase count, so a new design or the main study starts
+   level instead of inheriting the pilot's numbers.
+   $1 participant, $2 the assignable conditions comma separated, $3 language,
+   $4 the advisors comma separated, $5 design, $6 phase, $7 app version. */
 export const ASSIGN_PICK = `
 with cells as (
   select c as condition, a as advisor
   from unnest(string_to_array($2, ',')) as c
-  cross join unnest(array['ml', 'logit']) as a
+  cross join unnest(string_to_array($4, ',')) as a
 ),
 holding as (
   select participant_id, condition, advisor
   from responses
   where row_type = 'exit' and payload->>'assignedBy' = 'random'
+    and payload->>'studyDesign' = $5 and payload->>'studyPhase' = $6
   union
   select s.participant_id, s.condition, s.advisor
   from responses s
   where s.row_type = 'assign' and s.created_at > now() - interval '2 hours'
+    and s.payload->>'studyDesign' = $5 and s.payload->>'studyPhase' = $6
     and not exists (
       select 1 from responses x where x.row_type = 'exit' and x.participant_id = s.participant_id
     )
@@ -68,6 +73,9 @@ select $1, 'assign', pick.condition, pick.advisor,
     'assignedBy', 'random',
     'assignmentMethod', 'balanced',
     'language', $3::text,
+    'studyDesign', $5::text,
+    'studyPhase', $6::text,
+    'appVersion', $7::text,
     'timestamp', to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
   )
 from pick

@@ -46,7 +46,8 @@ export function ExplanationCard({
   );
 }
 
-export function FeatureBox({ result, modality = "visual" }: { result: AdvisorResult; modality?: Modality }) {
+/* plain: leave out the method footnote. Set in study cases. */
+export function FeatureBox({ result, modality = "visual", plain }: { result: AdvisorResult; modality?: Modality; plain?: boolean }) {
   const { locale } = useLang();
   const fx = featureExplanation(result);
   const showBars = modality === "visual" || modality === "hybrid";
@@ -92,7 +93,7 @@ export function FeatureBox({ result, modality = "visual" }: { result: AdvisorRes
         </ul>
       )}
       <p className="border-t border-border/70 pt-3 font-medium">{total}</p>
-      <p className="text-xs text-muted-foreground">{fx.methodNote}</p>
+      {!plain && <p className="text-xs text-muted-foreground">{fx.methodNote}</p>}
     </ExplanationCard>
   );
 }
@@ -124,7 +125,7 @@ function cfValue(v: string, locale: "en" | "id") {
   return CF_VALUE_ID[v] ?? v.replace(" years old", " tahun").replace(" years", " tahun").replace(" year", " tahun");
 }
 
-export function CounterfactualBox({ result }: { result: AdvisorResult }) {
+export function CounterfactualBox({ result, plain }: { result: AdvisorResult; plain?: boolean }) {
   const { locale } = useLang();
   const cf = counterfactualExplanation(result);
   return (
@@ -149,7 +150,7 @@ export function CounterfactualBox({ result }: { result: AdvisorResult }) {
           ))}
         </ul>
       )}
-      <p className="text-xs text-muted-foreground">{CF.rerunNote(result.advisor === "ml")}</p>
+      {!plain && <p className="text-xs text-muted-foreground">{CF.rerunNote(result.advisor === "ml")}</p>}
     </ExplanationCard>
   );
 }
@@ -178,7 +179,7 @@ export function ProbabilityBars({ probabilities, topIndex }: { probabilities: nu
   );
 }
 
-export function ConfidenceBox({ result }: { result: AdvisorResult }) {
+export function ConfidenceBox({ result, plain }: { result: AdvisorResult; plain?: boolean }) {
   const { locale } = useLang();
   const cx = confidenceExplanation(result);
   const tone =
@@ -195,12 +196,14 @@ export function ConfidenceBox({ result }: { result: AdvisorResult }) {
       </div>
       <p>{cx.sentence}</p>
       <ProbabilityBars probabilities={cx.probabilities} topIndex={result.portfolioIndex} />
-      <p className="text-xs text-muted-foreground">
-        {tr(locale, {
-          en: "Note: confidence displays can increase or decrease reliance depending on how people read them. That effect is exactly what this study measures.",
-          id: "Catatan: angka keyakinan bisa membuat orang lebih atau kurang mengandalkan saran, tergantung cara membacanya. Efek inilah yang diukur dalam penelitian ini.",
-        })}
-      </p>
+      {!plain && (
+        <p className="text-xs text-muted-foreground">
+          {tr(locale, {
+            en: "Note: confidence displays can increase or decrease reliance depending on how people read them. That effect is exactly what this study measures.",
+            id: "Catatan: angka keyakinan bisa membuat orang lebih atau kurang mengandalkan saran, tergantung cara membacanya. Efek inilah yang diukur dalam penelitian ini.",
+          })}
+        </p>
+      )}
     </ExplanationCard>
   );
 }

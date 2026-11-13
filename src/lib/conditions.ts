@@ -23,10 +23,10 @@ export interface ConditionSpec {
   modality?: Modality;
 }
 
-/* The nine cells of the pilot's fractional design. Five vary content at
-   static delivery, three vary delivery at the full content, and
-   "interactive" keeps interactivity with no written explanation, whose
-   clean comparator is "none" rather than "hybrid". */
+/* Every condition the instrument can show. The study uses the five content
+   conditions at static delivery (ASSIGNABLE_CONDITIONS in src/lib/study.ts);
+   the rest, from the pilot's wider design, stay available on the advisor
+   pages and for later studies. */
 export const PRESETS: Record<string, ConditionSpec> = {
   none: { content: [], form: "static" },
   feature: { content: ["feature"], form: "static", modality: "visual" },

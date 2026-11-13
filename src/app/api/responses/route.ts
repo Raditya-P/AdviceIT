@@ -15,8 +15,8 @@ import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { MAX_BODY_BYTES, MAX_ROWS_PER_POST, PARTICIPANT_ID_PATTERN } from "@/lib/records";
 import { INSERT_ROW } from "@/lib/sql";
 
-/* Limits. A study session is six trial rows and one exit row, so anything
-   beyond these is not a participant. */
+/* Limits. A study session is eight trial rows and one exit row, so
+   anything beyond these is not a participant. */
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_MAX_POSTS = 60;
 
@@ -57,6 +57,7 @@ const ALLOWED_KEYS = new Set([
   "whyNotAsked", "adaptiveVariant", "attentionCheck", "decisionTimeMs", "llmModel", "llmExplanation",
   "llmTurns", "llmRoutedTurns", "llmIntents", "llmModelAvailable", "exitDistrustMoment", "exitMissingExplanation", "userAgentMobile", "caseReadMs",
   "profileSource", "tryIndex", "sessionResumes", "sessionElapsedMs",
+  "appVersion", "studyDesign", "studyPhase", "misread", "attention1", "attention2", "repeatOf",
 ]);
 
 function sanitize(row: Record<string, unknown>): Record<string, unknown> | null {

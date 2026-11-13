@@ -1,14 +1,21 @@
 "use client";
 
-/* The full study flow: consent, the Big Three literacy questions, six
-   trials (half sound, half flawed, order seeded by the participant ID),
-   an attention check, an exit questionnaire, a debrief naming the flawed
-   trials, and a done screen with a verifiable completion code.
+/* The full study flow: consent, the Big Three literacy questions, the
+   statements about how the participant thinks, eight cases (half sound,
+   half flawed, order seeded by the participant ID), an exit questionnaire,
+   a debrief naming each flawed case and the wrong fact behind it, and a
+   done screen with a verifiable completion code. Two attention statements
+   sit in the questionnaires, never in a case.
 
-   Assignment: the explanation condition comes from /participate (random by
-   default, a chosen card is allowed and logged as chosen). The advisor is
-   randomised here and logged. One row is POSTed per trial plus one exit
-   row, with a localStorage buffer as fallback.
+   Assignment: the server places the participant in one of the five
+   explanation conditions at consent (src/lib/sql.ts). The advisor is the
+   same for everyone (STUDY_ADVISOR). Every row carries the app version,
+   the design and the phase. One row is POSTed per case plus one exit row,
+   with a localStorage buffer as fallback.
+
+   Nothing in a case moves or changes between conditions except the
+   explanation itself: no condition name on screen, no method notes, no
+   reasons on a referral, so reading and decision times stay comparable.
 
    Language: the participant-facing texts follow the site language toggle.
    Logged values (decisions, portfolio names, labels, option values) stay
@@ -25,11 +32,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ADVISORS } from "@/lib/advisor/advisors";
-import { PORTFOLIOS, applyFlawedScenario } from "@/lib/advisor/model";
+import { misreadCode, recommendWithMisread } from "@/lib/advisor/flaw";
+import { PORTFOLIOS, normalizeProfile } from "@/lib/advisor/model";
 import { outcomeName } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
-import { modalityOf, presetLabel, specFor, type ContentPart, type Form, type Modality } from "@/lib/conditions";
+import { modalityOf, specFor, type ContentPart, type Form, type Modality } from "@/lib/conditions";
 import { ArrowRight, Check, Copy, UserRound } from "lucide-react";
+import { VERSION } from "@/lib/version";
 import { tr, useLang } from "@/lib/i18n";
 import {
   markParticipated,
@@ -48,20 +57,26 @@ import {
   type ResumableStage,
   type SavedSession,
 } from "@/lib/session";
-import * as llm from "@/lib/llm";
 import {
   ASSIGNABLE_CONDITIONS,
+  ATTENTION_ITEMS,
   CONTACT,
   EOS_ITEMS,
+  ETHICS_APPROVAL,
   LITERACY_CORRECT,
   NFC_ITEMS,
   PERCEPTION_ITEMS,
+  STUDY_ADVISOR,
+  STUDY_DESIGN,
+  STUDY_PHASE,
+  SUPERVISOR,
+  attentionResult,
   buildPlan,
   caseDisplay,
   completionCode,
   literacyFor,
-  randomAdvisor,
   itemsFor,
+  misreadSentence,
   randomParticipantId,
   scaleScore,
   textsFor,
@@ -120,7 +135,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   const LQ = literacyFor(locale);
 
   const [pid] = useState(() => restored?.pid || assignment.pid || randomParticipantId());
-  const [advisorId, setAdvisorId] = useState<"ml" | "logit">(() => restored?.advisorId ?? randomAdvisor());
+  const advisorId = STUDY_ADVISOR;
   /* The condition in force. A restored session carries its own, so coming
      back through a different link cannot move anyone into another one. */
   const [live, setLive] = useState<Assignment>(() =>
@@ -151,6 +166,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   const [exit1, setExit1] = useState(restored?.exit1 ?? "");
   const [exit2, setExit2] = useState(restored?.exit2 ?? "");
   const [exitBusy, setExitBusy] = useState(false);
+  const [exitError, setExitError] = useState("");
   const prior = useMemo(() => (typeof window === "undefined" ? null : priorParticipation()), []);
   const router = useRouter();
   const [resumed, setResumed] = useState<{ stage: ResumableStage; trialIdx: number } | null>(() =>
@@ -159,8 +175,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   const startedAt = useRef(restored?.startedAt ?? "");
   const resumes = useRef(restored ? restored.resumes + 1 : 0);
 
-  const plan = useMemo(() => buildPlan(pid, 6), [pid]);
-  const advisor = ADVISORS[advisorId];
+  const plan = useMemo(() => buildPlan(pid), [pid]);
 
   const literacyScore = useMemo(() => {
     let score = 0;
@@ -183,7 +198,8 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
     const now = new Date().toISOString();
     if (!startedAt.current) startedAt.current = now;
     saveSession({
-      v: 1,
+      v: 2,
+      design: STUDY_DESIGN,
       pid,
       advisorId,
       condition: live.condition,
@@ -242,7 +258,12 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
       </Alert>
     ) : null;
 
+  /* attn1 is answered before the cases, so every case row carries its result. */
+  const attention1 = attentionResult("attn1", pcAnswers.attn1);
   const baseRow = (): Omit<StudyRow, "rowType" | "timestamp"> => ({
+    appVersion: VERSION,
+    studyDesign: STUDY_DESIGN,
+    studyPhase: STUDY_PHASE,
     participantId: pid,
     condition: live.condition,
     explanationContent: live.content.join("+"),
@@ -251,7 +272,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
     assignedBy: live.assignedBy,
     assignmentMethod: method,
     advisorModel: advisorId,
-    advisorAssignedBy: "random",
+    advisorAssignedBy: "fixed",
     language: locale,
     literacyScore: literacyScore.answered ? literacyScore.score : "",
     literacyAnswers: LQ.map((q) => litAnswers[q.name] || "").join("|"),
@@ -267,6 +288,11 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
        able to see that it was. */
     sessionResumes: resumes.current,
     sessionElapsedMs: startedAt.current ? Date.now() - Date.parse(startedAt.current) : "",
+    /* The ID of a session this browser had already completed, so repeat
+       sessions can be excluded as the pre-registration says. */
+    repeatOf: prior?.pid ?? "",
+    attention1,
+    attentionCheck: attention1,
   });
 
   const submitTrial = async (row: Partial<StudyRow>) => {
@@ -276,6 +302,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
 
   /* Guarded like the trial submit, so a double click on the last button
      cannot send the exit row twice. */
+  const attention2 = attentionResult("attn2", perception.attn2);
   const finishExit = async () => {
     if (exitBusy) return;
     setExitBusy(true);
@@ -291,6 +318,8 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
       percPersuasiveness: perception.percPersuasiveness ?? "",
       percUsefulness: perception.percUsefulness ?? "",
       percSatisfaction: perception.percSatisfaction ?? "",
+      attention2: attention2,
+      attentionCheck: attention1 === "failed" || attention2 === "failed" ? "failed" : "passed",
       exitDistrustMoment: exit1.trim().slice(0, 2000),
       exitMissingExplanation: exit2.trim().slice(0, 2000),
     } as StudyRow);
@@ -318,7 +347,6 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           form: spec.form,
           modality: modalityOf(spec),
         }));
-        setAdvisorId(cell.advisor);
         setMethod("balanced");
       }
       setAssigning(false);
@@ -341,17 +369,39 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
             </AlertDescription>
           </Alert>
         )}
-        {TX.consent.map((para, i) => (
-          <p key={i} className="text-muted-foreground">
-            {para}
-          </p>
-        ))}
+        <p className="leading-relaxed">{TX.consentIntro}</p>
+        <dl className="space-y-3">
+          {TX.consent.map((block) => (
+            <div key={block.heading} className="rounded-xl bg-muted/50 px-4 py-3">
+              <dt className="font-semibold">{block.heading}</dt>
+              <dd className="mt-1 leading-relaxed text-muted-foreground">{block.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="text-muted-foreground">
+          {ETHICS_APPROVAL
+            ? TX.approvalNote
+                .replace("{committee}", ETHICS_APPROVAL.committee)
+                .replace("{reference}", ETHICS_APPROVAL.reference)
+            : TX.pilotNote}
+        </p>
         <p className="text-muted-foreground">
           {t(
-            "For questions, or to have your data deleted later, write to",
-            "Jika ada pertanyaan, atau jika nanti ingin data Anda dihapus, hubungi",
+            "For questions, or to have your answers deleted later, write to",
+            "Jika ada pertanyaan, atau jika nanti ingin jawaban Anda dihapus, hubungi",
           )}{" "}
-          <ContactLine />.{" "}
+          <ContactLine />
+          {SUPERVISOR && (
+            <>
+              {t(" or the supervising lecturer, ", " atau dosen pembimbing, ")}
+              {SUPERVISOR.name} (
+              <a className="font-medium text-primary underline underline-offset-4" href={`mailto:${SUPERVISOR.email}`}>
+                {SUPERVISOR.email}
+              </a>
+              )
+            </>
+          )}
+          .{" "}
           {t("The", "Semua data yang dicatat dijelaskan di")}{" "}
           <Link href="/privacy" target="_blank" rel="noopener" className="underline underline-offset-4">
             {t("privacy page", "halaman privasi")}
@@ -360,10 +410,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         </p>
         <label className="flex items-start gap-2 pt-2 font-medium">
           <Checkbox checked={consented} onCheckedChange={(v) => setConsented(v === true)} className="mt-0.5" />
-          {t(
-            "I have read the information above and I agree to take part.",
-            "Saya sudah membaca informasi di atas dan bersedia ikut serta.",
-          )}
+          {TX.agree}
         </label>
         <div className="flex items-center gap-3 pt-2">
           <Button disabled={!consented || assigning} onClick={begin}>
@@ -416,15 +463,18 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
   }
 
   if (stage === "characteristics") {
-    const nfc = itemsFor(NFC_ITEMS, locale);
+    /* The first attention statement sits among the need for cognition items,
+       after the fourth, where answering by habit is likeliest. */
+    const nfcAll = itemsFor(NFC_ITEMS, locale);
+    const nfc = [...nfcAll.slice(0, 4), ...itemsFor(ATTENTION_ITEMS.slice(0, 1), locale), ...nfcAll.slice(4)];
     const eos = itemsFor(EOS_ITEMS, locale);
-    const answered = [...NFC_ITEMS, ...EOS_ITEMS].filter((it) => pcAnswers[it.name]).length;
+    const answered = [...nfc, ...eos].filter((it) => pcAnswers[it.name]).length;
     return (
       <StageShell title={t("A little about how you think", "Sedikit tentang cara Anda berpikir")} notice={resumeNotice}>
         <p className="text-muted-foreground">
           {t(
-            "These nine statements are not a test and have no right answers. They measure two traits that are known to change how people respond to explanations, so that we can account for them.",
-            "Sembilan pernyataan berikut bukan tes, jadi tidak ada jawaban yang benar atau salah. Pernyataan ini mengukur dua sifat yang diketahui memengaruhi cara orang menanggapi penjelasan, supaya kami bisa memperhitungkannya dalam analisis.",
+            "These statements are not a test and have no right answers. Choose how much you agree with each one.",
+            "Pernyataan berikut bukan tes, jadi tidak ada jawaban yang benar atau salah. Pilih seberapa setuju Anda dengan setiap pernyataan.",
           )}
         </p>
         <div className="space-y-4">
@@ -460,7 +510,7 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           size="lg"
           className="h-11 rounded-full px-6"
           onClick={() => {
-            if (answered < NFC_ITEMS.length + EOS_ITEMS.length) {
+            if (answered < nfc.length + eos.length) {
               setPcError(t("Please answer every statement.", "Mohon tanggapi setiap pernyataan."));
               return;
             }
@@ -483,10 +533,6 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
         key={trial.index}
         trial={trial}
         total={plan.length}
-        advisorRecommend={(p) => {
-          const r = advisor.recommend(p);
-          return trial.scenario === "flawed" ? applyFlawedScenario(r) : r;
-        }}
         assignment={live}
         literacyLevel={literacyLevel}
         saved={saved}
@@ -530,7 +576,18 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
             </div>
           </>
         )}
-        <p className={sawExplanation ? "pt-2 text-muted-foreground" : "text-muted-foreground"}>{TX.exitIntro}</p>
+        <div className={sawExplanation ? "pt-2" : ""}>
+          {itemsFor(ATTENTION_ITEMS.slice(1), locale).map((it) => (
+            <LikertRow
+              key={it.name}
+              index={sawExplanation ? PERCEPTION_ITEMS.length + 1 : 1}
+              label={it.text}
+              value={perception[it.name]}
+              onChange={(v) => setPerception((a) => ({ ...a, [it.name]: v }))}
+            />
+          ))}
+        </div>
+        <p className="pt-2 text-muted-foreground">{TX.exitIntro}</p>
         <div className="space-y-1.5">
           <Label htmlFor="exit1">{TX.exitQ1}</Label>
           <Textarea id="exit1" rows={3} value={exit1} onChange={(e) => setExit1(e.target.value)} />
@@ -539,7 +596,21 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
           <Label htmlFor="exit2">{TX.exitQ2}</Label>
           <Textarea id="exit2" rows={3} value={exit2} onChange={(e) => setExit2(e.target.value)} />
         </div>
-        <Button size="lg" className="h-11 rounded-full px-6" onClick={finishExit} disabled={exitBusy}>
+        {exitError && <p className="text-sm text-destructive">{exitError}</p>}
+        <Button
+          size="lg"
+          className="h-11 rounded-full px-6"
+          onClick={() => {
+            const ratingsDone = !sawExplanation || PERCEPTION_ITEMS.every((it) => perception[it.name]);
+            if (!ratingsDone || perception.attn2 === undefined) {
+              setExitError(t("Please answer every statement.", "Mohon tanggapi setiap pernyataan."));
+              return;
+            }
+            setExitError("");
+            void finishExit();
+          }}
+          disabled={exitBusy}
+        >
           {t("Continue", "Lanjut")}
         </Button>
       </StageShell>
@@ -550,12 +621,15 @@ function StudySession({ assignment, restored }: { assignment: Assignment; restor
     return (
       <StageShell title={TX.debriefTitle}>
         <p className="text-muted-foreground">{TX.debriefIntro}</p>
-        <ul className="list-disc pl-5">
+        <ul className="space-y-2">
           {plan
             .filter((tt) => tt.scenario === "flawed")
             .map((tt) => (
-              <li key={tt.index}>
-                {t("Case", "Kasus")} {tt.index + 1} ({caseDisplay(tt, locale).label})
+              <li key={tt.index} className="rounded-xl bg-muted/50 px-4 py-3">
+                <p className="font-medium">
+                  {t("Story", "Cerita")} {tt.index + 1}: {caseDisplay(tt, locale).label}
+                </p>
+                <p className="text-sm text-muted-foreground">{misreadSentence(tt.misread, tt.profile, locale)}</p>
               </li>
             ))}
         </ul>
@@ -663,7 +737,6 @@ function StageShell({
 function TrialStage({
   trial,
   total,
-  advisorRecommend,
   assignment,
   literacyLevel,
   saved,
@@ -671,7 +744,6 @@ function TrialStage({
 }: {
   trial: Trial;
   total: number;
-  advisorRecommend: (p: Trial["profile"]) => AdvisorResult;
   assignment: Assignment;
   literacyLevel: "low" | "high";
   saved: "server" | "local" | null;
@@ -680,7 +752,15 @@ function TrialStage({
   const { locale } = useLang();
   const t = (en: string, id: string) => tr(locale, { en, id });
   const shown = caseDisplay(trial, locale);
-  const result = useMemo(() => advisorRecommend(trial.profile), [advisorRecommend, trial.profile]);
+  /* On a flawed case the advisor is given the case's misread facts, and
+     everything it shows, explanations included, follows from those. */
+  const result: AdvisorResult = useMemo(
+    () =>
+      trial.scenario === "flawed"
+        ? recommendWithMisread(STUDY_ADVISOR, trial.profile, trial.misread)
+        : ADVISORS[STUDY_ADVISOR].recommend(trial.profile),
+    [trial],
+  );
   /* Each trial runs in three phases: read the case, watch the advisor work,
      then judge the advice. Reading the case on its own page is what stops
      people from jumping straight to the recommendation, and the case stays
@@ -702,13 +782,6 @@ function TrialStage({
   const [busy, setBusy] = useState(false);
   const [whatIfMoves, setWhatIfMoves] = useState(0);
   const [whyNotAsked, setWhyNotAsked] = useState(0);
-  const llmData = useRef<{ opening: string; model: string; turns: number; routed: number; intents: string[] }>({
-    opening: "",
-    model: "",
-    turns: 0,
-    routed: 0,
-    intents: [],
-  });
 
   /* TrialStage is keyed by trial index, so a new trial remounts it and every
      ref and phase starts fresh. Clocks are read in effects, never in render. */
@@ -725,8 +798,8 @@ function TrialStage({
     if (!decision) {
       setError(
         t(
-          "Please choose Follow, Adjust, Reject, or Ask a human adviser.",
-          "Silakan pilih Ikuti, Sesuaikan, Tolak, atau Tanya penasihat manusia.",
+          "Please choose what you would do with this advice.",
+          "Silakan pilih apa yang akan Anda lakukan dengan saran ini.",
         ),
       );
       return;
@@ -743,7 +816,8 @@ function TrialStage({
     setMissing(false);
     setError("");
     setBusy(true);
-    const p = result.profile;
+    /* The person as the case describes them, not as the advisor read them. */
+    const p = normalizeProfile(trial.profile);
     const names = PORTFOLIOS.map((x) => x.name);
     const shownIdx = names.indexOf(result.portfolio.name);
     const adjIdx = adjustedTo ? names.indexOf(adjustedTo) : -1;
@@ -765,6 +839,7 @@ function TrialStage({
       suitabilityLiquidity: result.labels.liquidity,
       recommendedPortfolio: result.portfolio.name,
       soundPortfolio: result.flawed && result.soundPortfolio ? result.soundPortfolio.name : result.portfolio.name,
+      misread: trial.scenario === "flawed" ? misreadCode(trial.misread, trial.profile) : "",
       score: result.score,
       margin: result.margin,
       confidence: result.confidence,
@@ -779,15 +854,8 @@ function TrialStage({
       whatIfMoves: assignment.form === "interactive" ? whatIfMoves : "",
       whyNotAsked: assignment.form === "interactive" ? whyNotAsked : "",
       adaptiveVariant: assignment.form === "adaptive" ? (literacyLevel === "low" ? "plain" : "detailed") : "",
-      attentionCheck: trial.attention ? (decision === "reject" ? "passed" : "failed") : "",
       decisionTimeMs: Date.now() - displayedAt.current,
       caseReadMs: caseReadMs.current,
-      llmModel: assignment.form === "llm" ? llmData.current.model : "",
-      llmExplanation: assignment.form === "llm" ? llmData.current.opening.slice(0, 4000) : "",
-      llmTurns: assignment.form === "llm" ? llmData.current.turns : "",
-      llmRoutedTurns: assignment.form === "llm" ? llmData.current.routed : "",
-      llmIntents: assignment.form === "llm" ? llmData.current.intents.join("|").slice(0, 500) : "",
-      llmModelAvailable: assignment.form === "llm" ? (llm.supported() ? "yes" : "no") : "",
     });
     setBusy(false);
   };
@@ -822,13 +890,13 @@ function TrialStage({
       <div className="space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
           <p className="font-medium">
-            {t("Case", "Kasus")} {trial.index + 1} <span className="text-muted-foreground">{t("of", "dari")} {total}</span>
+            {t("Story", "Cerita")} {trial.index + 1} <span className="text-muted-foreground">{t("of", "dari")} {total}</span>
           </p>
-          <p className="text-muted-foreground">
-            {presetLabel(assignment.condition, locale)}
-            {saved === "local" &&
-              t(" · offline, responses buffered in this browser", " · offline, jawaban disimpan sementara di browser ini")}
-          </p>
+          {saved === "local" && (
+            <p className="text-muted-foreground">
+              {t("Offline: your answers are kept in this browser for now", "Offline: jawaban disimpan sementara di browser ini")}
+            </p>
+          )}
         </div>
         <div aria-hidden className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
           <div
@@ -887,7 +955,7 @@ function TrialStage({
         {caseFacts}
       </details>
 
-      <RecommendationCard result={result} />
+      <RecommendationCard result={result} studyMode />
       <ExplanationArea
         result={result}
         content={assignment.content}
@@ -895,18 +963,7 @@ function TrialStage({
         modality={assignment.modality ?? "visual"}
         literacyLevel={literacyLevel}
         studyMode
-        autoStartLlm={assignment.form === "llm"}
         onInteract={(kind) => (kind === "move" ? setWhatIfMoves((n) => n + 1) : setWhyNotAsked((n) => n + 1))}
-        onLlmOpening={(text, model) => {
-          llmData.current.opening = text;
-          llmData.current.model = model;
-          displayedAt.current = Date.now();
-        }}
-        onLlmTurn={(info) => {
-          llmData.current.turns += 1;
-          if (info.routed) llmData.current.routed += 1;
-          if (info.intent) llmData.current.intents.push(info.intent);
-        }}
       />
 
       <section className="panel overflow-hidden">
@@ -914,17 +971,6 @@ function TrialStage({
           <h2 className="font-semibold tracking-tight">{t("Your response", "Tanggapan Anda")}</h2>
         </header>
         <div className="space-y-5 p-5 sm:p-6">
-          {trial.attention && (
-            <Alert>
-              <AlertTitle>{t("Attention check", "Cek perhatian")}</AlertTitle>
-              <AlertDescription>
-                {t(
-                  "For this case, please choose Reject whatever the advice says.",
-                  "Untuk kasus ini, pilih Tolak, apa pun saran yang diberikan.",
-                )}
-              </AlertDescription>
-            </Alert>
-          )}
           <div className="space-y-5">
             <RatingScale
               label={t("How much do you trust this recommendation?", "Seberapa percaya Anda pada rekomendasi ini?")}
@@ -936,18 +982,8 @@ function TrialStage({
             />
           </div>
           <div className="space-y-1.5">
-            <Label>{t("Would you follow this advice?", "Apakah Anda akan mengikuti saran ini?")}</Label>
-            <Seg
-              name={t("Decision", "Keputusan")}
-              options={[
-                { value: "follow", label: t("Follow", "Ikuti") },
-                { value: "adjust", label: t("Adjust", "Sesuaikan") },
-                { value: "reject", label: t("Reject", "Tolak") },
-                { value: "ask-human", label: t("Ask a human adviser", "Tanya penasihat manusia") },
-              ]}
-              value={decision}
-              onChange={setDecision}
-            />
+            <Label>{t("What would you do with this advice?", "Apa yang akan Anda lakukan dengan saran ini?")}</Label>
+            <DecisionChoice value={decision} onChange={setDecision} />
             {decision === "adjust" && (
               <div className="mt-2 space-y-1.5 rounded-lg bg-muted/50 p-3">
                 <Label>{t("Adjust to which portfolio?", "Ingin disesuaikan ke portofolio apa?")}</Label>
@@ -1003,12 +1039,52 @@ function TrialStage({
 
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button onClick={submit} disabled={busy} size="lg" className="h-11 rounded-full px-6">
-            {trial.index + 1 < total ? t("Submit and continue", "Kirim dan lanjut") : t("Submit final case", "Kirim kasus terakhir")}
+            {trial.index + 1 < total ? t("Next story", "Cerita berikutnya") : t("Finish the stories", "Selesaikan cerita")}
           </Button>
         </div>
       </section>
         </>
       )}
+    </div>
+  );
+}
+
+/* The four decisions, each with a line saying what it means, because a bare
+   "Adjust" or "Reject" is easy to misread for someone new to investing.
+   The logged values stay follow, adjust, reject and ask-human. */
+function DecisionChoice({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { locale } = useLang();
+  const t = (en: string, id: string) => tr(locale, { en, id });
+  const options = [
+    { value: "follow", label: t("Follow", "Ikuti"), hint: t("Go with this advice.", "Jalankan saran ini.") },
+    { value: "adjust", label: t("Adjust", "Sesuaikan"), hint: t("Choose a different mix instead.", "Pilih komposisi lain.") },
+    { value: "reject", label: t("Reject", "Tolak"), hint: t("Do not go with this advice.", "Jangan jalankan saran ini.") },
+    {
+      value: "ask-human",
+      label: t("Ask a human adviser", "Tanya penasihat manusia"),
+      hint: t("Talk to a person before deciding.", "Bicarakan dulu dengan seorang penasihat."),
+    },
+  ];
+  return (
+    <div role="radiogroup" aria-label={t("Decision", "Keputusan")} className="grid gap-2 sm:grid-cols-2">
+      {options.map((o) => {
+        const on = value === o.value;
+        return (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            onClick={() => onChange(o.value)}
+            className={`rounded-xl border px-4 py-3 text-left transition-colors ${
+              on ? "border-primary bg-primary/10 ring-2 ring-primary/30" : "border-border hover:border-primary/50 hover:bg-muted/60"
+            }`}
+          >
+            <span className="block font-semibold">{o.label}</span>
+            <span className="block text-sm text-muted-foreground">{o.hint}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

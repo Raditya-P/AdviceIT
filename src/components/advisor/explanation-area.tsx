@@ -61,11 +61,14 @@ export function ExplanationArea({
       />
     );
   }
+  /* In a study case the boxes leave out their method notes: the same
+     explanation, without the technical footnotes or a remark about what the
+     study measures. */
   const boxes = (
     <>
-      {content.includes("feature") && <FeatureBox result={result} modality={modality} />}
-      {content.includes("counterfactual") && <CounterfactualBox result={result} />}
-      {content.includes("confidence") && <ConfidenceBox result={result} />}
+      {content.includes("feature") && <FeatureBox result={result} modality={modality} plain={studyMode} />}
+      {content.includes("counterfactual") && <CounterfactualBox result={result} plain={studyMode} />}
+      {content.includes("confidence") && <ConfidenceBox result={result} plain={studyMode} />}
     </>
   );
   return (

@@ -8,6 +8,7 @@
    finished session leaving anything behind. */
 
 import { clearSession, loadSession, saveSession, sessionSnapshot, SESSION_TTL_MS, type SavedSession } from "@/lib/session";
+import { STUDY_DESIGN } from "@/lib/study";
 
 let store: Record<string, string> = {};
 (globalThis as unknown as { localStorage: Storage }).localStorage = {
@@ -35,7 +36,8 @@ function ok(name: string, cond: boolean, detail = "") {
 }
 
 const base = (over: Partial<SavedSession> = {}): SavedSession => ({
-  v: 1,
+  v: 2,
+  design: STUDY_DESIGN,
   pid: "P-ABC123",
   advisorId: "ml",
   condition: "hybrid",
@@ -101,7 +103,9 @@ ok("session inside the deadline resumes", loadSession() !== null);
    does not know, is dropped instead of half applied. */
 for (const [name, raw] of [
   ["corrupt JSON", "{not json"],
-  ["another version", JSON.stringify(base({ v: 2 as unknown as 1 }))],
+  ["another version", JSON.stringify(base({ v: 3 as unknown as 2 }))],
+  ["a version 1 record from before 3.0.0", JSON.stringify({ ...base(), v: 1, design: undefined })],
+  ["a session from another design", JSON.stringify(base({ design: "fractional-9" }))],
   ["unknown stage", JSON.stringify(base({ stage: "debrief" as SavedSession["stage"] }))],
   ["no participant id", JSON.stringify({ ...base(), pid: 7 })],
 ] as const) {

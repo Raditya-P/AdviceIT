@@ -26,6 +26,17 @@ export type AssignmentMethod = "balanced" | "simple" | "url";
 
 export interface StudyRow {
   rowType: "trial" | "exit" | "explore";
+  /* From 3.0.0: which build, design and phase produced the row. Rows before
+     3.0.0 have none of the three. */
+  appVersion?: string;
+  studyDesign?: string;
+  studyPhase?: "pilot" | "main";
+  /* Flawed trials: the wrong facts the advisor was given, real value first,
+     e.g. "horizon:15>5". Empty on sound trials. */
+  misread?: string;
+  /* The participant ID of a session this browser had already completed
+     before this one started, empty for a first session. */
+  repeatOf?: string;
   timestamp: string;
   participantId: string;
   condition: string;
@@ -35,7 +46,7 @@ export interface StudyRow {
   assignedBy: "random" | "chosen";
   assignmentMethod?: AssignmentMethod;
   advisorModel: "ml" | "logit";
-  advisorAssignedBy: "random" | "chosen";
+  advisorAssignedBy: "random" | "chosen" | "fixed";
   language?: "en" | "id";
   scenario?: "sound" | "flawed";
   trialIndex?: number;
@@ -84,7 +95,13 @@ export interface StudyRow {
   whatIfMoves?: number | "";
   whyNotAsked?: number | "";
   adaptiveVariant?: string;
+  /* attention1 is the statement before the cases, attention2 the one on the
+     last page, each "passed" or "failed". attentionCheck sums them up:
+     "failed" if either failed, so far as answered. Up to 2.15 attentionCheck
+     was set on one trial only, the attention case. */
   attentionCheck?: string;
+  attention1?: string;
+  attention2?: string;
   decisionTimeMs?: number;
   llmModel?: string;
   llmExplanation?: string;

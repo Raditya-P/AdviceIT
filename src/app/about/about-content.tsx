@@ -106,8 +106,8 @@ export function AboutContent() {
             <h2 className="text-2xl font-semibold tracking-tight">{t("What AdviceIT is", "Apa itu AdviceIT")}</h2>
             <p className="leading-relaxed text-muted-foreground">
               {t(
-                "The site has a working AI advisor that recommends an investment mix for a made-up person. It also has several ways of explaining that recommendation. People who take part read six short cases, see the advisor's recommendation with one kind of explanation, and say what they would do. Half of the recommendations are deliberately wrong, and the study measures whether the explanation helped people notice.",
-                "Situs ini punya penasihat AI yang benar-benar berfungsi dan menyarankan komposisi investasi untuk orang rekaan, beserta beberapa cara untuk menjelaskan saran itu. Peserta membaca enam kasus singkat, melihat rekomendasi penasihat dengan satu jenis penjelasan, lalu menjawab apa yang akan mereka lakukan. Separuh rekomendasi sengaja dibuat keliru, dan penelitian ini mengukur apakah penjelasan tersebut membantu orang menyadarinya.",
+                "The site has a working AI advisor that recommends an investment mix for a made-up person. It also has several ways of explaining that recommendation. People who take part read eight short cases, see the advisor's recommendation with one kind of explanation, and say what they would do. Half of the recommendations are deliberately wrong, and the study measures whether the explanation helped people notice.",
+                "Situs ini punya penasihat AI yang benar-benar berfungsi dan menyarankan komposisi investasi untuk orang rekaan, beserta beberapa cara untuk menjelaskan saran itu. Peserta membaca delapan kasus singkat, melihat rekomendasi penasihat dengan satu jenis penjelasan, lalu menjawab apa yang akan mereka lakukan. Separuh rekomendasi sengaja dibuat keliru, dan penelitian ini mengukur apakah penjelasan tersebut membantu orang menyadarinya.",
               )}
             </p>
             <p className="leading-relaxed text-muted-foreground">
@@ -187,7 +187,7 @@ export function AboutContent() {
           <Reveal as="section" className="cta-panel relative overflow-hidden rounded-[1.75rem] border border-border/70 px-6 py-10 text-center">
             <h2 className="text-2xl font-semibold tracking-tight">{t("Take part in the study", "Ikut penelitian")}</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              {t("About fifteen minutes, anonymous, and no real money involved.", "Sekitar lima belas menit, anonim, dan tanpa uang sungguhan.")}
+              {t("About 15 to 20 minutes, anonymous, and no real money involved.", "Sekitar 15 sampai 20 menit, anonim, dan tanpa uang sungguhan.")}
             </p>
             <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">
               <Link href="/participate">

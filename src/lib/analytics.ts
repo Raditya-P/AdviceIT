@@ -1,5 +1,8 @@
 /* Descriptive analytics over collected study rows, ported from AdviceIT v1
-   analytics.js. Pure functions: rows in, tables out. No inference. */
+   analytics.js. Pure functions: rows in, tables out. No inference. Decisions
+   are scored by src/lib/scoring.ts, the rules the pre-registration states. */
+
+import { appropriate, corrected, isLegacyAttentionTrial, relied } from "./scoring";
 
 export type Row = Record<string, unknown>;
 
@@ -19,7 +22,6 @@ export const CONDITION_LABELS: Record<string, string> = {
   custom: "Custom",
 };
 export const ADVISOR_LABELS: Record<string, string> = { ml: "AI advisor (network)", logit: "Interpretable rule-based" };
-const OVERRIDES = new Set(["adjust", "reject", "ask-human"]);
 
 const num = (v: unknown) => {
   const n = Number(v);
@@ -39,6 +41,9 @@ export const fmt = (x: number | null, d = 0) => (x === null ? "" : String(Math.r
 export const pct = (n: number, den: number) => (den ? `${Math.round((n / den) * 1000) / 10}%` : "");
 
 export const trials = (rows: Row[]) => rows.filter((r) => r.rowType === "trial" || r.rowType === undefined);
+/* The trials whose decision judges the advice: all of them from 3.0.0, and
+   all but the attention case before. */
+export const scoredTrials = (rows: Row[]) => trials(rows).filter((r) => !isLegacyAttentionTrial(r));
 export const exits = (rows: Row[]) => rows.filter((r) => r.rowType === "exit");
 
 /* A row stored twice (a resend whose first answer was lost, before the
@@ -55,8 +60,17 @@ export function dedupeRows(rows: Row[]): Row[] {
   });
 }
 
+/* Which design and phase a row belongs to. Rows from before 3.0.0 carry
+   neither and count as the earlier pilot. */
+export type PhaseFilter = "all" | "pilot" | "main";
+export function inCohort(r: Row, design: string | null, phase: PhaseFilter): boolean {
+  if (design !== null && r.studyDesign !== design) return false;
+  if (phase !== "all" && (r.studyPhase ?? "pilot") !== phase) return false;
+  return true;
+}
+
 /* The analysis population. The random stratum is the experiment proper,
-   and a participant who failed the attention check is usually excluded
+   and a participant who failed an attention check is usually excluded
    whole, with every row they gave. */
 export function scopeRows(rows: Row[], opts: { randomOnly: boolean; dropFailedAttention: boolean }): Row[] {
   const failed = new Set(rows.filter((r) => r.attentionCheck === "failed").map((r) => String(r.participantId)));
@@ -92,29 +106,31 @@ export interface RelianceRow {
   appropriate: string;
   overReliance: string;
   underReliance: string;
+  correctedFlawed: string;
   askedHuman: string;
 }
 
 export function relianceTable(rows: Row[]): RelianceRow[] {
-  const t = trials(rows);
+  const t = scoredTrials(rows);
   const out: RelianceRow[] = [];
   for (const c of [...CONDITION_ORDER, "all"]) {
     const rs = c === "all" ? t : t.filter((r) => r.condition === c);
     if (!rs.length) continue;
     const sound = rs.filter((r) => r.scenario === "sound");
     const flawed = rs.filter((r) => r.scenario === "flawed");
-    const followSound = sound.filter((r) => r.decision === "follow").length;
-    const overrideFlawed = flawed.filter((r) => OVERRIDES.has(String(r.decision))).length;
+    const reliedSound = sound.filter(relied).length;
+    const reliedFlawed = flawed.filter(relied).length;
     out.push({
       condition: c === "all" ? "All conditions" : CONDITION_LABELS[c],
       n: rs.length,
       soundN: sound.length,
-      followSound: pct(followSound, sound.length),
+      followSound: pct(reliedSound, sound.length),
       flawedN: flawed.length,
-      overrideFlawed: pct(overrideFlawed, flawed.length),
-      appropriate: pct(followSound + overrideFlawed, sound.length + flawed.length),
-      overReliance: pct(flawed.filter((r) => r.decision === "follow").length, flawed.length),
-      underReliance: pct(sound.filter((r) => OVERRIDES.has(String(r.decision))).length, sound.length),
+      overrideFlawed: pct(flawed.length - reliedFlawed, flawed.length),
+      appropriate: pct(rs.filter((r) => appropriate(r) === true).length, sound.length + flawed.length),
+      overReliance: pct(reliedFlawed, flawed.length),
+      underReliance: pct(sound.length - reliedSound, sound.length),
+      correctedFlawed: pct(flawed.filter((r) => corrected(r) === true).length, flawed.length),
       askedHuman: pct(rs.filter((r) => r.decision === "ask-human").length, rs.length),
     });
   }
@@ -185,19 +201,28 @@ export function perceptionTable(rows: Row[]) {
   return out;
 }
 
+/* Attention is counted per participant: checked if any of their rows
+   carries a result, passed if none of them says failed. */
 export function quality(rows: Row[]) {
-  const t = trials(rows);
-  const att = t.filter((r) => r.attentionCheck);
-  const passed = att.filter((r) => r.attentionCheck === "passed").length;
+  const t = scoredTrials(rows);
+  const checked = new Map<string, boolean>();
+  for (const r of rows) {
+    if (typeof r.attentionCheck !== "string" || !r.attentionCheck) continue;
+    const pid = String(r.participantId);
+    checked.set(pid, (checked.get(pid) ?? true) && r.attentionCheck !== "failed");
+  }
   const byLevel = ["low", "high"].map((l) => {
     const rs = t.filter((r) => r.literacyLevel === l);
-    const sound = rs.filter((r) => r.scenario === "sound");
-    const flawed = rs.filter((r) => r.scenario === "flawed");
-    const ok = sound.filter((r) => r.decision === "follow").length + flawed.filter((r) => OVERRIDES.has(String(r.decision))).length;
+    const ok = rs.filter((r) => appropriate(r) === true).length;
     return { level: l, n: rs.length, appropriate: pct(ok, rs.length), trust: fmt(mean(rs.map((r) => num(r.trustRating))), 2) };
   });
-  const fastest = t.filter((r) => num(r.decisionTimeMs) < 2000).length;
-  return { attentionTotal: att.length, attentionPassed: passed, byLevel, under2s: fastest };
+  const fastest = trials(rows).filter((r) => num(r.decisionTimeMs) < 2000).length;
+  return {
+    attentionTotal: checked.size,
+    attentionPassed: Array.from(checked.values()).filter(Boolean).length,
+    byLevel,
+    under2s: fastest,
+  };
 }
 
 /* Balanced assignment writes an "assign" row the moment a session starts.

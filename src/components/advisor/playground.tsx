@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, GraduationCap, Pencil, RefreshCw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ADVISORS, logitMeta, mlMeta } from "@/lib/advisor/advisors";
-import { applyFlawedScenario } from "@/lib/advisor/model";
+import { findMisread, recommendWithMisread } from "@/lib/advisor/flaw";
 import { labelValue } from "@/lib/advisor/strings";
 import type { AdvisorResult } from "@/lib/advisor/types";
 import { modalityOf, presetFor, presetLabel, specFor, type ContentPart, type Form, type Modality } from "@/lib/conditions";
@@ -80,9 +80,15 @@ export function Playground({
      knowledge field, and this switch lets a visitor see the other variant. */
   const [adaptiveView, setAdaptiveView] = useState<"auto" | "low" | "high">("auto");
 
+  /* The researcher preview of flawed advice uses the same mechanism as the
+     study: the advisor is given the single wrong fact that moves its advice
+     furthest. When no single fact moves it clearly, the sound advice shows. */
   const result: AdvisorResult = useMemo(() => {
-    const r = advisor.recommend(profile);
-    return scenario === "flawed" ? applyFlawedScenario(r) : r;
+    if (scenario === "flawed") {
+      const misread = findMisread(advisor.id, profile);
+      if (misread) return recommendWithMisread(advisor.id, profile, misread);
+    }
+    return advisor.recommend(profile);
   }, [advisor, profile, scenario]);
 
   const choosePreset = (name: string) => {
@@ -355,8 +361,8 @@ export function Playground({
               </h2>
               <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
                 {t(
-                  "Did that explanation help you judge the advice, or just make it feel convincing? About fifteen anonymous minutes with six cases is how we find out.",
-                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Untuk mencari tahu, kami butuh sekitar lima belas menit Anda, secara anonim, untuk enam kasus.",
+                  "Did that explanation help you judge the advice, or just make it feel convincing? About 15 to 20 anonymous minutes with eight cases is how we find out.",
+                  "Apakah penjelasan tadi membantu Anda menilai sarannya, atau sekadar membuatnya terasa meyakinkan? Untuk mencari tahu, kami butuh sekitar 15 sampai 20 menit Anda, secara anonim, untuk delapan kasus.",
                 )}
               </p>
               <Button asChild className="mt-5 h-11 rounded-full pl-6 pr-5">

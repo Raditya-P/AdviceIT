@@ -19,7 +19,7 @@ const REAL = "#e0a136";
 const SLATE = "#8fa3ba";
 
 const HEADLINE = ["Know when to trust", "AI investment advice"];
-const SUBLINE = ["An open research study.", "Six short cases, about 15 minutes."];
+const SUBLINE = ["An open research study.", "Eight short cases, about 15 to 20 minutes."];
 const PILL = "A research simulation. Not a financial service";
 
 /* Fonts are fetched from Google Fonts, subset to the characters drawn. If
